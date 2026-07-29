@@ -1,0 +1,396 @@
+{
+  "description": "Legal grounding for the ChildSafeAds ST3 compliance flags. Severity: per_se (prohibited outright under the UCPD blacklist) / conditional (prohibited where the general clauses are met) / soft_law (codes of conduct) / none (housekeeping label). Tier-2 flags carry scored=false: bonus track, not labelled in this release.",
+  "version": "1.0",
+  "flags": {
+    "undisclosed_advertising": {
+      "code": "T1.1",
+      "tier": 1,
+      "scored": true,
+      "severity": "per_se",
+      "family": "disclosure",
+      "instruments": [
+        {
+          "instrument": "UCPD",
+          "provisions": [
+            "Annex I point 11",
+            "Arts. 5-9"
+          ],
+          "note": "Advertorial without identification; unfair, misleading and aggressive practices."
+        },
+        {
+          "instrument": "AVMSD",
+          "provisions": [
+            "Arts. 9-11",
+            "Art. 28b"
+          ],
+          "note": "Identification requirements for audiovisual commercial communications (sponsorship, product placement); video-sharing platforms must reflect them in their terms."
+        },
+        {
+          "instrument": "DSA",
+          "provisions": [
+            "Art. 26",
+            "Art. 28"
+          ],
+          "note": "Advertising-transparency duties on the platform side; protection of minors including the Art. 28 guidelines."
+        }
+      ]
+    },
+    "inadequate_disclosure": {
+      "code": "T1.2",
+      "tier": 1,
+      "scored": true,
+      "severity": "conditional",
+      "family": "disclosure",
+      "edition1_scope": "Text and disclosure-mode adequacy only; visual (AD flash) and timing assessment deferred (requires video frames).",
+      "instruments": [
+        {
+          "instrument": "UCPD",
+          "provisions": [
+            "Arts. 6-7",
+            "Art. 5(3)"
+          ],
+          "note": "Misleading actions and omissions read with the vulnerable-consumer benchmark: the average member of a child audience."
+        },
+        {
+          "instrument": "DSA",
+          "provisions": [
+            "Art. 28 guidelines"
+          ],
+          "note": "Information addressed to minors must be child-friendly, age-appropriate, presented at the relevant point of use."
+        }
+      ]
+    },
+    "direct_exhortation": {
+      "code": "T1.3",
+      "tier": 1,
+      "scored": true,
+      "severity": "per_se",
+      "family": "content",
+      "instruments": [
+        {
+          "instrument": "UCPD",
+          "provisions": [
+            "Annex I point 28"
+          ],
+          "note": "Direct exhortation to children to buy, or to persuade parents or other adults to buy for them. Blacklisted; highest-severity Tier-1 flag."
+        }
+      ]
+    },
+    "misleading_claim": {
+      "code": "T1.4",
+      "tier": 1,
+      "scored": true,
+      "severity": "conditional",
+      "family": "content",
+      "edition1_scope": "Risky-claim-type detection (characteristics, performance, results, price; health/weight/fitness/skincare/supplement claims directed at a child audience). Truth verification is out of scope for the classifier.",
+      "instruments": [
+        {
+          "instrument": "UCPD",
+          "provisions": [
+            "Arts. 6-7"
+          ],
+          "note": "Misleading actions and omissions."
+        },
+        {
+          "instrument": "AVMSD",
+          "provisions": [
+            "Art. 9(1)"
+          ],
+          "note": "Commercial communications must not cause physical, mental or moral detriment to minors."
+        },
+        {
+          "instrument": "sectoral",
+          "provisions": [
+            "food and health-claims rules"
+          ],
+          "note": "Sectoral instruments in the legal reference corpus; elevated severity given eating-disorder-adjacent harms."
+        }
+      ]
+    },
+    "age_restricted_or_prohibited_product": {
+      "code": "T1.5",
+      "tier": 1,
+      "scored": true,
+      "severity": "conditional",
+      "family": "product",
+      "instruments": [
+        {
+          "instrument": "AVMSD",
+          "provisions": [
+            "Art. 9"
+          ],
+          "note": "Content restrictions on commercial communications (alcohol, tobacco)."
+        },
+        {
+          "instrument": "DSA",
+          "provisions": [
+            "Art. 28 guidelines"
+          ],
+          "note": "Age verification where products pose a high risk to minors."
+        },
+        {
+          "instrument": "national",
+          "provisions": [
+            "age-restriction laws"
+          ],
+          "note": "Member-State laws prohibiting or age-gating specific product categories."
+        }
+      ]
+    },
+    "hfss_food_marketing": {
+      "code": "T1.6",
+      "tier": 1,
+      "scored": true,
+      "severity": "soft_law",
+      "family": "product",
+      "edition1_scope": "Obvious cases only (energy drinks, confectionery, fast food); rigorous HFSS requires nutrient profiling. Codes of conduct to be retrieved separately.",
+      "instruments": [
+        {
+          "instrument": "AVMSD",
+          "provisions": [
+            "Art. 9(4)"
+          ],
+          "note": "Codes of conduct on HFSS food marketing to children."
+        },
+        {
+          "instrument": "UCPD",
+          "provisions": [
+            "Arts. 5-9"
+          ],
+          "note": "Backstop where the practice is also unfair or misleading."
+        }
+      ]
+    },
+    "undisclosed_synthetic_content": {
+      "code": "T1.7",
+      "tier": 1,
+      "scored": false,
+      "severity": "conditional",
+      "family": "content",
+      "deferred_reason": "Requires the media itself (cloned voice, deepfake detection); dataset does not redistribute video/audio. AI Act transparency obligations apply from 2 August 2026.",
+      "instruments": [
+        {
+          "instrument": "AI Act",
+          "provisions": [
+            "transparency obligations",
+            "Art. 5"
+          ],
+          "note": "Marking AI-generated content and labelling deepfakes; prohibitions where synthetic content manipulates or exploits children's vulnerabilities."
+        },
+        {
+          "instrument": "UCPD",
+          "provisions": [
+            "Arts. 5-9"
+          ],
+          "note": "Misleading-practice provisions."
+        }
+      ]
+    },
+    "no_flag": {
+      "code": "T1.8",
+      "tier": 1,
+      "scored": true,
+      "severity": "none",
+      "family": "housekeeping",
+      "instruments": []
+    },
+    "insufficient_context": {
+      "code": "T1.9",
+      "tier": 1,
+      "scored": true,
+      "severity": "none",
+      "family": "housekeeping",
+      "instruments": []
+    },
+    "defective_precontractual_information": {
+      "code": "T2.1",
+      "tier": 2,
+      "scored": false,
+      "severity": "conditional",
+      "family": "destination",
+      "data_needed": "Checkout/shop pages: trader identity, total price, right of withdrawal, digital-content functionality.",
+      "instruments": [
+        {
+          "instrument": "CRD",
+          "provisions": [
+            "Arts. 6 and 8"
+          ],
+          "note": "Pre-contractual and formal requirements for distance contracts; applies to all digital transactions including those involving minors."
+        },
+        {
+          "instrument": "UCPD",
+          "provisions": [
+            "Arts. 5-9"
+          ],
+          "note": "Where the practice is also unfair, misleading or aggressive."
+        }
+      ]
+    },
+    "unfair_contract_terms": {
+      "code": "T2.2",
+      "tier": 2,
+      "scored": false,
+      "severity": "conditional",
+      "family": "destination",
+      "data_needed": "The destination's terms of service.",
+      "instruments": [
+        {
+          "instrument": "UCTD",
+          "provisions": [
+            "Art. 3"
+          ],
+          "note": "Non-individually-negotiated terms creating significant imbalance are unfair and non-binding, including for minor consumers; interacts with national rules on minors' contractual capacity."
+        }
+      ]
+    },
+    "gambling_like_mechanics_at_destination": {
+      "code": "T2.3",
+      "tier": 2,
+      "scored": false,
+      "severity": "conditional",
+      "family": "destination",
+      "data_needed": "The linked game or app's monetisation mechanics (loot boxes, gacha, mystery mechanics).",
+      "instruments": [
+        {
+          "instrument": "DSA",
+          "provisions": [
+            "Art. 28 guidelines"
+          ],
+          "note": "Paid loot boxes as economically exploitative practices."
+        },
+        {
+          "instrument": "UCPD",
+          "provisions": [],
+          "note": "General clauses."
+        },
+        {
+          "instrument": "AI Act",
+          "provisions": [
+            "Art. 5"
+          ],
+          "note": "Where AI-personalised reward schedules exploit children's vulnerabilities."
+        },
+        {
+          "instrument": "national",
+          "provisions": [
+            "loot-box precedents"
+          ],
+          "note": "National precedents in the reference corpus."
+        }
+      ]
+    },
+    "unlawful_data_practices_toward_minors": {
+      "code": "T2.4",
+      "tier": 2,
+      "scored": false,
+      "severity": "conditional",
+      "family": "destination",
+      "data_needed": "Privacy policy, account defaults, consent flows of the linked service.",
+      "instruments": [
+        {
+          "instrument": "GDPR",
+          "provisions": [
+            "Art. 8",
+            "Art. 25",
+            "Art. 6(1)(f)",
+            "Art. 22",
+            "Recital 38"
+          ],
+          "note": "Age of digital consent (13-16, Member-State dependent); data protection by design and default (TikTok EUR 345m, Instagram EUR 450m); legitimate-interest balancing per Meta v. Bundeskartellamt (C-252/21); EDPB position against profiling children for marketing."
+        }
+      ]
+    },
+    "age_assurance_failure_at_destination": {
+      "code": "T2.5",
+      "tier": 2,
+      "scored": false,
+      "severity": "conditional",
+      "family": "destination",
+      "data_needed": "The destination's age-verification behaviour.",
+      "instruments": [
+        {
+          "instrument": "DSA",
+          "provisions": [
+            "Art. 28 and guidelines"
+          ],
+          "note": "Age verification where risks cannot be mitigated by less restrictive measures; 2026 preliminary findings against pornographic platforms and Meta under-13 findings as benchmark."
+        },
+        {
+          "instrument": "AVMSD",
+          "provisions": [
+            "Art. 28b"
+          ],
+          "note": "For video-sharing-platform destinations."
+        },
+        {
+          "instrument": "soft_law",
+          "provisions": [
+            "Commission Recommendation on EU-wide age verification"
+          ],
+          "note": "Soft-law reference."
+        }
+      ]
+    },
+    "harmful_or_addictive_design_at_destination": {
+      "code": "T2.6",
+      "tier": 2,
+      "scored": false,
+      "severity": "conditional",
+      "family": "destination",
+      "data_needed": "The linked app or game's engagement design (infinite scroll, streaks, variable rewards).",
+      "instruments": [
+        {
+          "instrument": "DSA",
+          "provisions": [
+            "Arts. 28, 34-35"
+          ],
+          "note": "Systemic-risk assessment where the destination is a VLOP; TikTok addictive-design preliminary findings as benchmark."
+        },
+        {
+          "instrument": "AI Act",
+          "provisions": [
+            "Art. 5"
+          ],
+          "note": "Prohibited practices for AI-driven addictive design exploiting children's vulnerabilities."
+        },
+        {
+          "instrument": "GPSR",
+          "provisions": [],
+          "note": "Safety net covering physical and mental health of child consumers. PLD cited as context only (civil-liability layer), not a classification ground."
+        }
+      ]
+    },
+    "unsafe_or_non_compliant_product": {
+      "code": "T2.7",
+      "tier": 2,
+      "scored": false,
+      "severity": "conditional",
+      "family": "destination",
+      "data_needed": "Product safety information; recall databases.",
+      "instruments": [
+        {
+          "instrument": "GPSR",
+          "provisions": [],
+          "note": "Manufacturers must assess risk for vulnerable consumers including children, covering physical and mental health."
+        },
+        {
+          "instrument": "DSA",
+          "provisions": [
+            "marketplace due-diligence"
+          ],
+          "note": "Where the destination is an online marketplace; Shein and Temu proceedings as precedent."
+        }
+      ]
+    }
+  },
+  "instruments_annex": {
+    "UCPD": "Unfair Commercial Practices Directive 2005/29/EC — misleading and aggressive practices; Art. 5(3) vulnerable consumers; Annex I blacklist incl. points 11 (advertorial) and 28 (direct exhortation to children).",
+    "CRD": "Consumer Rights Directive 2011/83/EU — pre-contractual information and formal requirements for distance contracts, applicable to all digital transactions including those involving minors.",
+    "UCTD": "Unfair Contract Terms Directive 93/13/EEC — non-individually-negotiated terms creating significant imbalance are unfair and non-binding.",
+    "DSA": "Digital Services Act (EU) 2022/2065 — Art. 25 dark patterns; Art. 26 advertising transparency; Art. 28 + Commission guidelines on the protection of minors; Arts. 34-35 systemic risk for VLOPs.",
+    "AVMSD": "Audiovisual Media Services Directive 2010/13/EU as amended — Arts. 9-11 commercial communications, sponsorship, product placement; Art. 9(1) protection of minors; Art. 9(4) HFSS codes of conduct; Art. 28b video-sharing platforms.",
+    "GDPR": "General Data Protection Regulation (EU) 2016/679 — Art. 6 legal bases; Art. 8 age of digital consent; Art. 25 data protection by design/default; Art. 22 + Recital 38 profiling of children.",
+    "AI Act": "Regulation (EU) 2024/1689 as amended by the Digital Omnibus on AI — Art. 5 prohibited practices exploiting children's vulnerabilities; transparency obligations incl. deepfake labelling (from 2 August 2026).",
+    "GPSR": "General Product Safety Regulation (EU) 2023/988 — product safety incl. risk assessment for vulnerable consumers such as children."
+  }
+}

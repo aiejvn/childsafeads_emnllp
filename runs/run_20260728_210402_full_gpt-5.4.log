@@ -1,0 +1,13 @@
+2026-07-28 21:04:02,574 | INFO | logging to runs/run_20260728_210402_full_gpt-5.4.log
+2026-07-28 21:04:02,574 | INFO | config: target=public_data_dev/dev.jsonl model=gpt-5.4 context=full sample_size=10 max_concurrency=8 out=submission_gpt.jsonl
+2026-07-28 21:04:06,453 | INFO | wrote 10 predictions to submission_gpt.jsonl
+2026-07-28 21:04:06,453 | INFO | === Distinct gold labels observed, by tier ===
+2026-07-28 21:04:06,453 | INFO | [ST1 - commercial type]     ['digital_content_or_services', 'none', 'physical_goods', 'physical_services']
+2026-07-28 21:04:06,453 | INFO | [ST2 - product category]    ['apps', 'education', 'fashion', 'hardware_electronics', 'health', 'other']
+2026-07-28 21:04:06,453 | INFO | [ST3 - compliance flags]    ['inadequate_disclosure', 'misleading_claim', 'no_flag', 'undisclosed_advertising']
+2026-07-28 21:04:06,454 | INFO | Evaluation:
+2026-07-28 21:04:06,454 | INFO |   st1_macro_f1: 0.727
+2026-07-28 21:04:06,454 | INFO |   st2_macro_f1: 0.439
+2026-07-28 21:04:06,454 | INFO |   st3_macro_f1: 0.220
+2026-07-28 21:04:06,454 | INFO |   st3_family_macro_f1: 0.348
+2026-07-28 21:04:06,454 | INFO |   mean_macro_f1: 0.462

@@ -140,6 +140,7 @@ def build_messages(instance: dict, context: str) -> list:
 def macro_f1(y_true: List[list], y_pred: List[list], labels: List[str]) -> float:
     """Macro-F1 over multi-label sets, averaged across `labels`."""
     scores = []
+    # Iterate over labels to avoid having to O(n^2) loop over every y_true and check if it is in y_pred (or vice-versa)
     for label in labels:
         tp = sum(1 for t, p in zip(y_true, y_pred) if label in t and label in p)
         fp = sum(1 for t, p in zip(y_true, y_pred) if label not in t and label in p)
@@ -167,6 +168,8 @@ def evaluate(gold: List[dict], pred: List[dict]) -> dict:
         "mean_macro_f1": (st1_f1 + st2_f1 + st3_f1) / 3,
     }
 
+# From repo root:
+# python src/baseline_gpt.py public_data_dev/dev.jsonl --sample-size 10 
 
 def main():
     ap = argparse.ArgumentParser()
@@ -191,8 +194,13 @@ def main():
     if args.sample_size:
         instances = random.Random(42).sample(instances, min(args.sample_size, len(instances)))
 
-    llm = ChatOpenAI(model=args.model, temperature=0).with_structured_output(Prediction)
+    llm = ChatOpenAI(model=args.model, temperature=0).with_structured_output(
+        Prediction, method="json_schema", strict=True
+    )
     batch_inputs = [build_messages(inst, args.context) for inst in instances]
+
+    # Parallel batch requests to AI API
+    # Returns output in a list, each elem maps to 1 query
     results = llm.batch(batch_inputs, config={"max_concurrency": args.max_concurrency},
                          return_exceptions=True)
 
@@ -200,8 +208,8 @@ def main():
     with open(args.out, "w", encoding="utf-8") as f:
         for inst, result in zip(instances, results):
             if isinstance(result, Exception):
-                log.warning(f"{inst['instanceID']} failed ({result}); falling back to insufficient_context")
-                pred = {"st1": "other", "st2": [], "st3": ["insufficient_context"]}
+                log.warning(f"{inst['instanceID']} failed ({result})")
+                pred = {"st1": "other", "st2": [], "st3": [f"error:{result}"]}
             else:
                 pred = {"st1": result.st1, "st2": result.st2, "st3": sanitize_st3(result.st3)}
             predictions.append(pred)
