@@ -89,7 +89,7 @@ def setup_logging(log_dir: str, method: str, model: str) -> logging.Logger:
     logger.setLevel(logging.INFO)
     logger.handlers.clear()
 
-    fmt = logging.Formatter("%(asctime)s | %(levelname)s | %(message)s")
+    fmt = logging.Formatter("%(asctime)s | %(levelname)s | %(threadName)s | %(message)s")
     file_handler = logging.FileHandler(log_path, encoding="utf-8")
     file_handler.setFormatter(fmt)
     console_handler = logging.StreamHandler()

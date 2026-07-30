@@ -1,0 +1,345 @@
+2026-07-29 22:13:11,814 | INFO | logging to runs/run_20260729_221311_agentic_rag_full_gpt-5.4.log
+2026-07-29 22:13:11,814 | INFO | config: target=public_data_dev/dev.jsonl model=gpt-5.4 context=full sample_size=30 max_concurrency=8 max_iterations=3 top_k=5 out=submission_agentic_rag.jsonl
+2026-07-29 22:13:15,966 | INFO | [Agentic] Initial query: YouTube influencer sponsorship disclosure children minors Surfshark VPN video vlog legal standards: search FTC Act Section 5 endorsement guides 16 CFR Part 255, FTC .com Disclosures, COPPA, state UDAP, and case law/regulatory actions on undisclosed or inadequately disclosed paid endorsements, affiliate links/discount codes, and misleading performance or safety claims (VPN, malware alerts, public Wi‑Fi protection, access to geo-restricted streaming/government websites). Include UK/EU sources where relevant: CAP Code/ASA guidance on influencer marketing to under-18s, direct exhortation in ads to children, misleading advertising for digital/security services, and platform policies on clear ad disclosure in creator content likely to be viewed by minors.
+2026-07-29 22:13:15,966 | INFO | [Agentic] Iteration 1/3
+2026-07-29 22:13:16,093 | INFO | [Agentic] Initial query: YouTube influencer sponsorship disclosure to minors Helix Sleep mattress endorsement legal standards: FTC Endorsement Guides 16 CFR Part 255, FTC .com Disclosures/native advertising rules, state UDAP, and platform paid-promotion disclosure requirements for clear and conspicuous ad identification in video, description, affiliate links, QR codes, and verbal statements such as “sponsor of this video” and “thank you for sponsoring.” Include child-directed/minor-audience authorities on direct exhortation and misleading health/performance claims about sleep/mattresses, including CARU Advertising Guidelines, ICC Advertising and Marketing Communications Code, CAP Code/ASA and UCPD annex ‘direct exhortation to children’ cases/guidance.
+2026-07-29 22:13:16,093 | INFO | [Agentic] Iteration 1/3
+2026-07-29 22:13:16,289 | INFO | [Agentic] Initial query: Search for legal and regulatory sources on influencer marketing to children for sponsored video game promotions, including FTC Act Section 5, FTC Endorsement Guides (16 CFR Part 255), FTC .com Disclosures, YouTube/ASA-CAP guidance on clear and conspicuous ad disclosures, and rules on whether verbal/text labels such as “sponsored” are sufficient when content is likely to reach minors. Also include statutes, case law, and codes on direct exhortations to children to purchase/download (“click the link,” “make sure you do click”), misleading free-to-play/reward claims and promotional codes, and age-rating/child-directed ad standards for violent online games under UK CAP Code/ASA, UCPD/AVMSD, and platform ad policies.
+2026-07-29 22:13:16,289 | INFO | [Agentic] Iteration 1/3
+2026-07-29 22:13:16,424 | INFO | [Agentic] Initial query: Search for legal/regulatory sources on influencer marketing to minors on video-sharing platforms, focusing on sponsored Temu app promotions for gaming/Nintendo products: FTC Act §5, FTC Endorsement Guides (16 CFR Part 255), .com Disclosures, COPPA, UCPD/AVMSD rules on audiovisual commercial communications, and ASA/CAP/CMA guidance on ad disclosure where videos state a sponsor but use purchase prompts, discount codes/coupons, price comparisons, and app-download calls to action. Include statutes, case law, regulator decisions, and platform/industry codes addressing inadequate sponsorship disclosure, direct exhortations to children to buy/download or ask parents, misleading price/savings and “cheapest” claims, dark-pattern or urgency claims (limited-time coupon), and any child-directed e-commerce/app marketing rules; exclude HFSS/alcohol/tobacco unless specifically tied to child-directed ad restrictions.
+2026-07-29 22:13:16,424 | INFO | [Agentic] Iteration 1/3
+2026-07-29 22:13:16,572 | INFO | [Agentic] Initial query: Search for UK and EU legal/regulatory sources on influencer and video-platform advertising to children concerning sponsored gaming content with VPN promotions: CAP Code (recognition of marketing communications, affiliate/sponsorship disclosure, direct exhortations to children), ASA/CMA guidance on ad disclosure in YouTube videos and descriptions, and AVMSD/UCPD rules on misleading commercial practices. Include sources on whether claims such as “protect your online data,” “safer internet,” and similar privacy/security efficacy claims for VPN services require substantiation, and any child-directed restrictions where school-age audiences are likely to view the content.
+2026-07-29 22:13:16,572 | INFO | [Agentic] Iteration 1/3
+2026-07-29 22:13:16,594 | INFO | [Agentic] Initial query: Search for legal and regulatory sources on influencer/video-platform advertising disclosures to minors for a sponsored Audible subscription promotion, including FTC Act Section 5, FTC Endorsement Guides (16 CFR Part 255), .com Disclosures, FTC staff guidance on influencers/clear and conspicuous sponsorship disclosure, YouTube branded content disclosure rules, and child-directed advertising standards addressing undisclosed advertising, inadequate disclosure, and direct exhortations such as “go to” or “text” to purchase. Also include CAP Code/ASA and UCPD/AVMSD guidance or case law on subscription-trial offers and price promotions requiring material term disclosures (auto-renewal after free trial, monthly fees, limited-time savings) in content likely to be seen by minors, excluding alcohol/gambling/HFSS unless discussed as comparator authorities.
+2026-07-29 22:13:16,594 | INFO | [Agentic] Iteration 1/3
+2026-07-29 22:13:17,024 | INFO | [Agentic] Initial query: YouTube influencer sponsorship disclosure for SeatGeek ticketing app aimed at or likely to be seen by minors: search FTC Act §5, FTC Endorsement Guides (16 CFR Part 255) and .com Disclosures, state UDAP law, NAD/CARU guidance, and platform branded-content policies on clear and conspicuous disclosure of paid endorsements/affiliate discount codes in video and description. Also retrieve rules on direct exhortations to children and youth-directed advertising under the UCPD Annex I No. 28 / AVMSD, CAP Code and ASA/CMA guidance, plus any gambling/age-restricted-event ticketing marketing standards relevant to ticket resale promotions to minors.
+2026-07-29 22:13:17,024 | INFO | [Agentic] Iteration 1/3
+2026-07-29 22:13:17,633 | INFO | [Agentic] Initial query: YouTube influencer sponsored beauty/skincare segment child-directed or likely-to-be-seen-by minors legal compliance: FTC Act Section 5 endorsement disclosure requirements, FTC Endorsement Guides (16 CFR Part 255) and .com Disclosures, COPPA/FTC youth advertising guidance, and state UDAP law on clear and conspicuous sponsored-content disclosures. Also search ASA CAP Code/UK Code of Non-broadcast Advertising and Direct & Promotional Marketing rules on recognisable marketing communications, influencer ad labels (#ad/sponsored), direct exhortations to children, and substantiation of cosmetic/skincare efficacy claims (e.g., acne, rosacea, non-comedogenic, “good for my skin,” “actually helping my skin,” free gift with purchase) plus EU cosmetics claims/common criteria and ICC Advertising and Marketing Communications Code.
+2026-07-29 22:13:17,633 | INFO | [Agentic] Iteration 1/3
+2026-07-29 22:13:21,741 | INFO | [Agentic] 5 total item(s) accumulated
+2026-07-29 22:13:22,243 | INFO | [Agentic] 5 total item(s) accumulated
+2026-07-29 22:13:22,253 | INFO | [Agentic] 5 total item(s) accumulated
+2026-07-29 22:13:22,256 | INFO | [Agentic] 5 total item(s) accumulated
+2026-07-29 22:13:22,260 | INFO | [Agentic] 5 total item(s) accumulated
+2026-07-29 22:13:22,264 | INFO | [Agentic] 5 total item(s) accumulated
+2026-07-29 22:13:22,272 | INFO | [Agentic] 4 total item(s) accumulated
+2026-07-29 22:13:23,118 | INFO | [Agentic] 5 total item(s) accumulated
+2026-07-29 22:13:24,058 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:13:24,058 | INFO | [Agentic] Next query: Canada advertising influencer/sponsorship disclosure law guidance Competition Bureau endorsement disclosure material connection YouTube video sponsor mention VPN claims privacy/security express and implied performance claims deceptive marketing guidance
+2026-07-29 22:13:24,058 | INFO | [Agentic] Iteration 2/3
+2026-07-29 22:13:24,176 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:13:24,177 | INFO | [Agentic] Next query: Canada advertising law guidance misleading performance/health claims for mattresses or sleep products endorsements testimonials influencer/sponsored content disclosure Competition Bureau Ad Standards Canada online advertising sleep quality claims trial warranty sale discount claims
+2026-07-29 22:13:24,178 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:13:24,179 | INFO | [Agentic] Iteration 2/3
+2026-07-29 22:13:24,179 | INFO | [Agentic] Next query: Canada advertising law sponsored influencer disclosures and subscription/free-trial pricing claims Audible automatic renewal Competition Act deceptive marketing Bureau guidance CASL/consumer protection 'save 46% off your first four months' 'free trial' material connection disclosure
+2026-07-29 22:13:24,179 | INFO | [Agentic] Iteration 2/3
+2026-07-29 22:13:24,321 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:13:24,321 | INFO | [Agentic] Next query: Canada influencer marketing sponsored content disclosure Competition Bureau guidance endorsement advertising material connection social media + Competition Act ordinary selling price price comparison discount coupon terms conditions drip pricing import charges advertising guidance Temu
+2026-07-29 22:13:24,321 | INFO | [Agentic] Iteration 2/3
+2026-07-29 22:13:24,448 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:13:24,448 | INFO | [Agentic] Next query: Search for current advertising and consumer protection rules/guidance applicable to influencer endorsements of VPN/cybersecurity services, including disclosure requirements and substantiation of claims about security/privacy, malware alerts, public Wi‑Fi protection, streaming/geo-access, and Netflix library access. Prioritize FTC Endorsement Guides/.com Disclosures and comparable UK ASA/CAP/CMA guidance, plus any rules on promoting circumvention of geo-restrictions or access to region-locked content.
+2026-07-29 22:13:24,449 | INFO | [Agentic] Iteration 2/3
+2026-07-29 22:13:24,455 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:13:24,455 | INFO | [Agentic] Next query: Search for current advertising disclosure rules and guidance for sponsored influencer/content creator endorsements in online videos, including FTC endorsement guides and platform-specific requirements (YouTube), plus any rules on promo codes/bonus offers for video games (clear disclosure of eligibility such as 'new players only', free-to-play claims, and material terms).
+2026-07-29 22:13:24,455 | INFO | [Agentic] Iteration 2/3
+2026-07-29 22:13:24,913 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:13:24,913 | INFO | [Agentic] Next query: Search for U.S. advertising law/guidance on influencer sponsorship disclosures and ticketing promotions, specifically FTC Endorsement Guides, FTC .com Disclosures, and state automatic renewal/consumer protection or ticket resale laws relevant to claims like 'number one rated ticketing app,' 'best deal,' 'every ticket is backed by their buyer guarantee,' 'only site that allows you to return your ticket right before the event with swaps,' and promo code '$20 off your first purchase' including material terms, substantiation, and required disclosures.
+2026-07-29 22:13:24,913 | INFO | [Agentic] Iteration 2/3
+2026-07-29 22:13:25,381 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:13:25,382 | INFO | [Agentic] Next query: Canada influencer advertising cosmetics sponsored video disclosure Competition Act deceptive marketing testimonial endorsement material connection disclosure Bureau guidance cosmetics/drug claims acne rosacea non-comedogenic suitable for blemish-prone skin free gift with purchase ordinary selling price substantiation Health Canada cosmetics advertising guidance
+2026-07-29 22:13:25,382 | INFO | [Agentic] Iteration 2/3
+2026-07-29 22:13:27,450 | INFO | [Agentic] 10 total item(s) accumulated
+2026-07-29 22:13:29,315 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:13:29,315 | INFO | [Agentic] Next query: Canada influencer marketing sponsored content disclosure law YouTube video endorsements Competition Bureau disclosure guidelines material connection clear conspicuous #ad VPN privacy/security claims advertising substantiation Competition Act deceptive marketing CASL/online advertising guidance
+2026-07-29 22:13:29,315 | INFO | [Agentic] Iteration 3/3
+2026-07-29 22:13:30,062 | INFO | [Agentic] 8 total item(s) accumulated
+2026-07-29 22:13:30,079 | INFO | [Agentic] 8 total item(s) accumulated
+2026-07-29 22:13:31,517 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:13:31,520 | INFO | [Agentic] Next query: Canada influencer/sponsored advertising guidance disclosure testimonials endorsements mattress sleep claims Competition Act Ad Standards Canada health/product performance claims sleep better insomnia guidance
+2026-07-29 22:13:31,521 | INFO | [Agentic] Iteration 3/3
+2026-07-29 22:13:31,536 | INFO | [Agentic] 7 total item(s) accumulated
+2026-07-29 22:13:31,540 | INFO | [Agentic] 8 total item(s) accumulated
+2026-07-29 22:13:31,558 | INFO | [Agentic] 9 total item(s) accumulated
+2026-07-29 22:13:31,559 | INFO | [Agentic] 9 total item(s) accumulated
+2026-07-29 22:13:31,578 | INFO | [Agentic] 10 total item(s) accumulated
+2026-07-29 22:13:32,566 | INFO | [Agentic] 11 total item(s) accumulated
+2026-07-29 22:13:33,115 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:13:33,116 | INFO | [Agentic] Next query: Canada influencer marketing cosmetics sponsored content disclosure Competition Act Ad Standards Canada influencer guidelines testimonials skincare efficacy claims rosacea acne non-comedogenic suitable for blemish-prone skin 'made in France' EU regulations ban ingredients free gift with purchase advertising
+2026-07-29 22:13:33,116 | INFO | [Agentic] Iteration 3/3
+2026-07-29 22:13:33,318 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:13:33,319 | INFO | [Agentic] Next query: Canada influencer advertising disclosure Competition Bureau endorsement guidelines material connection social media sponsored content disclosure terms Canada + Competition Act false or misleading ordinary selling price discount coupon claims shipping/import charges claims Temu promotional terms consumer protection guidance
+2026-07-29 22:13:33,319 | INFO | [Agentic] Iteration 3/3
+2026-07-29 22:13:33,472 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:13:33,473 | INFO | [Agentic] Next query: Canada influencer marketing sponsored video disclosure FTC-like requirements Competition Bureau endorsement disclosures YouTube gaming sponsorship material connection 'sponsored' disclosure adequacy incentivized download code free-to-play game new players rewards age advertising guidance loot boxes youth
+2026-07-29 22:13:33,473 | INFO | [Agentic] Iteration 3/3
+2026-07-29 22:13:33,550 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:13:33,550 | INFO | [Agentic] Next query: Canada influencer advertising disclosure sponsored content Competition Act/Ad Standards Canada guidance endorsement discount code buyer guarantee return your ticket claims ticket resale advertising deceptive marketing
+2026-07-29 22:13:33,550 | INFO | [Agentic] Iteration 3/3
+2026-07-29 22:13:33,656 | INFO | [Agentic] 10 total item(s) accumulated
+2026-07-29 22:13:34,005 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:13:34,005 | INFO | [Agentic] Next query: Canada advertising law sponsored influencer endorsement disclosure competition act testimonial endorsement social media disclosure material connection free trial automatic renewal price savings claims '46% off' 'first four months' '7.95 a month' 'text to 500-500' CASL mobile marketing contest/telecom guidance Bureau Ad Standards
+2026-07-29 22:13:34,005 | INFO | [Agentic] Iteration 3/3
+2026-07-29 22:13:34,060 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:13:34,060 | INFO | [Agentic] Next query: Search for advertising law/guidance applicable to influencer endorsements of VPN/cybersecurity services in online videos, especially requirements for clear sponsorship disclosure and substantiation of claims about VPN benefits/security/performance/location switching. Include FTC Endorsement Guides (.gov), FTC advertising substantiation and deceptive claims guidance, YouTube paid promotion/disclosure rules, and if available UK ASA/CAP guidance on VPN or cybersecurity marketing claims such as 'protects you on public Wi‑Fi,' 'encrypts your data,' 'alerts you to malware,' and access to region-specific content (e.g., Netflix libraries, government websites).
+2026-07-29 22:13:34,060 | INFO | [Agentic] Iteration 3/3
+2026-07-29 22:13:36,987 | INFO | [Agentic] 10 total item(s) accumulated
+2026-07-29 22:13:37,449 | INFO | [Agentic] Initial query: video platform influencer sponsorship Audible 30-day free trial children minors disclosure requirements advert recognition "advertisement feature" "paid promotion" YouTube gaming content direct exhortation misleading subscription claims automatic renewal trial terms. Include statutes/codes/case law most relevant to child-directed or likely child-audience marketing: FTC Act Section 5 and FTC Endorsement Guides (.com Disclosures), CAP Code/ASA guidance on recognition of marketing communications to children and direct exhortations, UCPD 2005/29/EC Annex I para 28 and AVMSD rules on audiovisual commercial communications to minors.
+2026-07-29 22:13:37,450 | INFO | [Agentic] Iteration 1/3
+2026-07-29 22:13:38,561 | INFO | [Agentic] 10 total item(s) accumulated
+2026-07-29 22:13:38,573 | INFO | [Agentic] 11 total item(s) accumulated
+2026-07-29 22:13:38,578 | INFO | [Agentic] 14 total item(s) accumulated
+2026-07-29 22:13:38,583 | INFO | [Agentic] 13 total item(s) accumulated
+2026-07-29 22:13:38,900 | INFO | [Agentic] 9 total item(s) accumulated
+2026-07-29 22:13:39,309 | INFO | [Agentic] Initial query: Search for legal/regulatory sources on child-directed or likely-to-be-seen-by-children motorsport/branded video content featuring sponsor integration without clear ad labeling: FTC Act §5 and FTC Endorsement Guides (.com Disclosures/native advertising), UK CAP Code and BCAP rules on recognition of marketing communications, disclosure of commercial intent, and direct exhortation to children; also include EU UCPD/Audiovisual Media Services rules and relevant ASA/CMA/Ofcom decisions on F1/sports sponsorship content branded by Red Bull or DHL. Include child-safety authorities on age-restricted product advertising where Red Bull branding may imply energy drink marketing to minors, plus HFSS/food marketing rules applicable to non-broadcast and video-sharing platform content.
+2026-07-29 22:13:39,309 | INFO | [Agentic] Iteration 1/3
+2026-07-29 22:13:39,919 | INFO | [Agentic] 5 total item(s) accumulated
+2026-07-29 22:13:40,781 | INFO | [Agentic] 5 total item(s) accumulated
+2026-07-29 22:13:42,115 | INFO | [Agentic] Initial query: Search for legal and regulatory sources on influencer/video-platform advertising disclosures to minors, focusing on sponsored host-read endorsements with affiliate URLs/discount codes in YouTube content: FTC Act §5 endorsement disclosure requirements, FTC Endorsement Guides (16 CFR Part 255), FTC .com Disclosures, FTC staff guidance on influencers/social media ads, YouTube paid promotion disclosure rules, and CARU Advertising Guidelines/children’s influencer marketing standards. Also include UK/EU sources on identifiable advertising and direct exhortation to children where relevant to apparel marketing in youth-audience content, including CAP Code/BCAP, ASA rulings, UCPD Annex I para 28, and AVMSD provisions on commercial communications to minors.
+2026-07-29 22:13:42,115 | INFO | [Agentic] Iteration 1/3
+2026-07-29 22:13:42,152 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:13:42,152 | INFO | [Agentic] Next query: Search for Canadian advertising law and guidance on influencer/sponsored endorsements and subscription free-trial claims, including Competition Act deceptive marketing provisions, Ad Standards Canada influencer disclosure rules, and any Canadian consumer protection/automatic renewal requirements applicable to claims like '30-day trial,' 'choose three titles every month,' 'keep forever even if you cancel,' and call-to-action URLs/text offers.
+2026-07-29 22:13:42,152 | INFO | [Agentic] Iteration 2/3
+2026-07-29 22:13:42,572 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:13:42,572 | INFO | [Agentic] Next query: Canada advertising law sponsored content disclosure sports video social media official disclosure false Competition Act Ad Standards influencer marketing endorsements branded content Formula 1 DHL
+2026-07-29 22:13:42,572 | INFO | [Agentic] Iteration 2/3
+2026-07-29 22:13:43,188 | INFO | [Agentic] Initial query: Search for legal/regulatory sources on influencer and video-platform advertising disclosures to minors for a travel-membership promotion: FTC Act Section 5, FTC Endorsement Guides (16 CFR Part 255), .com Disclosures, COPPA/FTC children’s advertising guidance, UK CAP Code and ASA rulings on ad recognition/identifiability, inadequate disclosure in descriptions, affiliate links and promo codes, and direct exhortations such as “click the link” / “use my code.” Also include rules on misleading savings/performance claims for membership benefits (“better deals,” “up to 70% off,” “free 1-year trial,” upgrade discounts), and any child-directed or mixed-audience standards relevant to age-targeting on YouTube.
+2026-07-29 22:13:43,189 | INFO | [Agentic] Iteration 1/3
+2026-07-29 22:13:43,273 | INFO | [Agentic] Initial query: YouTube influencer sponsorship to minors Raycon bone conduction headphones undisclosed advertising and adequate disclosure requirements: FTC Endorsement Guides 16 CFR Part 255, FTC .com Disclosures, FTC staff guidance on clear and conspicuous disclosures in video/social media, YouTube paid promotion policies, and case law/regulatory actions on influencer endorsements. Include rules on direct exhortations to children/young audiences, misleading or unsubstantiated safety and performance claims (“stay safe,” “safer and more alert,” waterproof/IP68, battery life, premium performance), and any child-directed advertising standards/codes (CARU, CAP Code/ASA, UCPD Annex I para 28, AVMSD) relevant to non-age-restricted consumer electronics.
+2026-07-29 22:13:43,274 | INFO | [Agentic] Iteration 1/3
+2026-07-29 22:13:43,763 | INFO | [Agentic] Initial query: Search for UK/EU and platform-specific rules on influencer marketing to children in online video content: undisclosed or inadequately disclosed paid promotion/sponsorship, including YouTube creator endorsements and affiliate/retail links, under the UK Consumer Protection from Unfair Trading Regulations 2008, CAP Code/BCAP Code (recognition of marketing communications; marketing to children; direct exhortations to buy), ASA/CMA guidance on influencer advertising disclosures (#ad, sponsored), and UCPD/AVMSD provisions and cases on commercial communications aimed at minors. Include authorities on whether child-appealing creator content for art/learning products triggers heightened standards for clear ad identification and prohibitions on direct encouragement to purchase via description links or calls to 'go check out'/'buy'.
+2026-07-29 22:13:43,764 | INFO | [Agentic] Iteration 1/3
+2026-07-29 22:13:44,009 | INFO | [Agentic] Initial query: YouTube influencer/podcast host sponsorship BetterHelp online therapy disclosure to minors: search FTC Act Section 5 endorsement disclosure requirements, FTC Endorsement Guides (16 CFR Part 255), FTC .com Disclosures, YouTube/online video ad disclosure rules, and cases/regulatory actions on undisclosed or inadequately disclosed paid promotion. Also search CAP Code/ASA, AVMSD/UCPD, and child-directed advertising rules on direct exhortation, misleading health/therapy claims, and age-appropriateness of promoting online mental health services or collecting sensitive personal data from under-18s in commercial content.
+2026-07-29 22:13:44,009 | INFO | [Agentic] Iteration 1/3
+2026-07-29 22:13:45,105 | INFO | [Agentic] 9 total item(s) accumulated
+2026-07-29 22:13:45,113 | INFO | [Agentic] 5 total item(s) accumulated
+2026-07-29 22:13:46,605 | INFO | [Agentic] 10 total item(s) accumulated
+2026-07-29 22:13:47,089 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:13:47,090 | INFO | [Agentic] Next query: Canada influencer sponsored content disclosure requirements social media video endorsements Competition Bureau influencer marketing guidelines material connection ad disclosure 'paid partnership' YouTube podcast host-read ads apparel claims advertising standards Canada
+2026-07-29 22:13:47,090 | INFO | [Agentic] Iteration 2/3
+2026-07-29 22:13:47,885 | INFO | [Agentic] Initial query: YouTube sponsored segment for SCP Foundation art books in a horror/gaming video likely viewed by minors: search FTC Endorsement Guides 16 CFR Part 255, FTC native advertising/.com disclosures, COPPA and FTC guidance on child-directed influencer marketing, and state UDAP law on clear and conspicuous ad disclosure in video descriptions and verbal sponsorship acknowledgments. Include CAP Code/ASA and UK CMA guidance on identifiable advertising, direct exhortations to children to 'click the link' or 'snag yourself a copy,' and any rules/codes on marketing age-sensitive horror-themed products to children or misleading product claims in influencer promotions.
+2026-07-29 22:13:47,885 | INFO | [Agentic] Iteration 1/3
+2026-07-29 22:13:48,029 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:13:48,029 | INFO | [Agentic] Next query: Targeted search for applicable advertising law/guidance on influencer/sponsored endorsements and subscription free-trial claims for Audible in Canada: Competition Bureau guidance on testimonials/endorsements and material connection disclosure (e.g., sponsorship disclosure in YouTube videos), plus Canadian consumer protection/Competition Act guidance or cases on negative-option billing, automatic renewal after 30-day free trials, claims such as 'largest selection,' 'you keep forever even if you cancel,' rollover credits, and required qualification disclosures for digital subscription ads.
+2026-07-29 22:13:48,029 | INFO | [Agentic] Iteration 3/3
+2026-07-29 22:13:48,165 | INFO | [Agentic] 5 total item(s) accumulated
+2026-07-29 22:13:48,317 | INFO | [Agentic] 5 total item(s) accumulated
+2026-07-29 22:13:48,435 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:13:48,435 | INFO | [Agentic] Next query: Canada advertising law sports sponsorship branded content disclosure influencer/social media endorsements Competition Act Ad Standards sponsored content Red Bull DHL Formula 1 official disclosure material connection
+2026-07-29 22:13:48,435 | INFO | [Agentic] Iteration 3/3
+2026-07-29 22:13:50,143 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:13:50,143 | INFO | [Agentic] Next query: Canada influencer/advertising disclosure law affiliate marketing endorsement guidance Competition Bureau Ad Standards Canada testimonial typical results free trial discount code material connection travel membership promotions misleading price claims ordinary selling price trial upgrade terms
+2026-07-29 22:13:50,143 | INFO | [Agentic] Iteration 2/3
+2026-07-29 22:13:50,755 | INFO | [Agentic] 5 total item(s) accumulated
+2026-07-29 22:13:50,759 | INFO | [Agentic] 5 total item(s) accumulated
+2026-07-29 22:13:50,893 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:13:50,893 | INFO | [Agentic] Next query: Find U.S. FTC endorsement/advertising rules and guidance for influencer-sponsored YouTube content, specifically: disclosure requirements for paid sponsorships and affiliate/discount links in video/audio and description, adequacy of verbal/on-screen disclosures, substantiation standards for product performance/safety claims (e.g., 'keeps you safer and more alert,' 'quality rivals big brands,' waterproof/IP68, battery life), and any guidance on scarcity/limited-time claims such as '35 units remaining' or countdown/offer representations on landing pages.
+2026-07-29 22:13:50,894 | INFO | [Agentic] Iteration 2/3
+2026-07-29 22:13:51,870 | INFO | [Agentic] 5 total item(s) accumulated
+2026-07-29 22:13:51,911 | INFO | [Agentic] 10 total item(s) accumulated
+2026-07-29 22:13:51,929 | INFO | [Agentic] 10 total item(s) accumulated
+2026-07-29 22:13:52,318 | INFO | [Agentic] 11 total item(s) accumulated
+2026-07-29 22:13:52,542 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:13:52,542 | INFO | [Agentic] Next query: Canada influencer advertising disclosure endorsement sponsored content BetterHelp podcast YouTube #ad Competition Bureau Ad Standards disclosure material connection mental health service testimonials privacy sensitive health data advertising guidance
+2026-07-29 22:13:52,542 | INFO | [Agentic] Iteration 2/3
+2026-07-29 22:13:53,151 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:13:53,152 | INFO | [Agentic] Next query: Search for advertising disclosure rules and guidance for sponsored influencer endorsements in online videos and descriptions, especially FTC Endorsement Guides (.com Disclosures) and UK ASA/CAP or Australian AANA guidance on clear disclosure of paid sponsorships/affiliate links; also search for substantiation requirements for product performance claims (e.g., compatibility with Android, single-cable power/connectivity, pressure sensitivity/specs) in influencer advertising.
+2026-07-29 22:13:53,152 | INFO | [Agentic] Iteration 2/3
+2026-07-29 22:13:53,874 | INFO | [Agentic] 7 total item(s) accumulated
+2026-07-29 22:13:53,886 | INFO | [Agentic] 10 total item(s) accumulated
+2026-07-29 22:13:53,932 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:13:53,932 | INFO | [Agentic] Next query: Canada influencer/sponsored YouTube video disclosure requirements advertising endorsement guidelines Competition Bureau Ad Standards social media clear and conspicuous disclosure sponsorship affiliate links 'material connection' + Canada copyright guidance Creative Commons BY-SA 3.0 compliance attribution requirements for selling/promoting derivative works online
+2026-07-29 22:13:53,932 | INFO | [Agentic] Iteration 2/3
+2026-07-29 22:13:54,323 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:13:54,323 | INFO | [Agentic] Next query: Canada influencer marketing and sponsored content disclosure law guidance Competition Bureau endorsement testimonials social media clear conspicuous disclosure material connection video podcast YouTube affiliate link clothing brand claims apparel advertising ordinary selling price performance claims
+2026-07-29 22:13:54,323 | INFO | [Agentic] Iteration 3/3
+2026-07-29 22:13:55,287 | INFO | [Agentic] Initial query: video platform influencer sponsorship disclosure children advertising law YouTube Twitch livestream "undisclosed advertising" "inadequate disclosure" FTC Endorsement Guides .com Disclosures COPPA UCPD direct exhortation "ask your parents" CAP Code BCAP Code ASA guidance AVMSD UCPD Annex I misleading claims substantiation "lightest 14-inch laptop in the world" energy drink marketing minors Red Bull age-restricted products HFSS food marketing children
+2026-07-29 22:13:55,287 | INFO | [Agentic] Iteration 1/3
+2026-07-29 22:13:55,756 | INFO | [Agentic] 9 total item(s) accumulated
+2026-07-29 22:13:55,797 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:13:55,797 | INFO | [Agentic] Next query: Canada influencer advertising disclosure rules sponsored YouTube video affiliate link endorsement Competition Act deceptive marketing Ad Standards disclosure guidelines social media sponsorship material connection health/safety claims headphones situational awareness waterproof battery life 'Raycon'
+2026-07-29 22:13:55,797 | INFO | [Agentic] Iteration 3/3
+2026-07-29 22:13:55,894 | INFO | [Agentic] 9 total item(s) accumulated
+2026-07-29 22:13:55,978 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:13:55,978 | INFO | [Agentic] Next query: Canada influencer/advertising disclosure law testimonial endorsement affiliate promo code free trial discount ordinary price claims travel membership Competition Act false or misleading representations Bureau guidelines disclosure material connection trial offer upgrade terms
+2026-07-29 22:13:55,978 | INFO | [Agentic] Iteration 3/3
+2026-07-29 22:13:57,539 | INFO | [Agentic] Initial query: YouTube influencer sponsorship disclosure for minors video game marketing: FTC Endorsement Guides (16 CFR Part 255), FTC .com Disclosures, FTC native advertising/deceptive endorsement rules, YouTube paid promotion disclosure requirements, and UK CAP Code/ASA guidance on ad recognition in influencer marketing to children. Include legal/regulatory sources on whether verbal thanks plus description link disclosure are sufficient, and on direct exhortation/undue pressure in ads for online games aimed at under-18s (e.g., ‘play now,’ ‘best time to start playing’), including any age-targeting rules for digital game advertising.
+2026-07-29 22:13:57,540 | INFO | [Agentic] Iteration 1/3
+2026-07-29 22:13:58,546 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:13:58,546 | INFO | [Agentic] Next query: Canada influencer marketing sponsored video disclosure law guidance YouTube endorsement 'sponsored' description verbal disclosure Competition Bureau Ad Standards influencer marketing guidelines material connection social media
+2026-07-29 22:13:58,546 | INFO | [Agentic] Iteration 3/3
+2026-07-29 22:13:58,677 | INFO | [Agentic] 13 total item(s) accumulated
+2026-07-29 22:13:58,835 | INFO | [Agentic] 9 total item(s) accumulated
+2026-07-29 22:13:59,229 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:13:59,229 | INFO | [Agentic] Next query: Canada influencer marketing / advertising disclosure rules for sponsored YouTube endorsements, including Competition Bureau guidance, Ad Standards Canada influencer disclosure requirements, and any health-service advertising/privacy guidance applicable to BetterHelp online therapy promotions (material connection disclosure, endorsement claims, and consent/privacy representations).
+2026-07-29 22:13:59,229 | INFO | [Agentic] Iteration 3/3
+2026-07-29 22:14:00,038 | INFO | [Agentic] 15 total item(s) accumulated
+2026-07-29 22:14:00,063 | INFO | [Agentic] 5 total item(s) accumulated
+2026-07-29 22:14:01,118 | INFO | [Agentic] 10 total item(s) accumulated
+2026-07-29 22:14:01,372 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:14:01,373 | INFO | [Agentic] Next query: Canada influencer marketing and sponsored content disclosure rules Competition Act Ad Standards disclosure guidelines YouTube sponsorship endorsement 'material connection' 'clear and conspicuous' plus Canadian copyright guidance for Creative Commons BY-SA 3.0 attribution requirements in commercial video promotions
+2026-07-29 22:14:01,373 | INFO | [Agentic] Iteration 3/3
+2026-07-29 22:14:02,285 | INFO | [Agentic] 5 total item(s) accumulated
+2026-07-29 22:14:02,328 | INFO | [Agentic] 14 total item(s) accumulated
+2026-07-29 22:14:02,651 | INFO | [Agentic] 11 total item(s) accumulated
+2026-07-29 22:14:03,701 | INFO | [Agentic] 11 total item(s) accumulated
+2026-07-29 22:14:04,236 | INFO | [Agentic] Initial query: Formula 1 / motorsport video platform child-directed or mixed-audience content sponsorship disclosure law query: undisclosed advertising and inadequate disclosure for branded sports content featuring title sponsor/product branding (e.g., Pirelli) in video title/description without clear ad identifier; search UK/EU/US sources including CAP Code Section 2 (recognition of marketing communications), BCAP/CMA influencer and native advertising guidance, UCPD/AVMSD, FTC Endorsement Guides, COPPA/children’s advertising rules, and case law/regulatory decisions on whether sports highlight/onboard videos constitute identifiable marketing to minors. Also retrieve rules on direct exhortation to children, misleading commercial intent, and any child-protection standards applicable to motorsport brand integrations, while excluding HFSS/age-restricted product issues unless sponsor category triggers them.
+2026-07-29 22:14:04,236 | INFO | [Agentic] Iteration 1/3
+2026-07-29 22:14:04,538 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:14:04,538 | INFO | [Agentic] Next query: Find FTC endorsement/advertising disclosure rules and guidance for livestreams and YouTube sponsored segments, plus substantiation standards for objective product claims like 'lightest 14-inch laptop in the world' and material connection disclosures (#sponsored, verbal sponsor mentions, chat commands/affiliate links). Include FTC Endorsement Guides (16 CFR Part 255), .com Disclosures guidance, FTC health/efficacy not needed, and any platform-specific creator ad disclosure guidance for YouTube/Twitch.
+2026-07-29 22:14:04,538 | INFO | [Agentic] Iteration 2/3
+2026-07-29 22:14:04,656 | INFO | [Agentic] Initial query: Search UK/EU legal and self-regulatory sources on influencer marketing to minors for a YouTube gaming sponsorship: CAP Code/BCAP Code, ASA rulings, CMA guidance, Consumer Protection from Unfair Trading Regulations 2008, UCPD/Omnibus rules, and platform disclosure guidance on whether verbal and description disclosures such as “this video is sponsored” are sufficiently prominent/identifiable as marketing communications. Include authorities on ads for video games aimed at under-18s covering direct exhortation to children to click/sign up/play, misleading endorsement claims, and any age-rating/violent-content or other age-restricted marketing rules relevant to closed-beta game promotion.
+2026-07-29 22:14:04,656 | INFO | [Agentic] Iteration 1/3
+2026-07-29 22:14:04,730 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:14:04,731 | INFO | [Agentic] Next query: Find current U.S. FTC and platform-specific guidance on influencer/sponsored content disclosures for YouTube videos and descriptions, including whether verbal thanks plus description disclosure/hashtags satisfy endorsement disclosure requirements, and any rules on advertising claims for video games (e.g., 'best time to start playing,' leveling speed, rewards) under FTC endorsement/deceptive advertising standards.
+2026-07-29 22:14:04,731 | INFO | [Agentic] Iteration 2/3
+2026-07-29 22:14:06,677 | INFO | [Agentic] 5 total item(s) accumulated
+2026-07-29 22:14:07,261 | INFO | [Agentic] Initial query: Search for legal/regulatory sources on influencer and video-platform advertising disclosures in child-directed or mixed-audience content promoting repair tools and discounted iPhone parts: FTC Act §5 endorsement/affiliate disclosure requirements, FTC Endorsement Guides (16 CFR Part 255), FTC .com Disclosures, COPPA/YouTube child-directed content guidance, and UK CAP Code/ASA guidance on identifiable marketing communications, influencer ads, and direct exhortations to children. Include statutes, enforcement actions, case law, and platform/self-regulatory codes addressing clear and conspicuous sponsorship disclosure (e.g., verbal thanks to sponsor, link in description, affiliate disclosure), purchase prompts such as 'definitely check out iFixit'/'don’t miss out,' and whether electronics repair tools/phone parts are treated as age-restricted or otherwise unsafe products for minors.
+2026-07-29 22:14:07,261 | INFO | [Agentic] Iteration 1/3
+2026-07-29 22:14:07,471 | INFO | [Agentic] Initial query: Search for legal and self-regulatory sources on influencer marketing of GamerSupps/energy or gaming supplement products to children or mixed-audience viewers on YouTube, focusing on undisclosed paid promotion and inadequate ad disclosures in video descriptions (e.g., affiliate links, discount code, ‘official disclosure: false’). Include FTC Act §5, FTC Endorsement Guides (16 CFR Part 255), FTC .com Disclosures, COPPA/child-directed audience guidance, UK CAP Code/ASA influencer disclosure rulings and direct exhortation to children, UCPD/AVMSD national implementations, and any rules or cases on youth marketing of caffeinated or HFSS-like products, misleading health/performance claims, and age-targeting on video platforms.
+2026-07-29 22:14:07,471 | INFO | [Agentic] Iteration 1/3
+2026-07-29 22:14:07,569 | INFO | [Agentic] Initial query: YouTube influencer sponsorship mattress ad Helix child-directed or mixed-audience video "Magic: The Gathering" legal compliance undisclosed advertising and adequate influencer disclosure: FTC Act Section 5, FTC Guides Concerning the Use of Endorsements and Testimonials (16 CFR Part 255), FTC .com Disclosures, FTC staff guidance on clear and conspicuous disclosures in videos/description boxes/QR codes, NAD decisions on sponsored creator content, ASA CAP Code/BCAP influencer disclosure rules, UCPD Articles 6-7 and AVMSD rules on audiovisual commercial communications to minors; also substantiation of sleep/performance claims ("proven results," "better sleep quality," testimonial/doctor endorsement claims, warranty/discount claims) and any rules on direct exhortation to children in online video advertising.
+2026-07-29 22:14:07,569 | INFO | [Agentic] Iteration 1/3
+2026-07-29 22:14:08,144 | INFO | [Agentic] Initial query: Search for legal and self-regulatory rules on influencer marketing disclosures to minors for sponsored video game promotions on YouTube/TikTok, including FTC Act Section 5 and FTC Endorsement Guides (16 CFR Part 255), FTC staff guidance on clear and conspicuous disclosures in audiovisual/social media ads, YouTube/ASA-CAP guidance on #ad and verbal sponsorship identification, and case law or enforcement on undisclosed or inadequately disclosed endorsements. Also retrieve child-directed advertising standards addressing direct exhortations to children in games marketing, including EU AVMSD/UCPD, UK CAP Code/ASA rulings, and any ESRB/platform policies relevant to advertising age-rated interactive entertainment.
+2026-07-29 22:14:08,145 | INFO | [Agentic] Iteration 1/3
+2026-07-29 22:14:08,204 | INFO | [Agentic] 10 total item(s) accumulated
+2026-07-29 22:14:08,868 | INFO | [Agentic] 9 total item(s) accumulated
+2026-07-29 22:14:08,876 | INFO | [Agentic] 5 total item(s) accumulated
+2026-07-29 22:14:09,232 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:14:09,233 | INFO | [Agentic] Next query: Canada advertising law sports video sponsorship disclosure influencer/brand content official channel social media guidance Competition Bureau Ad Standards endorsements disclosures sponsored content motor racing Pirelli Formula 1
+2026-07-29 22:14:09,233 | INFO | [Agentic] Iteration 2/3
+2026-07-29 22:14:10,580 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:14:10,580 | INFO | [Agentic] Next query: Canada influencer marketing sponsored video disclosure guidelines YouTube Competition Bureau Ad Standards material connection clear conspicuous #ad sponsored paid promotion gaming video closed beta sign-up
+2026-07-29 22:14:10,580 | INFO | [Agentic] Iteration 2/3
+2026-07-29 22:14:10,635 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:14:10,635 | INFO | [Agentic] Next query: Canada influencer marketing sponsored video disclosure requirements YouTube Competition Bureau Ad Standards testimonials endorsements conspicuous disclosure gaming sponsorship material connection official disclosure description verbal in-video
+2026-07-29 22:14:10,635 | INFO | [Agentic] Iteration 3/3
+2026-07-29 22:14:11,555 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:14:11,556 | INFO | [Agentic] Next query: Search for U.S. FTC endorsement/advertising disclosure rules and guidance for livestream or podcast sponsorships, including disclosures in video descriptions/chat commands; rules on objective product claims and puffery for laptops/headsets (e.g., 'lightest 14-inch laptop in the world'); and any platform-specific branded content policies for YouTube/Twitch relevant to sponsored segments.
+2026-07-29 22:14:11,556 | INFO | [Agentic] Iteration 3/3
+2026-07-29 22:14:12,134 | INFO | [Agentic] 5 total item(s) accumulated
+2026-07-29 22:14:12,140 | INFO | [Agentic] 5 total item(s) accumulated
+2026-07-29 22:14:12,147 | INFO | [Agentic] 5 total item(s) accumulated
+2026-07-29 22:14:13,057 | INFO | [Agentic] 5 total item(s) accumulated
+2026-07-29 22:14:14,207 | INFO | [Agentic] 10 total item(s) accumulated
+2026-07-29 22:14:14,380 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:14:14,381 | INFO | [Agentic] Next query: Canada influencer endorsement advertising disclosure guidance sponsored video mattress claims Competition Act Ad Standards testimonials sleep quality warranty free shipping discount claims healthcare sleep claims FTC equivalent Canada
+2026-07-29 22:14:14,383 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:14:14,383 | INFO | [Agentic] Iteration 2/3
+2026-07-29 22:14:14,383 | INFO | [Agentic] Next query: Find official FTC endorsement/disclosure rules and guidance for influencers on YouTube/ social media about sponsored product links, discount codes, affiliate relationships, and free shipping promotions; include FTC Endorsement Guides (16 CFR Part 255), FTC .com Disclosures guidance, and any platform-specific or U.S./Canada advertising standards on clear and conspicuous disclosure of material connections in video descriptions.
+2026-07-29 22:14:14,384 | INFO | [Agentic] Iteration 2/3
+2026-07-29 22:14:14,428 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:14:14,428 | INFO | [Agentic] Next query: Canada advertising law sponsored influencer affiliate disclosure promotional pricing coupon code free gift offer Competition Act deceptive marketing ordinary selling price drip pricing influencer endorsement advertising standards disclosure Quebec/Canada contest or promotion rules repair parts discount claims
+2026-07-29 22:14:14,428 | INFO | [Agentic] Iteration 2/3
+2026-07-29 22:14:14,962 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:14:14,962 | INFO | [Agentic] Next query: Canada influencer marketing sponsored content disclosure requirements YouTube gaming video #ad partner label Competition Bureau Ad Standards social media endorsement guidance material connection clear conspicuous disclosure deceptive marketing
+2026-07-29 22:14:14,962 | INFO | [Agentic] Iteration 2/3
+2026-07-29 22:14:15,645 | INFO | [Agentic] 12 total item(s) accumulated
+2026-07-29 22:14:15,682 | INFO | [Agentic] 10 total item(s) accumulated
+2026-07-29 22:14:15,724 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:14:15,724 | INFO | [Agentic] Next query: Canada advertising law sports video social media disclosure sponsorship official content implied endorsement competition act misleading advertising ad standards influencer disclosure Formula 1 Pirelli branded content
+2026-07-29 22:14:15,724 | INFO | [Agentic] Iteration 3/3
+2026-07-29 22:14:16,323 | INFO | [Agentic] 14 total item(s) accumulated
+2026-07-29 22:14:17,561 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:14:17,561 | INFO | [Agentic] Next query: Canada influencer marketing sponsored video disclosure law guidance YouTube 'sponsored' endorsement disclosure Competition Bureau Ad Standards Canada social media influencers material connection clear conspicuous disclosure gaming video
+2026-07-29 22:14:17,561 | INFO | [Agentic] Iteration 3/3
+2026-07-29 22:14:18,950 | INFO | [Agentic] 10 total item(s) accumulated
+2026-07-29 22:14:20,094 | INFO | [Agentic] 9 total item(s) accumulated
+2026-07-29 22:14:20,116 | INFO | [Agentic] 10 total item(s) accumulated
+2026-07-29 22:14:20,128 | INFO | [Agentic] 10 total item(s) accumulated
+2026-07-29 22:14:20,135 | INFO | [Agentic] 12 total item(s) accumulated
+2026-07-29 22:14:20,606 | INFO | [Agentic] Initial query: Search for UK/EU and U.S. legal/regulatory authorities on influencer marketing to minors in online video/gaming content, including FTC Endorsement Guides and .com Disclosures, COPPA, CAP Code/ASA guidance, UCPD/AVMSD, and relevant case law or enforcement on sponsorship disclosure clarity/conspicuousness where YouTube creators promote a free-to-play military game using affiliate links, bonus incentives, and child-directed language. Focus on rules concerning undisclosed or inadequately disclosed advertising, direct exhortations to children to download or ask parents, misleading ‘free-to-play’/bonus claims, and any child-protection standards relevant to violent or age-rated game marketing and adjacent HFSS/energy-supplement affiliate promotions (e.g., GamerSupps) to under-18s.
+2026-07-29 22:14:20,606 | INFO | [Agentic] Iteration 1/3
+2026-07-29 22:14:20,686 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:14:20,686 | INFO | [Agentic] Next query: Canada influencer/sponsored content advertising guidance Competition Bureau Ad Standards disclosure endorsements testimonials mattress sleep claims 120-night trial lifetime warranty 'better sleep' 'proven results' 'customers report' Dr. Andrew Huberman endorsement
+2026-07-29 22:14:20,686 | INFO | [Agentic] Iteration 3/3
+2026-07-29 22:14:21,502 | INFO | [Agentic] Initial query: Search for legal and regulatory sources on child-directed influencer/video-platform advertising disclosures for sponsored legal-services promotions, including FTC Act Section 5, FTC Endorsement Guides (16 CFR Part 255), FTC .com Disclosures, state unfair/deceptive acts and practices rules, YouTube paid-promotion disclosure requirements, and UK CAP Code/ASA rules on recognizability of ads, direct exhortations to children, and misleading advertising. Also retrieve authorities on whether a host-read sponsor segment and description-link for a law-firm mass-tort sign-up page in a child-appealing video can constitute inadequate disclosure, undisclosed advertising, misleading legal-claim solicitation, or an impermissible direct appeal to minors, including any bar advertising/attorney solicitation rules and platform child-safety ad policies.
+2026-07-29 22:14:21,502 | INFO | [Agentic] Iteration 1/3
+2026-07-29 22:14:21,779 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:14:21,779 | INFO | [Agentic] Next query: Canada influencer advertising disclosure sponsored gaming video #ad partner official disclosure Competition Act Ad Standards Disclosure Guidelines social media endorsements material connection YouTube video descriptions verbal disclosure gaming sponsorship
+2026-07-29 22:14:21,779 | INFO | [Agentic] Iteration 3/3
+2026-07-29 22:14:21,930 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:14:21,930 | INFO | [Agentic] Next query: Canada influencer marketing disclosure requirements sponsored social media posts affiliate discount codes free shipping claims Competition Act FTC-style endorsement guidance Ad Standards Canada testimonials/endorsements material connection disclosure health supplement advertising GamerSupps
+2026-07-29 22:14:21,930 | INFO | [Agentic] Iteration 3/3
+2026-07-29 22:14:22,627 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:14:22,628 | INFO | [Agentic] Next query: Canada advertising law influencer sponsorship affiliate disclosure contest/sale promotion guidance Competition Act false or misleading ordinary selling price discount claims promo codes free gift with purchase material connection disclosure social media endorsements Ad Standards Canada Competition Bureau iPhone parts 20% off free case with purchase
+2026-07-29 22:14:22,628 | INFO | [Agentic] Iteration 3/3
+2026-07-29 22:14:23,096 | INFO | [Agentic] 13 total item(s) accumulated
+2026-07-29 22:14:23,662 | INFO | [Agentic] 5 total item(s) accumulated
+2026-07-29 22:14:23,671 | INFO | [Agentic] 13 total item(s) accumulated
+2026-07-29 22:14:24,642 | INFO | [Agentic] Initial query: YouTube influencer marketing to minors sponsored video game sale disclosure legal standards: search FTC Act Section 5 endorsement guides 16 CFR Part 255, FTC .com Disclosures, COPPA, state UDAP, and platform ad policies on clear and conspicuous sponsorship disclosure in-video, description, and pinned comment. Include ASA/CAP Code and CMA guidance on influencer ads, rules on direct exhortations to children (‘what are you waiting for? grab the games now’, ‘head to my link’), misleading urgency/limited-time sale claims, and any child-directed advertising standards for age-rated video games/digital game promotions.
+2026-07-29 22:14:24,642 | INFO | [Agentic] Iteration 1/3
+2026-07-29 22:14:25,570 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:14:25,570 | INFO | [Agentic] Next query: Find current FTC endorsement/disclosure rules and platform advertising guidance for sponsored YouTube content, including requirements for clear and conspicuous ad disclosures in video/audio/descriptions, disclosure of free-to-play game promotions and bonus offers, and any children/teen-directed advertising guidance relevant to gaming influencer sponsorships.
+2026-07-29 22:14:25,570 | INFO | [Agentic] Iteration 2/3
+2026-07-29 22:14:26,354 | INFO | [Agentic] 5 total item(s) accumulated
+2026-07-29 22:14:26,359 | INFO | [Agentic] 12 total item(s) accumulated
+2026-07-29 22:14:27,105 | INFO | [Agentic] 13 total item(s) accumulated
+2026-07-29 22:14:27,111 | INFO | [Agentic] 12 total item(s) accumulated
+2026-07-29 22:14:28,469 | INFO | [Agentic] Initial query: YouTube influencer gaming-chair promotion to mixed/child audience: search FTC Endorsement Guides 16 CFR Part 255, FTC .com Disclosures, FTC cases/guidance on affiliate links, discount codes, material connection disclosure, and deceptive endorsement claims/testimonials; include UK CAP Code/ASA and CMA guidance on “ad” disclosure in influencer marketing and direct exhortation to children in online video. Also retrieve rules on misleading objective claims for furniture durability/comfort/weight-capacity (e.g., “supporting up to 550 lbs,” “very comfortable,” “perfect for hardcore gamers”) and any child-directed advertising standards relevant to gaming content, including ICC Advertising and Marketing Communications Code and platform policies.
+2026-07-29 22:14:28,469 | INFO | [Agentic] Iteration 1/3
+2026-07-29 22:14:28,545 | INFO | [Agentic] Initial query: Search for legal and regulatory authority on influencer marketing of beverage/supplement products to minors on video-sharing platforms, including FTC Act §5, FTC Endorsement Guides (16 C.F.R. Part 255), Children’s Online Privacy Protection Act/COPPA where child-directed audiences are relevant, UCPD/Unfair Commercial Practices Directive 2005/29/EC Annex I para. 28 (direct exhortations to children), AVMSD rules on audiovisual commercial communications, and CAP Code/ASA and CMA guidance on ad disclosure in influencer content. Focus on undisclosed or inadequate sponsorship disclosure, use of discount codes/affiliate promotions, misleading health or hydration claims for caffeinated and caffeine-free ‘gaming supplements’/energy drinks, and any child-directed advertising restrictions or HFSS/age-sensitive marketing standards applicable to YouTube or streaming content featuring anime/VTuber branding.
+2026-07-29 22:14:28,545 | INFO | [Agentic] Iteration 1/3
+2026-07-29 22:14:28,550 | INFO | [Agentic] 5 total item(s) accumulated
+2026-07-29 22:14:28,554 | INFO | [Agentic] 9 total item(s) accumulated
+2026-07-29 22:14:28,577 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:14:28,577 | INFO | [Agentic] Next query: Find U.S. and state advertising/endorsement rules for influencer or YouTube sponsorships promoting legal services and mass tort claims, including FTC Endorsement Guides, YouTube paid promotion disclosure requirements, state bar attorney advertising/solicitation rules, and laws/guidance on misleading privacy/data-collection lawsuit ads (e.g., claims about Google Incognito, required disclaimers, 'may have a claim' lead generation).
+2026-07-29 22:14:28,578 | INFO | [Agentic] Iteration 2/3
+2026-07-29 22:14:30,249 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:14:30,249 | INFO | [Agentic] Next query: Canada influencer marketing sponsored video disclosure guidance endorsement advertising conspicuous disclosure YouTube sponsorship affiliate link Competition Bureau Ad Standards Canada social media testimonials material connection gaming promotion
+2026-07-29 22:14:30,249 | INFO | [Agentic] Iteration 3/3
+2026-07-29 22:14:30,695 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:14:30,696 | INFO | [Agentic] Next query: Canada influencer marketing sponsored content disclosure guidance endorsement advertising Competition Bureau Ad Standards social media clear and conspicuous disclosure YouTube verbal and description disclosures limited-time sale price advertising ordinary selling price claims misleading advertising retail sale duration guidance
+2026-07-29 22:14:30,696 | INFO | [Agentic] Iteration 2/3
+2026-07-29 22:14:31,122 | INFO | [Agentic] Initial query: YouTube influencer marketing to minors sponsored gameplay ad disclosure Disney Speedstorm free-to-play video game legal/regulatory guidance: FTC Act Section 5, FTC Endorsement Guides (16 CFR Part 255), FTC .com Disclosures, COPPA/children-directed advertising, UK CAP Code/ASA and CMA influencer disclosure rules, UCPD/AVMSD rules on identifiable commercial communications. Focus on child-directed or teen-audience content and risks of inadequate/unclear sponsorship disclosure, blended advertising in gameplay content, direct exhortations to children to download/play (“download the game,” “play with your friends”), and misleading omission of monetization/in-app purchase mechanics in “free-to-play” claims.
+2026-07-29 22:14:31,122 | INFO | [Agentic] Iteration 1/3
+2026-07-29 22:14:31,260 | INFO | [Agentic] 5 total item(s) accumulated
+2026-07-29 22:14:32,082 | INFO | [Agentic] 9 total item(s) accumulated
+2026-07-29 22:14:32,087 | INFO | [Agentic] 5 total item(s) accumulated
+2026-07-29 22:14:33,103 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:14:33,103 | INFO | [Agentic] Next query: Canada influencer/endorsement advertising guidance affiliate links discount codes disclosure testimonial typical results misleading advertising Competition Bureau Ad Standards social media endorsements sponsored content product reviews
+2026-07-29 22:14:33,103 | INFO | [Agentic] Iteration 2/3
+2026-07-29 22:14:33,965 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:14:33,965 | INFO | [Agentic] Next query: Canada influencer marketing and endorsement disclosure requirements Competition Act Ad Standards Canada social media sponsorship disclosure affiliate discount code material connection video description FTC-like guidance health supplement advertising dehydration claims social life mental health claims caffeine-free drink advertising
+2026-07-29 22:14:33,966 | INFO | [Agentic] Iteration 2/3
+2026-07-29 22:14:34,503 | INFO | [Agentic] 5 total item(s) accumulated
+2026-07-29 22:14:34,514 | INFO | [Agentic] 14 total item(s) accumulated
+2026-07-29 22:14:34,527 | INFO | [Agentic] 10 total item(s) accumulated
+2026-07-29 22:14:34,907 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:14:34,907 | INFO | [Agentic] Next query: Find U.S. federal and state advertising/endorsement rules and platform disclosure guidance applicable to YouTube creator-paid legal services ads and mass tort lead generation, including FTC Endorsement Guides (.com Disclosures), FTC guidance on clear and conspicuous sponsorship disclosures, state bar attorney advertising/solicitation rules for online video ads and referral/lead-generation services (especially Florida Bar and multistate rules), and any laws/guidance on deceptive privacy/data-claim advertising tied to the Google Chrome Incognito litigation.
+2026-07-29 22:14:34,907 | INFO | [Agentic] Iteration 3/3
+2026-07-29 22:14:35,960 | INFO | [Agentic] 10 total item(s) accumulated
+2026-07-29 22:14:36,267 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:14:36,268 | INFO | [Agentic] Next query: Canada influencer marketing sponsored video disclosure requirements Competition Bureau Ad Standards disclosure of material connection YouTube verbal and description disclosures limited-time sale price advertising ordinary selling price claims guidance
+2026-07-29 22:14:36,268 | INFO | [Agentic] Iteration 3/3
+2026-07-29 22:14:36,718 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:14:36,718 | INFO | [Agentic] Next query: Canada influencer advertising disclosure sponsored video gaming endorsement disclosure #sponsored Competition Bureau Ad Standards Canada guidance material connection YouTube; plus Canadian advertising rules for video game ads aimed at teens/children including disclosure of free-to-play and in-app purchases/monetization and violence content claims
+2026-07-29 22:14:36,719 | INFO | [Agentic] Iteration 2/3
+2026-07-29 22:14:36,783 | INFO | [Agentic] 8 total item(s) accumulated
+2026-07-29 22:14:37,198 | INFO | [Agentic] 12 total item(s) accumulated
+2026-07-29 22:14:38,118 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:14:38,118 | INFO | [Agentic] Next query: Canada advertising law influencer/affiliate endorsement disclosure sponsored content YouTube discount code affiliate links Competition Act Ad Standards FTC-style guidance material connection disclosure performance claims comfort durability 'very comfortable' 'supporting up to 550 lbs' testimonials endorsements
+2026-07-29 22:14:38,118 | INFO | [Agentic] Iteration 3/3
+2026-07-29 22:14:38,413 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:14:38,413 | INFO | [Agentic] Next query: Canada influencer marketing disclosure requirements social media endorsements Competition Bureau guidelines material connection disclosure YouTube Twitch affiliate code sponsored content dietary supplements energy drinks health claims testimonials advertising standards
+2026-07-29 22:14:38,413 | INFO | [Agentic] Iteration 3/3
+2026-07-29 22:14:39,092 | INFO | [Agentic] 12 total item(s) accumulated
+2026-07-29 22:14:39,096 | INFO | [Agentic] 10 total item(s) accumulated
+2026-07-29 22:14:40,592 | INFO | [Agentic] 14 total item(s) accumulated
+2026-07-29 22:14:40,933 | INFO | [Agentic] 9 total item(s) accumulated
+2026-07-29 22:14:41,175 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:14:41,175 | INFO | [Agentic] Next query: Canada influencer marketing sponsored gaming video disclosure requirements Competition Act deceptive marketing Ad Standards Canada Disclosure Guidelines YouTube #sponsored material connection disclosure free-to-play game child/youth advertising in-game purchases violence content advertising standards
+2026-07-29 22:14:41,175 | INFO | [Agentic] Iteration 3/3
+2026-07-29 22:14:42,528 | INFO | [Agentic] 12 total item(s) accumulated
+2026-07-29 22:14:43,447 | INFO | wrote 30 retrieval trace(s) to runs/rag/20260729_221443.json
+2026-07-29 22:14:43,447 | INFO | wrote 30 predictions to submission_agentic_rag.jsonl
+2026-07-29 22:14:43,447 | INFO | wrote 26 misclassified instance(s) to submission_agentic_rag_error.jsonl
+2026-07-29 22:14:43,448 | INFO | === Distinct gold labels observed, by tier ===
+2026-07-29 22:14:43,448 | INFO | [ST1 - commercial type]     ['digital_content_or_services', 'none', 'physical_goods', 'physical_services']
+2026-07-29 22:14:43,448 | INFO | [ST2 - product category]    ['apps', 'creator_community', 'education', 'fashion', 'food', 'hardware_electronics', 'health', 'other']
+2026-07-29 22:14:43,448 | INFO | [ST3 - compliance flags]    ['direct_exhortation', 'inadequate_disclosure', 'insufficient_context', 'misleading_claim', 'no_flag', 'undisclosed_advertising']
+2026-07-29 22:14:43,448 | INFO | Evaluation:
+2026-07-29 22:14:43,448 | INFO |   st1_macro_f1: 0.860
+2026-07-29 22:14:43,448 | INFO |   st2_macro_f1: 0.479
+2026-07-29 22:14:43,448 | INFO |   st3_macro_f1: 0.288
+2026-07-29 22:14:43,448 | INFO |   st3_family_macro_f1: 0.452
+2026-07-29 22:14:43,448 | INFO |   mean_macro_f1: 0.543

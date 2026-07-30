@@ -1,0 +1,26 @@
+2026-07-29 22:12:20,675 | INFO | logging to runs/run_20260729_221220_agentic_rag_full_gpt-5.4.log
+2026-07-29 22:12:20,675 | INFO | config: target=public_data_dev/dev.jsonl model=gpt-5.4 context=full sample_size=1 max_concurrency=8 max_iterations=3 top_k=5 out=submission_agentic_rag.jsonl
+2026-07-29 22:12:25,733 | INFO | [Agentic] Initial query: Search for UK/US legal and self-regulatory sources on influencer marketing to minors for a YouTube vlog sponsorship by Surfshark VPN: FTC Act §5, FTC Endorsement Guides (16 CFR Part 255), FTC .com Disclosures, COPPA, CAP Code/ASA guidance, CMA influencer advertising guidance, and platform branded-content disclosure rules on clear and conspicuous disclosure of paid promotion (#ad, sponsored, description-box-only disclosures). Include authorities on misleading VPN/cybersecurity claims and unsubstantiated representations about privacy, malware protection, public Wi‑Fi safety, IP switching/access to geo-restricted streaming libraries or government sites, plus any rules on direct exhortation or child-directed advertising for digital services.
+2026-07-29 22:12:25,733 | INFO | [Agentic] Iteration 1/3
+2026-07-29 22:12:27,272 | INFO | [Agentic] 5 total item(s) accumulated
+2026-07-29 22:12:30,601 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:12:30,601 | INFO | [Agentic] Next query: Find current advertising law and platform guidance applicable to influencer endorsements of VPN/cybersecurity services in YouTube videos, especially: FTC Endorsement Guides and .com Disclosures; YouTube paid promotion/disclosure rules; UK ASA/CAP and CMA influencer ad disclosure rules; rules/guidance on substantiating cybersecurity/privacy claims such as 'keeps you safe online,' 'protecting you from using public Wi‑Fi,' 'encrypting your data,' 'alerts you if they notice malware,' and claims about accessing Netflix libraries/government websites by switching IP addresses; plus any legal guidance on advertising VPNs for bypassing geo-restrictions/streaming access.
+2026-07-29 22:12:30,601 | INFO | [Agentic] Iteration 2/3
+2026-07-29 22:12:32,012 | INFO | [Agentic] 8 total item(s) accumulated
+2026-07-29 22:12:33,848 | INFO | [Agentic] Sufficiency check: done=False
+2026-07-29 22:12:33,848 | INFO | [Agentic] Next query: Canada influencer advertising disclosure requirements Competition Bureau testimonial/endorsement guidance social media sponsorship disclosure VPN advertising claims privacy/security encryption malware alerts geo-unblocking misleading advertising
+2026-07-29 22:12:33,848 | INFO | [Agentic] Iteration 3/3
+2026-07-29 22:12:35,698 | INFO | [Agentic] 10 total item(s) accumulated
+2026-07-29 22:12:36,863 | INFO | wrote 1 retrieval trace(s) to runs/rag/20260729_221236.json
+2026-07-29 22:12:36,864 | INFO | wrote 1 predictions to submission_agentic_rag.jsonl
+2026-07-29 22:12:36,864 | INFO | wrote 1 misclassified instance(s) to submission_agentic_rag_error.jsonl
+2026-07-29 22:12:36,864 | INFO | === Distinct gold labels observed, by tier ===
+2026-07-29 22:12:36,864 | INFO | [ST1 - commercial type]     ['digital_content_or_services']
+2026-07-29 22:12:36,864 | INFO | [ST2 - product category]    ['other']
+2026-07-29 22:12:36,864 | INFO | [ST3 - compliance flags]    ['misleading_claim']
+2026-07-29 22:12:36,864 | INFO | Evaluation:
+2026-07-29 22:12:36,864 | INFO |   st1_macro_f1: 1.000
+2026-07-29 22:12:36,864 | INFO |   st2_macro_f1: 0.000
+2026-07-29 22:12:36,864 | INFO |   st3_macro_f1: 1.000
+2026-07-29 22:12:36,864 | INFO |   st3_family_macro_f1: 1.000
+2026-07-29 22:12:36,864 | INFO |   mean_macro_f1: 0.667

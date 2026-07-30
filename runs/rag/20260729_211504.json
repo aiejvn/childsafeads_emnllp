@@ -1,0 +1,55 @@
+{
+  "metadata": {
+    "generated_at": "2026-07-29T21:15:04.204083",
+    "target": "public_data_dev/dev.jsonl",
+    "model": "gpt-5.4",
+    "context": "full",
+    "sample_size": 10,
+    "max_concurrency": 8,
+    "max_iterations": 3,
+    "top_k": 5,
+    "n_instances": 10
+  },
+  "results": [
+    {
+      "instanceID": "UCa-DreapaYm4Roo0CfUBGQg_s2NOMxaH3l8_7e973a1b",
+      "error": "Extra data: line 1 column 5 (char 4)"
+    },
+    {
+      "instanceID": "UCuvSqzfO_LV_QzHdmEj84SQ_wrbyP7y5z80_7de330ad",
+      "error": "Extra data: line 1 column 5 (char 4)"
+    },
+    {
+      "instanceID": "UCrPseYLGpNygVi34QpGNqpA_RDAROhyCnSc_cf8eda2f",
+      "error": "Extra data: line 1 column 5 (char 4)"
+    },
+    {
+      "instanceID": "UCK3eoeo-HGHH11Pevo1MzfQ_M2Z_g6FRnpU_231fa1b3",
+      "error": "Extra data: line 1 column 5 (char 4)"
+    },
+    {
+      "instanceID": "UCkxctb0jr8vwa4Do6c6su0Q_5rkd3e_aCds_441aa5d4",
+      "error": "Extra data: line 1 column 5 (char 4)"
+    },
+    {
+      "instanceID": "UC7-hR5EfgpM6oHfiGDkxfMA_AdXnba0dUBw_811b53fc",
+      "error": "Extra data: line 1 column 5 (char 4)"
+    },
+    {
+      "instanceID": "UC7-hR5EfgpM6oHfiGDkxfMA_r8vJy5W3yqY_4a68818a",
+      "error": "Extra data: line 1 column 5 (char 4)"
+    },
+    {
+      "instanceID": "UC8JOgFXp-I3YV6dsKqqQdUw_6Eu9rC9glrs_c50465a8",
+      "error": "Extra data: line 1 column 5 (char 4)"
+    },
+    {
+      "instanceID": "UClyGlKOhDUooPJFy4v_mqPg_4BDnjhD0Yp8_4deac4c5",
+      "error": "Extra data: line 1 column 5 (char 4)"
+    },
+    {
+      "instanceID": "UCB_qr75-ydFVKSF9Dmo6izg_oNDquLRCBHA_67f0ddda",
+      "error": "Extra data: line 1 column 5 (char 4)"
+    }
+  ]
+}

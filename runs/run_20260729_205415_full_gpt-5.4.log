@@ -1,0 +1,14 @@
+2026-07-29 20:54:15,620 | INFO | logging to runs/run_20260729_205415_full_gpt-5.4.log
+2026-07-29 20:54:15,621 | INFO | config: target=public_data_dev/dev.jsonl model=gpt-5.4 context=full sample_size=100 max_concurrency=8 out=submission_gpt.jsonl
+2026-07-29 20:54:29,822 | INFO | wrote 100 predictions to submission_gpt.jsonl
+2026-07-29 20:54:29,822 | INFO | wrote 85 misclassified instance(s) to submission_gpt_error.jsonl
+2026-07-29 20:54:29,822 | INFO | === Distinct gold labels observed, by tier ===
+2026-07-29 20:54:29,822 | INFO | [ST1 - commercial type]     ['digital_content_or_services', 'none', 'physical_goods', 'physical_services']
+2026-07-29 20:54:29,822 | INFO | [ST2 - product category]    ['apps', 'creator_community', 'education', 'fashion', 'financial', 'food', 'gambling', 'gambling_adjacent', 'hardware_electronics', 'health', 'other', 'toys']
+2026-07-29 20:54:29,822 | INFO | [ST3 - compliance flags]    ['age_restricted_or_prohibited_product', 'direct_exhortation', 'hfss_food_marketing', 'inadequate_disclosure', 'insufficient_context', 'misleading_claim', 'no_flag', 'undisclosed_advertising']
+2026-07-29 20:54:29,822 | INFO | Evaluation:
+2026-07-29 20:54:29,822 | INFO |   st1_macro_f1: 0.772
+2026-07-29 20:54:29,823 | INFO |   st2_macro_f1: 0.702
+2026-07-29 20:54:29,823 | INFO |   st3_macro_f1: 0.438
+2026-07-29 20:54:29,823 | INFO |   st3_family_macro_f1: 0.555
+2026-07-29 20:54:29,823 | INFO |   mean_macro_f1: 0.637

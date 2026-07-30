@@ -1,0 +1,13 @@
+2026-07-29 21:52:55,382 | INFO | logging to runs/run_20260729_215255_agentic_rag_full_gpt-5.4.log
+2026-07-29 21:52:55,382 | INFO | config: target=public_data_dev/dev.jsonl model=gpt-5.4 context=full sample_size=1 max_concurrency=8 max_iterations=3 top_k=5 out=submission_agentic_rag.jsonl
+2026-07-29 21:53:00,391 | INFO | [Agentic] Initial query: YouTube influencer sponsorship disclosure to minors Surfshark VPN vlog legal standards: search FTC Act Section 5 endorsement guides (16 CFR Part 255), FTC .com Disclosures, Children’s Online Privacy Protection / youth-directed advertising guidance, UCPD 2005/29/EC Annex I direct exhortation to children, UK CAP Code/ASA influencer marketing rules (obviously identifiable marketing communications, #ad disclosure) and misleading advertising substantiation for VPN/cybersecurity claims such as public Wi‑Fi safety, malware alerts, privacy/security, and access to geo-restricted streaming libraries/government websites. Include case law, enforcement actions, and platform/self-regulatory codes relevant to undisclosed or inadequately disclosed influencer ads to child or teen audiences, with any age-targeting or restricted-service issues for VPN marketing on video platforms.
+2026-07-29 21:53:00,391 | INFO | [Agentic] Iteration 1/3
+2026-07-29 21:53:06,330 | INFO | [Agentic] 5 total item(s) accumulated
+2026-07-29 21:53:06,331 | WARNING | UCa-DreapaYm4Roo0CfUBGQg_s2NOMxaH3l8_7e973a1b failed ('api.openjustice.ai')
+2026-07-29 21:53:06,332 | INFO | wrote 1 retrieval trace(s) to runs/rag/20260729_215306.json
+2026-07-29 21:53:06,332 | INFO | wrote 1 predictions to submission_agentic_rag.jsonl
+2026-07-29 21:53:06,332 | INFO | wrote 1 misclassified instance(s) to submission_agentic_rag_error.jsonl
+2026-07-29 21:53:06,332 | INFO | === Distinct gold labels observed, by tier ===
+2026-07-29 21:53:06,332 | INFO | [ST1 - commercial type]     ['digital_content_or_services']
+2026-07-29 21:53:06,333 | INFO | [ST2 - product category]    ['other']
+2026-07-29 21:53:06,333 | INFO | [ST3 - compliance flags]    ['misleading_claim']

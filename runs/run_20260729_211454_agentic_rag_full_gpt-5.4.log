@@ -1,0 +1,19 @@
+2026-07-29 21:14:54,914 | INFO | logging to runs/run_20260729_211454_agentic_rag_full_gpt-5.4.log
+2026-07-29 21:14:54,914 | INFO | config: target=public_data_dev/dev.jsonl model=gpt-5.4 context=full sample_size=10 max_concurrency=8 max_iterations=3 top_k=5 out=submission_agentic_rag.jsonl
+2026-07-29 21:14:59,367 | WARNING | UCuvSqzfO_LV_QzHdmEj84SQ_wrbyP7y5z80_7de330ad failed (Extra data: line 1 column 5 (char 4))
+2026-07-29 21:14:59,371 | WARNING | UCkxctb0jr8vwa4Do6c6su0Q_5rkd3e_aCds_441aa5d4 failed (Extra data: line 1 column 5 (char 4))
+2026-07-29 21:14:59,374 | WARNING | UCK3eoeo-HGHH11Pevo1MzfQ_M2Z_g6FRnpU_231fa1b3 failed (Extra data: line 1 column 5 (char 4))
+2026-07-29 21:14:59,490 | WARNING | UC7-hR5EfgpM6oHfiGDkxfMA_AdXnba0dUBw_811b53fc failed (Extra data: line 1 column 5 (char 4))
+2026-07-29 21:14:59,687 | WARNING | UC7-hR5EfgpM6oHfiGDkxfMA_r8vJy5W3yqY_4a68818a failed (Extra data: line 1 column 5 (char 4))
+2026-07-29 21:14:59,738 | WARNING | UCa-DreapaYm4Roo0CfUBGQg_s2NOMxaH3l8_7e973a1b failed (Extra data: line 1 column 5 (char 4))
+2026-07-29 21:14:59,964 | WARNING | UCrPseYLGpNygVi34QpGNqpA_RDAROhyCnSc_cf8eda2f failed (Extra data: line 1 column 5 (char 4))
+2026-07-29 21:15:00,160 | WARNING | UC8JOgFXp-I3YV6dsKqqQdUw_6Eu9rC9glrs_c50465a8 failed (Extra data: line 1 column 5 (char 4))
+2026-07-29 21:15:02,515 | WARNING | UCB_qr75-ydFVKSF9Dmo6izg_oNDquLRCBHA_67f0ddda failed (Extra data: line 1 column 5 (char 4))
+2026-07-29 21:15:04,162 | WARNING | UClyGlKOhDUooPJFy4v_mqPg_4BDnjhD0Yp8_4deac4c5 failed (Extra data: line 1 column 5 (char 4))
+2026-07-29 21:15:04,204 | INFO | wrote 10 retrieval trace(s) to runs/rag/20260729_211504.json
+2026-07-29 21:15:04,231 | INFO | wrote 10 predictions to submission_agentic_rag.jsonl
+2026-07-29 21:15:04,231 | INFO | wrote 10 misclassified instance(s) to submission_agentic_rag_error.jsonl
+2026-07-29 21:15:04,231 | INFO | === Distinct gold labels observed, by tier ===
+2026-07-29 21:15:04,231 | INFO | [ST1 - commercial type]     ['digital_content_or_services', 'none', 'physical_goods', 'physical_services']
+2026-07-29 21:15:04,231 | INFO | [ST2 - product category]    ['apps', 'education', 'fashion', 'hardware_electronics', 'health', 'other']
+2026-07-29 21:15:04,231 | INFO | [ST3 - compliance flags]    ['inadequate_disclosure', 'misleading_claim', 'no_flag', 'undisclosed_advertising']

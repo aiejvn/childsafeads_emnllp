@@ -1,0 +1,19 @@
+2026-07-29 21:23:22,004 | INFO | logging to runs/run_20260729_212322_agentic_rag_full_gpt-5.4.log
+2026-07-29 21:23:22,004 | INFO | config: target=public_data_dev/dev.jsonl model=gpt-5.4 context=full sample_size=10 max_concurrency=8 max_iterations=3 top_k=5 out=submission_agentic_rag.jsonl
+2026-07-29 21:23:25,993 | WARNING | UCuvSqzfO_LV_QzHdmEj84SQ_wrbyP7y5z80_7de330ad failed ('api.openjustice.ai')
+2026-07-29 21:23:26,212 | WARNING | UCkxctb0jr8vwa4Do6c6su0Q_5rkd3e_aCds_441aa5d4 failed ('api.openjustice.ai')
+2026-07-29 21:23:26,238 | WARNING | UC8JOgFXp-I3YV6dsKqqQdUw_6Eu9rC9glrs_c50465a8 failed ('api.openjustice.ai')
+2026-07-29 21:23:26,306 | WARNING | UC7-hR5EfgpM6oHfiGDkxfMA_AdXnba0dUBw_811b53fc failed ('api.openjustice.ai')
+2026-07-29 21:23:26,391 | WARNING | UC7-hR5EfgpM6oHfiGDkxfMA_r8vJy5W3yqY_4a68818a failed ('api.openjustice.ai')
+2026-07-29 21:23:26,539 | WARNING | UCrPseYLGpNygVi34QpGNqpA_RDAROhyCnSc_cf8eda2f failed ('api.openjustice.ai')
+2026-07-29 21:23:26,886 | WARNING | UCK3eoeo-HGHH11Pevo1MzfQ_M2Z_g6FRnpU_231fa1b3 failed ('api.openjustice.ai')
+2026-07-29 21:23:27,068 | WARNING | UCa-DreapaYm4Roo0CfUBGQg_s2NOMxaH3l8_7e973a1b failed ('api.openjustice.ai')
+2026-07-29 21:23:29,846 | WARNING | UCB_qr75-ydFVKSF9Dmo6izg_oNDquLRCBHA_67f0ddda failed ('api.openjustice.ai')
+2026-07-29 21:23:30,307 | WARNING | UClyGlKOhDUooPJFy4v_mqPg_4BDnjhD0Yp8_4deac4c5 failed ('api.openjustice.ai')
+2026-07-29 21:23:30,309 | INFO | wrote 10 retrieval trace(s) to runs/rag/20260729_212330.json
+2026-07-29 21:23:30,310 | INFO | wrote 10 predictions to submission_agentic_rag.jsonl
+2026-07-29 21:23:30,310 | INFO | wrote 10 misclassified instance(s) to submission_agentic_rag_error.jsonl
+2026-07-29 21:23:30,310 | INFO | === Distinct gold labels observed, by tier ===
+2026-07-29 21:23:30,310 | INFO | [ST1 - commercial type]     ['digital_content_or_services', 'none', 'physical_goods', 'physical_services']
+2026-07-29 21:23:30,310 | INFO | [ST2 - product category]    ['apps', 'education', 'fashion', 'hardware_electronics', 'health', 'other']
+2026-07-29 21:23:30,310 | INFO | [ST3 - compliance flags]    ['inadequate_disclosure', 'misleading_claim', 'no_flag', 'undisclosed_advertising']
