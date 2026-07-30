@@ -23,11 +23,17 @@ from langchain_openai import ChatOpenAI
 from pydantic import BaseModel, Field
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "starting_kit"))
-from check_submission import ST1, ST2, ST3 
-from load_data import full_context, load_split, transcript_only 
+from check_submission import ST1, ST2, ST3
+from load_data import full_context, load_split, transcript_only
 
 from dotenv import load_dotenv
 load_dotenv()
+
+LABELS_TAXONOMY_PATH = os.path.join(
+    os.path.dirname(__file__), "..", "public_data_dev", "labels_taxonomy.md"
+)
+with open(LABELS_TAXONOMY_PATH, encoding="utf-8") as _f:
+    LABELS_TAXONOMY = _f.read()
 
 ST1_LABELS = sorted(ST1)
 ST2_LABELS = sorted(ST2)
@@ -49,40 +55,14 @@ assert set(ST3_FAMILY) == ST3
 SYSTEM_PROMPT = """You are a compliance analyst at an authority monitoring commercial content \
 that reaches minors on video platforms. You are given one sponsored segment (transcript, the \
 host video's metadata, and the product page its description links to). It is a GIVEN FACT that \
-the segment is commercial and that the channel is child-facing; do not re-assess either. Predict \
-three sub-tasks.
+the segment is commercial and that the channel is child-facing; do not re-assess either.
 
-ST1 - commercial type (exactly one label). Decide from what the buyer receives, not how it is \
-marketed:
-- physical_goods: tangible items shipped/handed to the buyer
-- digital_content_or_services: content/services delivered digitally, no physical delivery, no \
-human performance (games, apps, software, streaming, in-game currency)
-- physical_services: services performed by humans or in the physical world (therapy, haircuts, \
-travel, live events, repairs)
-- none: no identifiable commercial offer
-- other: genuinely none of the above
+Predict three sub-tasks -- ST1 (commercial type, exactly one label), ST2 (product category, one \
+or more labels), and ST3 (compliance risk flags, one or more labels) -- using the label taxonomy \
+below, which gives the full definitions, examples, and legal basis for each label. Base every \
+judgment only on the text given. Respond with the structured prediction only.
 
-ST2 - product category (one or more labels): toys, food, apps, hardware_electronics, fashion, \
-health, education, financial, gambling, gambling_adjacent, creator_community, other.
-
-ST3 - compliance risk flags (one or more labels). Emit every flag that applies:
-- undisclosed_advertising: the commercial nature is not identified anywhere available to the \
-viewer (not spoken, not in the description, not via the platform's paid-promotion label)
-- inadequate_disclosure: a disclosure exists but is not clear and comprehensible to a child \
-(buried, adult jargon, etc.) -- mutually exclusive with undisclosed_advertising
-- direct_exhortation: a direct appeal to children to buy, or to get their parents to buy, using \
-personal/hyped/pressuring/parasocial language ("if you love us, buy it", pleading, urgency \
-aimed at the viewer). Plain transactional instructions ("link in description", "use my code") \
-are NOT exhortation. If genuinely ambiguous, do not flag.
-- misleading_claim: unsubstantiated or high-risk claims about characteristics, performance, \
-results, or price; includes any health/weight/fitness/skincare/supplement claim aimed at children
-- age_restricted_or_prohibited_product: alcohol, tobacco/vaping, gambling, weapons, or similar
-- hfss_food_marketing: clear cases of food high in fat, salt or sugar (energy drinks, \
-confectionery, fast food)
-- no_flag: commercial content that appears compliant -- must stand alone, no other flags
-- insufficient_context: segment too short/ambiguous to assess -- must stand alone, no other flags
-
-Base every judgment only on the text given. Respond with the structured prediction only."""
+""" + LABELS_TAXONOMY
 
 
 class Prediction(BaseModel):
@@ -154,6 +134,20 @@ def macro_f1(y_true: List[list], y_pred: List[list], labels: List[str]) -> float
     return sum(scores) / len(scores) if scores else 0.0
 
 
+def prediction_errors(gold: dict, pred: dict) -> dict:
+    """Diff a prediction against gold, tier by tier. Returns {} if fully correct;
+    otherwise one entry per wrong tier describing exactly what was wrong."""
+    errors = {}
+    if pred["st1"] != gold["st1"]:
+        errors["st1"] = {"gold": gold["st1"], "pred": pred["st1"]}
+    for tier in ("st2", "st3"):
+        missing = sorted(set(gold[tier]) - set(pred[tier]))  # gold labels the prediction missed
+        extra = sorted(set(pred[tier]) - set(gold[tier]))    # predicted labels not in gold
+        if missing or extra:
+            errors[tier] = {"missing": missing, "extra": extra}
+    return errors
+
+
 def evaluate(gold: List[dict], pred: List[dict]) -> dict:
     st1_f1 = macro_f1([[g["st1"]] for g in gold], [[p["st1"]] for p in pred], ST1_LABELS)
     st2_f1 = macro_f1([g["st2"] for g in gold], [p["st2"] for p in pred], ST2_LABELS)
@@ -175,6 +169,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("target", help="split file to predict on, e.g. dev.jsonl")
     ap.add_argument("--out", default="submission_gpt.jsonl", help="output predictions jsonl")
+    ap.add_argument("--error-out", default="submission_gpt_error.jsonl",
+                     help="instances with a wrong st1/st2/st3 prediction, with a diff against gold")
     ap.add_argument("--model", default="gpt-5.4")
     ap.add_argument("--context", choices=["transcript", "full"], default="full",
                      help="how much of the instance to show the model")
@@ -205,7 +201,9 @@ def main():
                          return_exceptions=True)
 
     predictions, gold = [], []
-    with open(args.out, "w", encoding="utf-8") as f:
+    n_errors = 0
+    with open(args.out, "w", encoding="utf-8") as f, \
+         open(args.error_out, "w", encoding="utf-8") as f_err:
         for inst, result in zip(instances, results):
             if isinstance(result, Exception):
                 log.warning(f"{inst['instanceID']} failed ({result})")
@@ -216,7 +214,16 @@ def main():
             f.write(json.dumps({"instanceID": inst["instanceID"], **pred}) + "\n")
             if inst.get("labels"):
                 gold.append(inst["labels"])
+                errors = prediction_errors(inst["labels"], pred)
+                if errors:
+                    n_errors += 1
+                    f_err.write(json.dumps({
+                        "instanceID": inst["instanceID"], "gold": inst["labels"],
+                        "pred": pred, "errors": errors,
+                    }) + "\n")
     log.info(f"wrote {len(predictions)} predictions to {args.out}")
+    if gold:
+        log.info(f"wrote {n_errors} misclassified instance(s) to {args.error_out}")
 
     if len(gold) == len(predictions) and gold:
         log_gold_label_inventory(log, gold)
