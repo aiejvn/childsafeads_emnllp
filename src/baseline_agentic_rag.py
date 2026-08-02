@@ -28,6 +28,7 @@ import argparse
 import json
 import os
 import random
+import shutil
 import sys
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
@@ -259,6 +260,10 @@ def main():
                     "pred": pred, "errors": errors,
                 }) + "\n")
     log.info(f"wrote {len(predictions)} predictions to {out}")
+
+    canonical = "submission_agentic_rag.jsonl"
+    shutil.copyfile(out, canonical)
+    log.info(f"copied predictions to {canonical} (canonical submission file)")
 
     if gold:
         log.info(f"wrote {n_errors} misclassified instance(s) to {error_out}")

@@ -1,0 +1,14 @@
+2026-08-01 20:50:35,144 | INFO | MainThread | logging to runs/run_20260801_205035_full_gpt-5.4.log
+2026-08-01 20:50:35,144 | INFO | MainThread | config: target=public_data_dev/dev.jsonl model=gpt-5.4 context=full sample_size=30 max_concurrency=8 out=runs/submission_gpt_20260801_205035.jsonl
+2026-08-01 20:50:40,710 | INFO | MainThread | wrote 30 predictions to runs/submission_gpt_20260801_205035.jsonl
+2026-08-01 20:50:40,712 | INFO | MainThread | wrote 27 misclassified instance(s) to runs/submission_gpt_error_20260801_205035.jsonl
+2026-08-01 20:50:40,712 | INFO | MainThread | === Distinct gold labels observed, by tier ===
+2026-08-01 20:50:40,712 | INFO | MainThread | [ST1 - commercial type]     ['digital_content_or_services', 'none', 'physical_goods', 'physical_services']
+2026-08-01 20:50:40,712 | INFO | MainThread | [ST2 - product category]    ['apps', 'creator_community', 'education', 'fashion', 'food', 'hardware_electronics', 'health', 'other']
+2026-08-01 20:50:40,712 | INFO | MainThread | [ST3 - compliance flags]    ['direct_exhortation', 'inadequate_disclosure', 'insufficient_context', 'misleading_claim', 'no_flag', 'undisclosed_advertising']
+2026-08-01 20:50:40,713 | INFO | MainThread | Evaluation:
+2026-08-01 20:50:40,713 | INFO | MainThread |   st1_macro_f1: 0.776
+2026-08-01 20:50:40,713 | INFO | MainThread |   st2_macro_f1: 0.461
+2026-08-01 20:50:40,713 | INFO | MainThread |   st3_macro_f1: 0.250
+2026-08-01 20:50:40,713 | INFO | MainThread |   st3_family_macro_f1: 0.274
+2026-08-01 20:50:40,713 | INFO | MainThread |   mean_macro_f1: 0.496

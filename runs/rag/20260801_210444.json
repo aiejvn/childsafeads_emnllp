@@ -1,0 +1,44 @@
+{
+  "metadata": {
+    "generated_at": "2026-08-01T21:05:45.217234",
+    "target": "public_data_dev/dev.jsonl",
+    "model": "gpt-5.4",
+    "context": "full",
+    "sample_size": 1,
+    "max_concurrency": 8,
+    "max_iterations": 3,
+    "top_k": 5,
+    "n_instances": 1
+  },
+  "results": [
+    {
+      "instanceID": "UCa-DreapaYm4Roo0CfUBGQg_s2NOMxaH3l8_7e973a1b",
+      "iterations": 3,
+      "total_items": 6,
+      "iter_evals": [
+        {
+          "iteration": 1,
+          "query": "Search for UK/US legal and self-regulatory sources on influencer marketing disclosure to minors for a YouTube vlog sponsored by Surfshark VPN: FTC Act \u00a75, FTC Endorsement Guides (16 CFR Part 255), FTC .com Disclosures, YouTube paid promotion disclosure rules, UK CAP Code/ASA guidance on \u201cobviously identifiable\u201d ads, affiliate links and discount codes, and direct exhortations such as \u201cuse my code\u201d or \u201ctry it out.\u201d Include authorities on misleading cybersecurity/privacy and geo-access claims by VPN services (e.g., safety on public Wi\u2011Fi, malware/data-breach alerts, accessing Netflix libraries or government sites), plus any child-directed advertising standards relevant to whether teen audiences require enhanced ad disclosure or restrictions.",
+          "eval": {
+            "enabled?": false
+          }
+        },
+        {
+          "iteration": 2,
+          "query": "Find applicable advertising/consumer protection rules and guidance for influencer endorsements of VPN/cybersecurity services, especially requirements for clear sponsorship disclosure and substantiation of security/performance claims (e.g., protects you on public Wi\u2011Fi, encrypts data, alerts malware, data breach alerts, access content/government websites/Netflix libraries by switching IP). Prioritize FTC Endorsement Guides/.com Disclosures and UK ASA/CAP Code or other likely-jurisdiction guidance for YouTube creators and VPN ads.",
+          "eval": {
+            "enabled?": false
+          }
+        },
+        {
+          "iteration": 3,
+          "query": "Find applicable advertising law/guidance for influencer endorsements of VPN/cybersecurity services, focusing on (1) disclosure requirements for sponsored YouTube content, and (2) substantiation limits for claims that a VPN 'keeps you safe online,' 'protects you from public Wi\u2011Fi,' 'encrypts your data,' 'alerts you to malware/data leaks,' and enables access to region-restricted/government websites or other content. Prioritize UK ASA/CAP Code and CMA influencer guidance, and also FTC Endorsement Guides/.com Disclosures if the channel targets US viewers.",
+          "eval": {
+            "enabled?": false
+          }
+        }
+      ],
+      "grounding": "Relevance: 0.83825725\nDocument: This document is a court judgment from the British Columbia Court of Appeal regarding an appeal by the Office of the Information and Privacy Commissioner against a lower court's decision that required the City of Vancouver to disclose information about short-term rental licensees provided by Airbnb. It addresses issues of personal privacy under the Freedom of Information and Protection of Privacy Act (FIPPA) and procedural fairness regarding notice to affected parties. This document is useful for legal professionals and policymakers involved in privacy law, administrative law, or municipal governance, particularly in cases involving the disclosure of personal information.\n**********\nRelevance: 0.83467263\nDocument: This document is a court order from the Federal Court of Canada regarding a proposed class action initiated by Voltage Pictures, LLC and others against an unidentified respondent for alleged copyright infringement through illegal file sharing. It grants the Samuelson-Glushko Canadian Internet Policy and Public Interest Clinic (CIPPIC) the status of intervener in the disclosure motion, allowing them to address specific public interest issues related to privacy and the disclosure of personal information. This document is useful for legal professionals involved in intellectual property cases, particularly those addressing privacy rights and the implications of class actions.\n**********\nRelevance: 0.83459806\nDocument: This document is a court decision regarding a proposed class action by Voltage Pictures, LLC and others against an unidentified respondent, John Doe, for alleged copyright infringement through illegal file sharing. The court ordered Rogers Communications Inc. to disclose the name and address of the subscriber associated with a specific IP address while ruling that Rogers is entitled to compensation for this disclosure. This document is useful for legal professionals dealing with copyright infringement cases, particularly those involving internet service providers and the disclosure of subscriber information.\n**********\nRelevance: 0.8339428\nDocument: This document is a judicial review decision from the Supreme Court of British Columbia regarding the Vancouver Whitecaps FC's challenge to an order by the Information and Privacy Commissioner for the disclosure of a Sponsorship Addendum Agreement with BC Pavilion Corporation. It outlines the legal framework under the Freedom of Information and Protection of Privacy Act (FIPPA), the reasoning behind the Adjudicator's decision, and the court's conclusion that the Adjudicator's ruling was reasonable. This document is useful for legal professionals and organizations navigating public access to information laws, particularly in cases involving private interests and public bodies.\n**********\nRelevance: 0.833157\nDocument: This document is a Supreme Court of British Columbia judgment regarding a case between the Private Career Training Institutions Agency and Vancouver Career College (Burnaby) Inc. It addresses allegations of misleading advertising practices by VCC Inc. through Keyword Advertising, ultimately ruling in favor of VCC Inc. The judgment is useful for understanding legal interpretations of advertising regulations in the context of educational institutions and can serve as a reference for similar cases involving deceptive marketing practices.\n**********\nRelevance: 0.82720923\nDocument: This document is a judicial review decision from the Supreme Court of British Columbia regarding Clearview AI Inc.'s compliance with the Personal Information Protection Act (PIPA). It outlines the court's findings on whether PIPA applies to Clearview, the reasonableness of the Information and Privacy Commissioner's order prohibiting Clearview from using personal information of individuals in British Columbia without consent, and the enforceability of that order. This document is useful for legal professionals and policymakers interested in privacy law, facial recognition technology regulations, and the implications of cross-border data practices."
+    }
+  ]
+}

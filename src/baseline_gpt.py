@@ -16,6 +16,7 @@ import json
 import logging
 import os
 import random
+import shutil
 import sys
 from datetime import datetime
 from typing import List, Literal
@@ -223,6 +224,11 @@ def main():
                         "pred": pred, "errors": errors,
                     }) + "\n")
     log.info(f"wrote {len(predictions)} predictions to {out}")
+
+    canonical = "submission_gpt.jsonl"
+    shutil.copyfile(out, canonical)
+    log.info(f"copied predictions to {canonical} (canonical submission file)")
+
     if gold:
         log.info(f"wrote {n_errors} misclassified instance(s) to {error_out}")
 
