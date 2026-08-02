@@ -1,3 +1,11 @@
+# --- LoRA encoder pipeline (src/lora_*.py) ---
+# torch: install the build matching your CUDA version yourself (e.g. via
+# https://pytorch.org/get-started/locally/) -- this pin only guarantees a CPU wheel.
+torch
+transformers
+peft
+accelerate
+
 annotated-types==0.8.0
 anyio==4.14.2
 certifi==2026.7.22
