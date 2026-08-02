@@ -1,0 +1,55 @@
+{
+  "metadata": {
+    "generated_at": "2026-08-01T20:43:16.615101",
+    "target": "public_data_dev/dev.jsonl",
+    "model": "gpt-5.4",
+    "context": "full",
+    "sample_size": 10,
+    "max_concurrency": 8,
+    "max_iterations": 3,
+    "top_k": 5,
+    "n_instances": 10
+  },
+  "results": [
+    {
+      "instanceID": "UCa-DreapaYm4Roo0CfUBGQg_s2NOMxaH3l8_7e973a1b",
+      "error": "string indices must be integers, not 'str'"
+    },
+    {
+      "instanceID": "UCuvSqzfO_LV_QzHdmEj84SQ_wrbyP7y5z80_7de330ad",
+      "error": "string indices must be integers, not 'str'"
+    },
+    {
+      "instanceID": "UCrPseYLGpNygVi34QpGNqpA_RDAROhyCnSc_cf8eda2f",
+      "error": "string indices must be integers, not 'str'"
+    },
+    {
+      "instanceID": "UCK3eoeo-HGHH11Pevo1MzfQ_M2Z_g6FRnpU_231fa1b3",
+      "error": "string indices must be integers, not 'str'"
+    },
+    {
+      "instanceID": "UCkxctb0jr8vwa4Do6c6su0Q_5rkd3e_aCds_441aa5d4",
+      "error": "string indices must be integers, not 'str'"
+    },
+    {
+      "instanceID": "UC7-hR5EfgpM6oHfiGDkxfMA_AdXnba0dUBw_811b53fc",
+      "error": "string indices must be integers, not 'str'"
+    },
+    {
+      "instanceID": "UC7-hR5EfgpM6oHfiGDkxfMA_r8vJy5W3yqY_4a68818a",
+      "error": "string indices must be integers, not 'str'"
+    },
+    {
+      "instanceID": "UC8JOgFXp-I3YV6dsKqqQdUw_6Eu9rC9glrs_c50465a8",
+      "error": "string indices must be integers, not 'str'"
+    },
+    {
+      "instanceID": "UClyGlKOhDUooPJFy4v_mqPg_4BDnjhD0Yp8_4deac4c5",
+      "error": "string indices must be integers, not 'str'"
+    },
+    {
+      "instanceID": "UCB_qr75-ydFVKSF9Dmo6izg_oNDquLRCBHA_67f0ddda",
+      "error": "string indices must be integers, not 'str'"
+    }
+  ]
+}

@@ -15,8 +15,10 @@ label-constrained submission.
 Requires OPENAI_API_KEY and OJ_API_KEY in the environment (or a .env file next to this
 script) -- the former for classification, the latter for the OpenJustice retrieval API.
 
+Writes predictions to runs/submission_agentic_rag_<timestamp>.jsonl.
+
 Usage:
-    python baseline_agentic_rag.py ../public_data_dev/dev.jsonl --out submission_agentic_rag.jsonl
+    python baseline_agentic_rag.py ../public_data_dev/dev.jsonl
     python baseline_agentic_rag.py ../public_data_dev/dev.jsonl --sample-size 20  # smoke test
 
 Prints the same macro-F1 metrics as baseline_gpt.py whenever the target split carries gold
@@ -45,6 +47,7 @@ from load_data import full_context, load_split, transcript_only
 # oj-eval submodule: reuse its agentic-retrieval loop and OpenJustice vector-DB backend as-is.
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "oj-eval", "src"))
 import flowchart as oj_flowchart
+import globals as oj_globals
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -153,9 +156,6 @@ def process_instance(inst: dict, context: str, flowchart_engine, node, llm_final
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("target", help="split file to predict on, e.g. dev.jsonl")
-    ap.add_argument("--out", default="submission_agentic_rag.jsonl", help="output predictions jsonl")
-    ap.add_argument("--error-out", default="submission_agentic_rag_error.jsonl",
-                     help="instances with a wrong st1/st2/st3 prediction, with a diff against gold")
     ap.add_argument("--model", default="gpt-5.4")
     ap.add_argument("--context", choices=["transcript", "full"], default="full",
                      help="how much of the instance to show the model")
@@ -170,19 +170,25 @@ def main():
                           "only supports single-digit k)")
     args = ap.parse_args()
 
-    log = setup_logging("runs", f"agentic_rag_{args.context}", args.model)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    log = setup_logging("runs", f"agentic_rag_{args.context}", args.model, timestamp)
+    out = os.path.join("runs", f"submission_agentic_rag_{timestamp}.jsonl")
+    error_out = os.path.join("runs", f"submission_agentic_rag_error_{timestamp}.jsonl")
 
-    # oj_flowchart.logger ("flowchart") is a separate named logger from ours ("baseline_gpt")
-    # with no handlers of its own, so its per-iteration [Agentic] logs would otherwise vanish
-    # into the unconfigured root logger. Route it through the same file+console handlers so
-    # the retrieval loop's logging lands in this run's log file.
-    oj_flowchart.logger.handlers = log.handlers
-    oj_flowchart.logger.setLevel(log.level)
-    oj_flowchart.logger.propagate = False
+    # oj_flowchart.logger ("flowchart") and oj_globals.logger ("globals") are separate named
+    # loggers from ours ("baseline_gpt") with no handlers of their own, so their per-iteration
+    # [Agentic] logs and db_retrieval's request/response logs (including the raw API response
+    # body on a malformed reply) would otherwise vanish into the unconfigured root logger.
+    # Route both through the same file+console handlers so the retrieval loop's logging lands
+    # in this run's log file.
+    for oj_logger in (oj_flowchart.logger, oj_globals.logger):
+        oj_logger.handlers = log.handlers
+        oj_logger.setLevel(log.level)
+        oj_logger.propagate = False
 
     log.info(f"config: target={args.target} model={args.model} context={args.context} "
              f"sample_size={args.sample_size} max_concurrency={args.max_concurrency} "
-             f"max_iterations={args.max_iterations} top_k={args.top_k} out={args.out}")
+             f"max_iterations={args.max_iterations} top_k={args.top_k} out={out}")
 
     if not os.environ.get("OPENAI_API_KEY"):
         raise SystemExit("Set OPENAI_API_KEY in the environment (or a .env file) first.")
@@ -213,7 +219,7 @@ def main():
 
     rag_dir = "runs/rag"
     os.makedirs(rag_dir, exist_ok=True)
-    rag_path = os.path.join(rag_dir, f"{datetime.now().strftime('%Y%m%d_%H%M%S')}.json")
+    rag_path = os.path.join(rag_dir, f"{timestamp}.json")
     with open(rag_path, "w", encoding="utf-8") as f:
         json.dump({
             "metadata": {
@@ -234,8 +240,8 @@ def main():
     gold = []
     gold_predictions = []
     n_errors = 0
-    with open(args.out, "w", encoding="utf-8") as f, \
-         open(args.error_out, "w", encoding="utf-8") as f_err:
+    with open(out, "w", encoding="utf-8") as f, \
+         open(error_out, "w", encoding="utf-8") as f_err:
         for inst, pred, retrieval in zip(instances, predictions, retrieval_records):
             f.write(json.dumps({"instanceID": inst["instanceID"], **pred}) + "\n")
             if not inst.get("labels"):
@@ -252,10 +258,10 @@ def main():
                     "instanceID": inst["instanceID"], "gold": inst["labels"],
                     "pred": pred, "errors": errors,
                 }) + "\n")
-    log.info(f"wrote {len(predictions)} predictions to {args.out}")
+    log.info(f"wrote {len(predictions)} predictions to {out}")
 
     if gold:
-        log.info(f"wrote {n_errors} misclassified instance(s) to {args.error_out}")
+        log.info(f"wrote {n_errors} misclassified instance(s) to {error_out}")
         log_gold_label_inventory(log, gold)
         metrics = evaluate(gold, gold_predictions)
         log.info("Evaluation:")

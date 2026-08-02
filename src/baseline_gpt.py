@@ -2,9 +2,11 @@
 
 Requires OPENAI_API_KEY in the environment (or a .env file next to this script).
 
+Writes predictions to runs/submission_gpt_<timestamp>.jsonl.
+
 Usage:
-    python baseline_gpt.py ../public_data_dev/dev.jsonl --out submission_gpt.jsonl
-    python baseline_gpt.py ../public_data_dev/dev.jsonl --out submission_gpt.jsonl --sample-size 20  # smoke test
+    python baseline_gpt.py ../public_data_dev/dev.jsonl
+    python baseline_gpt.py ../public_data_dev/dev.jsonl --sample-size 20  # smoke test
 
 Prints macro-F1 for st1/st2/st3, the family-level st3 macro-F1, and their mean,
 whenever the target split carries gold "labels" (train/dev, not the withheld test set).
@@ -79,10 +81,9 @@ def sanitize_st3(flags: List[str]) -> List[str]:
     return flags or ["insufficient_context"]
 
 
-def setup_logging(log_dir: str, method: str, model: str) -> logging.Logger:
+def setup_logging(log_dir: str, method: str, model: str, timestamp: str) -> logging.Logger:
     """Log everything (config, warnings, gold-label inventory, results) to console + a run file."""
     os.makedirs(log_dir, exist_ok=True)
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     log_path = os.path.join(log_dir, f"run_{timestamp}_{method}_{model}.log")
 
     logger = logging.getLogger(__name__)
@@ -168,9 +169,6 @@ def evaluate(gold: List[dict], pred: List[dict]) -> dict:
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("target", help="split file to predict on, e.g. dev.jsonl")
-    ap.add_argument("--out", default="submission_gpt.jsonl", help="output predictions jsonl")
-    ap.add_argument("--error-out", default="submission_gpt_error.jsonl",
-                     help="instances with a wrong st1/st2/st3 prediction, with a diff against gold")
     ap.add_argument("--model", default="gpt-5.4")
     ap.add_argument("--context", choices=["transcript", "full"], default="full",
                      help="how much of the instance to show the model")
@@ -179,9 +177,12 @@ def main():
     ap.add_argument("--max-concurrency", type=int, default=8)
     args = ap.parse_args()
 
-    log = setup_logging("runs", args.context, args.model)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    log = setup_logging("runs", args.context, args.model, timestamp)
+    out = os.path.join("runs", f"submission_gpt_{timestamp}.jsonl")
+    error_out = os.path.join("runs", f"submission_gpt_error_{timestamp}.jsonl")
     log.info(f"config: target={args.target} model={args.model} context={args.context} "
-             f"sample_size={args.sample_size} max_concurrency={args.max_concurrency} out={args.out}")
+             f"sample_size={args.sample_size} max_concurrency={args.max_concurrency} out={out}")
 
     if not os.environ.get("OPENAI_API_KEY"):
         raise SystemExit("Set OPENAI_API_KEY in the environment (or a .env file) first.")
@@ -202,8 +203,8 @@ def main():
 
     predictions, gold = [], []
     n_errors = 0
-    with open(args.out, "w", encoding="utf-8") as f, \
-         open(args.error_out, "w", encoding="utf-8") as f_err:
+    with open(out, "w", encoding="utf-8") as f, \
+         open(error_out, "w", encoding="utf-8") as f_err:
         for inst, result in zip(instances, results):
             if isinstance(result, Exception):
                 log.warning(f"{inst['instanceID']} failed ({result})")
@@ -221,9 +222,9 @@ def main():
                         "instanceID": inst["instanceID"], "gold": inst["labels"],
                         "pred": pred, "errors": errors,
                     }) + "\n")
-    log.info(f"wrote {len(predictions)} predictions to {args.out}")
+    log.info(f"wrote {len(predictions)} predictions to {out}")
     if gold:
-        log.info(f"wrote {n_errors} misclassified instance(s) to {args.error_out}")
+        log.info(f"wrote {n_errors} misclassified instance(s) to {error_out}")
 
     if len(gold) == len(predictions) and gold:
         log_gold_label_inventory(log, gold)

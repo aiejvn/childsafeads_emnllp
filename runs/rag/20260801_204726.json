@@ -1,0 +1,19 @@
+{
+  "metadata": {
+    "generated_at": "2026-08-01T20:47:31.352858",
+    "target": "public_data_dev/dev.jsonl",
+    "model": "gpt-5.4",
+    "context": "full",
+    "sample_size": 1,
+    "max_concurrency": 8,
+    "max_iterations": 3,
+    "top_k": 5,
+    "n_instances": 1
+  },
+  "results": [
+    {
+      "instanceID": "UCa-DreapaYm4Roo0CfUBGQg_s2NOMxaH3l8_7e973a1b",
+      "error": "string indices must be integers, not 'str'"
+    }
+  ]
+}
