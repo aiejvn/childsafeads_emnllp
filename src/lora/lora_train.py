@@ -21,6 +21,7 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 from transformers import AutoTokenizer, get_linear_schedule_with_warmup
 
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))  # so `import lora` resolves src/lora as a package
 from lora import ST1_LABELS, ST2_LABELS, ST3_LABELS, evaluate, sanitize_st3, setup_logging  # noqa: E402
 from lora.lora_data import Collator, ClassificationDataset, load_split  # noqa: E402
 from lora.lora_model import build_peft_model  # noqa: E402
