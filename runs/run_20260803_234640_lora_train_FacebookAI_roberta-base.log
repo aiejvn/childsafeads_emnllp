@@ -1,0 +1,7 @@
+2026-08-03 23:46:40,581 | INFO | MainThread | logging to runs/run_20260803_234640_lora_train_FacebookAI_roberta-base.log
+2026-08-03 23:46:40,581 | INFO | MainThread | config: {'train': 'public_data_dev/train.jsonl', 'dev': 'public_data_dev/dev.jsonl', 'model': 'FacebookAI/roberta-base', 'context': 'full', 'max_length': 512, 'epochs': 5, 'batch_size': 16, 'grad_accum_steps': 1, 'lr': 0.0002, 'warmup_ratio': 0.06, 'lora_r': 8, 'lora_alpha': 16, 'lora_dropout': 0.1, 'target_modules': 'query,value', 'st2_loss_weight': 1.0, 'st3_loss_weight': 1.0, 'pos_weight': False, 'threshold': 0.5, 'sample_size': None, 'seed': 42, 'device': None, 'output_dir': 'runs/lora_roberta'} device=cuda
+2026-08-03 23:46:40,669 | INFO | MainThread | train=2353 dev=504
+2026-08-03 23:48:17,457 | INFO | MainThread | epoch 1: mean train loss = 1.7957
+2026-08-03 23:48:26,446 | INFO | MainThread | epoch 1 dev metrics: st1_macro_f1=0.384, st2_macro_f1=0.075, st3_macro_f1=0.099, st3_family_macro_f1=0.291, mean_macro_f1=0.186
+2026-08-03 23:48:26,467 | INFO | MainThread | epoch 1: new best mean_macro_f1=0.186, saved to runs/lora_roberta/best
+2026-08-03 23:50:01,574 | INFO | MainThread | epoch 2: mean train loss = 1.1038

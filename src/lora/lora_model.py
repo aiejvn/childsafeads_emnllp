@@ -34,6 +34,7 @@ class MultiTaskEncoder(nn.Module):
         st3_loss_weight: float = 1.0,
         st2_pos_weight: Optional[torch.Tensor] = None,
         st3_pos_weight: Optional[torch.Tensor] = None,
+        **kwargs,  # PeftModelForFeatureExtraction.forward always passes inputs_embeds/output_attentions/etc.
     ) -> dict:
         pooled = self.encoder(input_ids=input_ids, attention_mask=attention_mask).last_hidden_state[:, 0]
         st1_logits = self.st1_head(pooled)
