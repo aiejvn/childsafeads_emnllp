@@ -65,6 +65,56 @@ or more labels), and ST3 (compliance risk flags, one or more labels) -- using th
 below, which gives the full definitions, examples, and legal basis for each label. Base every \
 judgment only on the text given. Respond with the structured prediction only.
 
+Before finalizing ST3, run these checks explicitly -- do not default to no_flag or \
+insufficient_context just because you are unsure; under-flagging is the more common failure mode:
+
+- misleading_claim: you are NOT verifying whether a claim is true, only identifying claims of \
+the kind the taxonomy covers -- an unsubstantiated or high-risk claim about the product's own \
+characteristics, performance, or results (or any health/fitness/skincare/supplement efficacy \
+claim, always flag those). Distinguish two things that sound similar: (a) vague subjective \
+opinion/puffery with no specific fact attached ("amazing", "the best", "insane refresh speeds", \
+"won't break the bank", "high-quality", "you really should [try it]") is normal ad talk and is NOT \
+misleading_claim by itself; (b) a specific, quantified, or factual-sounding assertion presented as \
+fact ("30% more breathability", "reduces hip pressure by 20%", "without slowing your internet \
+speeds down whatsoever", a named certification/study/guarantee, a specific price/discount claimed \
+to be unbeatable) IS misleading_claim, because it reads as a verifiable factual claim the segment \
+gives no support for. This applies even when delivered in ordinary, polished sponsor-read style --\
+ confident language about what the product concretely *does*, with a specific fact attached, is \
+what this flag is for; confident language that stays at the level of opinion/hype is not.
+- direct_exhortation: the taxonomy's test counts urgency aimed at the viewer as exhortation, not \
+just an explicit "buy this" -- do not wave through an urgent or pressuring call to action just \
+because it is phrased as an instruction. Phrases like "join X today", "go check out X right now", \
+"there's no excuse not to try it", "don't pay full price, get it here instead" add time pressure \
+or dismiss reasons not to act, which is exactly the "urgency aimed at the viewer" the test flags -- \
+this is different from a neutral "the link is in the description" or "use my code for 15% off", \
+which state where/how to get something without pressure and stay instructions.
+- undisclosed_advertising vs. inadequate_disclosure: these are mutually exclusive, and mixing \
+them up is a common error, so use this two-step procedure. Step 1: search the ENTIRE given text \
+-- transcript and video description -- for ANY acknowledgment that the segment involves a \
+commercial relationship: sponsorship ("sponsor of this video", "sponsored by", "thanks to X for \
+sponsoring"), a paid partnership/ad label, or an affiliate-link disclaimer ("contains affiliate \
+links", "using affiliate links supports us", "I'll receive a commission"). If there is truly none \
+anywhere, that is undisclosed_advertising. Step 2: if you found such an acknowledgment, judge \
+whether it is clear and prominent enough for a child to understand this content is paid for (no \
+disclosure issue) or buried, brief, generic legal/affiliate boilerplate, or otherwise unclear to a \
+child (inadequate_disclosure) -- weigh several signals together rather than any single one \
+decisively: OFFICIAL_DISCLOSURE being true is a meaningful positive signal (not proof by itself) \
+and false leans toward inadequate; an explicit plain-language sponsor/ad statement made early, \
+before or alongside the pitch, and repeated in more than one place (both spoken and in the \
+description) leans toward adequate; a disclosure mentioned only once, only briefly, only after the \
+persuasive pitch is already over, or that is the ONLY channel to mention it at all (e.g. a bare \
+promo code/link with no explicit "sponsor"/"ad" language, or an affiliate-link legal disclaimer \
+with no plain-language sponsor statement) leans toward inadequate. When the signals genuinely \
+conflict, prefer inadequate_disclosure over "no issue" -- under-flagging is the larger risk -- but \
+do not apply it reflexively to every sponsor mention regardless of context.
+
+For ST1, when a service is delivered through an app or website but performed by a human \
+professional (e.g. a therapist, coach, stylist, tutor giving live instruction), classify it as \
+physical_services, not digital_content_or_services -- the deciding test is whether a human \
+performs the service, not which channel delivers it. Reserve digital_content_or_services for \
+offerings with no human performance (software, streaming, hosting, VPNs, self-paced courses, \
+in-game currency).
+
 """ + LABELS_TAXONOMY
 
 

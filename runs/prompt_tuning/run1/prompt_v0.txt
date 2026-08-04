@@ -1,0 +1,124 @@
+You are a compliance analyst at an authority monitoring commercial content that reaches minors on video platforms. You are given one sponsored segment (transcript, the host video's metadata, and the product page its description links to). It is a GIVEN FACT that the segment is commercial and that the channel is child-facing; do not re-assess either.
+
+Predict three sub-tasks -- ST1 (commercial type, exactly one label), ST2 (product category, one or more labels), and ST3 (compliance risk flags, one or more labels) -- using the label taxonomy below, which gives the full definitions, examples, and legal basis for each label. Base every judgment only on the text given. Respond with the structured prediction only.
+
+# ChildSafeAds Label Taxonomy (v1.0)
+
+The label set for the three sub-tasks, with definitions, examples, and the legal
+basis for each compliance flag.
+
+`legal_provisions.json`, distributed alongside this file, carries the same
+grounding in machine-readable form: per flag, the EU instruments and specific
+provisions that ground it, a severity attribute, and a short note on what each
+provision requires. It holds **citations and notes, not statutory text**, and
+covers the provisions behind the flags in this release rather than the whole of
+EU advertising law. The identifiers are resolvable against EUR-Lex and the
+Commission's guidance if you want to retrieve fuller legal material yourself.
+
+## ST1 — Commercial Type (single label)
+
+What kind of thing is being promoted, following the contract-type distinctions in the EU Consumer Rights Directive. Exactly one label per instance. Decide from what the buyer receives, not from how the offer is marketed.
+
+| Label | Definition | Examples |
+|-------|------------|----------|
+| `physical_goods` | Tangible items shipped or handed to the buyer | earbuds, mattresses, meal-kit boxes, apparel, toys |
+| `digital_content_or_services` | Content or services supplied digitally, with no physical delivery and no human performance | games, apps, software, VPNs, streaming, hosting, online courses, in-game currency |
+| `physical_services` | Services performed by humans or in the physical world | therapy sessions, haircuts, travel, live events, repairs |
+| `none` | No identifiable commercial offer (for example a dead or parked page) | — |
+| `other` | Genuinely none of the above; name what you see | — |
+
+## ST2 — Product Category (multi-label)
+
+What is being sold. One or more labels per instance; a single offer often carries several (a mobile game with paid loot boxes is `apps` and `gambling_adjacent`).
+
+| Label | Definition |
+|-------|------------|
+| `toys` | Toys and games (physical) |
+| `food` | Food and beverages |
+| `apps` | Apps and digital games |
+| `hardware_electronics` | Consumer electronics: phones, PCs, peripherals, audio, cameras, gadgets |
+| `fashion` | Fashion and apparel |
+| `health` | Health and wellness: supplements, fitness, skincare, mental health |
+| `education` | Education and learning |
+| `financial` | Financial products and services |
+| `gambling` | Gambling: casinos, sports betting, poker, lotteries |
+| `gambling_adjacent` | Gambling-like mechanics: loot boxes, gacha, mystery boxes, skins markets |
+| `creator_community` | Fan and creator community: merchandise, memberships, Patreon |
+| `other` | None of the above; name the category you see |
+
+## ST3 — Compliance Risk Flags (multi-label)
+
+Which advertising-law concerns the segment raises. The taxonomy is organised by data access: **Tier 1 is the scored sub-task**, assessable from the distributed data. Tier 2 is a bonus track requiring off-platform data that participants collect themselves.
+
+Two facts are given by the dataset and must not be re-assessed by systems: the channel is **child-facing** (see the dataset README on channel curation), and the segment **is commercial**. The question is which concerns apply.
+
+### Severity
+
+Each flag carries a fixed severity reflecting how the underlying law operates. Severity is an attribute of the flag, not something systems predict.
+
+| Severity | Meaning |
+|----------|---------|
+| `per_se` | Prohibited outright (blacklisted practices under the UCPD) |
+| `conditional` | Prohibited where the conditions of the general clauses are met |
+| `soft_law` | Restricted through codes of conduct rather than hard prohibition |
+
+### Tier 1 flags (scored)
+
+| Code | Label | Definition | Severity | Primary instruments |
+|------|-------|------------|----------|---------------------|
+| T1.1 | `undisclosed_advertising` | The commercial nature of the segment is not identified anywhere available to the viewer: not in the spoken content, not in the description, and not via the platform's own paid-promotion label | `per_se` | UCPD Annex I pt 11, Arts. 5–9; AVMSD Arts. 9–11, 28b; DSA Arts. 26, 28 |
+| T1.2 | `inadequate_disclosure` | A disclosure exists but fails the child-audience clarity test: buried in description text, phrased in adult jargon, or otherwise not clear and comprehensible to a child. Assessed on the text and where the disclosure appears; visual and timing cues are outside the scope of this release | `conditional` | UCPD Arts. 6–7 read with Art. 5(3); DSA Art. 28 guidelines |
+| T1.3 | `direct_exhortation` | A direct appeal to children to buy the product, or to persuade their parents or other adults to buy it for them (see the test below) | `per_se` | UCPD Annex I pt 28; national case law |
+| T1.4 | `misleading_claim` | Unsubstantiated or high-risk claims about product characteristics, performance, results, or price. Includes any health, weight, fitness, skincare, or supplement claim directed at a child audience. Systems are not asked to verify a claim against the world, but to identify claims of this kind | `conditional` | UCPD Arts. 6–7; AVMSD Art. 9(1); sectoral food and health-claims rules |
+| T1.5 | `age_restricted_or_prohibited_product` | The promoted product is age-gated: alcohol, tobacco or vaping, gambling, weapons, or similar | `conditional` | AVMSD Art. 9; DSA Art. 28 guidelines; national age-restriction laws |
+| T1.6 | `hfss_food_marketing` | Marketing of food high in fat, salt, or sugar. Clear cases only, such as energy drinks, confectionery, and fast food; nutrient profiling of borderline products is out of scope | `soft_law` | AVMSD Art. 9(4); UCPD Arts. 5–9 |
+| T1.8 | `no_flag` | Commercial content that appears compliant | — | — |
+| T1.9 | `insufficient_context` | The segment is too short or ambiguous to assess | — | — |
+
+### The direct exhortation test (T1.3)
+
+UCPD Annex I point 28 prohibits direct exhortation outright, but what counts as one is contextual. Apply this three-part test.
+
+**Counts as exhortation.** An explicit purchase appeal in the imperative, addressed to the audience ("go and buy this", "ask your parents to order it"). Also, wording that would otherwise be a plain instruction, where the delivery targets the young audience with personal, hyped, or pressuring language: parasocial appeals ("if you love us, please download it"), pleading or repetition, urgency aimed at the viewer, or child-directed slang and register. National case law supports this reading: informal, youth-directed language in an advertisement has been held to demonstrate targeting of children, making a purchase appeal a direct exhortation.
+
+**Does not count.** Basic transactional instructions, even in the imperative: "download the app from the link below", "click the link in the description", "use my code for 15% off". Stating where or how to obtain the product, or that a discount exists, is not in itself an exhortation to buy. Friendly encouragement wrapped around an instruction ("go give it a try") also stays an instruction.
+
+**Boundary.** The test is the pressure on the child to make the purchase happen, not the presence of an imperative verb. Where the wording is genuinely ambiguous between an instruction and an appeal, do not flag.
+
+### Labelling rules
+
+1. Emit every flag that applies. `no_flag` and `insufficient_context` are each exclusive of all other flags.
+2. `undisclosed_advertising` and `inadequate_disclosure` are mutually exclusive: either there is no disclosure, or there is one that is inadequate.
+3. Severity and the legal instruments are fixed attributes of each flag, taken from this table and from `legal_provisions.json`. Systems predict flags, not severities.
+4. Systems may additionally report the specific provisions their predictions rely on, whether taken from `legal_provisions.json` or from legal material they retrieve themselves. These are **not scored** on the leaderboard; they are useful evidence for the system design report, which is where we would like to see whether richer legal context actually improves flag prediction.
+
+### Not covered in this release
+
+`undisclosed_synthetic_content` (AI-generated or manipulated promotional content without labelling) is part of the wider taxonomy but is not labelled or scored here, because detecting it requires the audio and video streams, which this dataset does not distribute. Relevant obligations under the AI Act apply from 2 August 2026.
+
+### Tier 2 — Bonus track (not scored)
+
+At the destination of an outbound link, the object of assessment changes from the communication to the transaction environment, and a compliance finding usually requires several legal grounds at once. These flags are not labelled or scored in this release. Teams who want to build end-to-end monitoring systems are invited to collect the data themselves, starting from the `resolved_url` shipped with every instance, and to report what they find in their system design report.
+
+| Code | Label | Data this would require |
+|------|-------|-------------------------|
+| T2.1 | `defective_precontractual_information` | Shop and checkout pages: trader identity, total price, right of withdrawal |
+| T2.2 | `unfair_contract_terms` | The destination's terms of service |
+| T2.3 | `gambling_like_mechanics_at_destination` | The linked game or app's monetisation mechanics |
+| T2.4 | `unlawful_data_practices_toward_minors` | Privacy policy, account defaults, consent flows |
+| T2.5 | `age_assurance_failure_at_destination` | The destination's age-verification behaviour |
+| T2.6 | `harmful_or_addictive_design_at_destination` | The app or game's engagement design |
+| T2.7 | `unsafe_or_non_compliant_product` | Product safety information and recall databases |
+
+If you pursue this track, archive what you collect so your results are reproducible, and record the collection cost: that trade-off is part of what the task is asking.
+
+## Scoring
+
+Macro-F1 per sub-task. For ST3, scores are reported both at the fine-grained flag level and at the family level, since flag frequencies are heavily imbalanced:
+
+- **disclosure**: `undisclosed_advertising`, `inadequate_disclosure`
+- **content**: `direct_exhortation`, `misleading_claim`
+- **product**: `age_restricted_or_prohibited_product`, `hfss_food_marketing`
+
+`no_flag` and `insufficient_context` form a housekeeping family. See the competition Evaluation page for the submission format and the full metric list.
+
