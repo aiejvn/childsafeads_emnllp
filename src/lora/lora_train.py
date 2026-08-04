@@ -1,11 +1,11 @@
 """Train a LoRA-adapted BERT-family encoder (roBERTa/legal-bert) with three heads
 (st1/st2/st3) on the ChildSafeAds task.
 
-Usage:
-    python lora_train.py ../public_data_dev/train.jsonl ../public_data_dev/dev.jsonl \\
-        --model FacebookAI/roberta-base --epochs 5 --batch-size 16 --output-dir ../runs/lora_roberta
-    python lora_train.py ../public_data_dev/train.jsonl ../public_data_dev/dev.jsonl \\
-        --sample-size 16 --epochs 1 --batch-size 4 --output-dir ../runs/lora_smoke  # smoke test
+Usage (run from the repo root):
+    python src/lora/lora_train.py public_data_dev/train.jsonl public_data_dev/dev.jsonl \\
+        --model FacebookAI/roberta-base --epochs 5 --batch-size 16 --output-dir runs/lora_roberta
+    python src/lora/lora_train.py public_data_dev/train.jsonl public_data_dev/dev.jsonl \\
+        --sample-size 16 --epochs 1 --batch-size 4 --output-dir runs/lora_smoke  # smoke test
 
 Saves the best-dev-macro-F1 adapter+heads to <output-dir>/best and the final epoch's
 to <output-dir>/last (both loadable with lora_predict.py).
@@ -21,10 +21,9 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 from transformers import AutoTokenizer, get_linear_schedule_with_warmup
 
-sys.path.insert(0, os.path.dirname(__file__))
-from baseline_gpt import ST1_LABELS, ST2_LABELS, ST3_LABELS, evaluate, sanitize_st3, setup_logging  # noqa: E402
-from lora_data import Collator, ClassificationDataset, load_split  # noqa: E402
-from lora_model import build_peft_model  # noqa: E402
+from lora import ST1_LABELS, ST2_LABELS, ST3_LABELS, evaluate, sanitize_st3, setup_logging  # noqa: E402
+from lora.lora_data import Collator, ClassificationDataset, load_split  # noqa: E402
+from lora.lora_model import build_peft_model  # noqa: E402
 
 
 def to_device(batch: dict, device: str) -> dict:
@@ -62,7 +61,7 @@ def main():
     ap.add_argument("dev", help="dev split for per-epoch evaluation, e.g. public_data_dev/dev.jsonl")
     ap.add_argument("--model", default="FacebookAI/roberta-base")
     ap.add_argument("--context", choices=["transcript", "full"], default="full")
-    ap.add_argument("--max-length", type=int, default=512)
+    ap.add_argument("--max-length", type=int, default=512) # 512?! seems a bit short, if this is sequence length
     ap.add_argument("--epochs", type=int, default=5)
     ap.add_argument("--batch-size", type=int, default=16)
     ap.add_argument("--grad-accum-steps", type=int, default=1)

@@ -1,11 +1,11 @@
 """Run a trained LoRA encoder adapter over a split and write a submission.jsonl.
 
-Usage:
-    python lora_predict.py ../public_data_dev/dev.jsonl \\
-        --model FacebookAI/roberta-base --adapter-dir ../runs/lora_roberta/best \\
-        --out ../runs/submission_lora.jsonl
-    python lora_predict.py ../public_data_dev/dev.jsonl --adapter-dir ... \\
-        --tune-thresholds-on ../public_data_dev/dev.jsonl  # per-label thresholds, tuned for F1
+Usage (run from the repo root):
+    python src/lora/lora_predict.py public_data_dev/dev.jsonl \\
+        --model FacebookAI/roberta-base --adapter-dir runs/lora_roberta/best \\
+        --out runs/submission_lora.jsonl
+    python src/lora/lora_predict.py public_data_dev/dev.jsonl --adapter-dir ... \\
+        --tune-thresholds-on public_data_dev/dev.jsonl  # per-label thresholds, tuned for F1
 
 Prints the same macro-F1 metrics as baseline_gpt.py whenever the target split carries
 gold "labels". Beyond sanitize_st3 (shared with the LLM baselines), this also resolves
@@ -26,12 +26,9 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 from transformers import AutoTokenizer
 
-sys.path.insert(0, os.path.dirname(__file__))
-from baseline_gpt import (  # noqa: E402
-    ST1_LABELS, ST2_LABELS, ST3_LABELS, evaluate, prediction_errors, sanitize_st3, setup_logging,
-)
-from lora_data import Collator, ClassificationDataset, load_split  # noqa: E402
-from lora_model import load_peft_model  # noqa: E402
+from lora import ST1_LABELS, ST2_LABELS, ST3_LABELS, evaluate, prediction_errors, sanitize_st3, setup_logging  # noqa: E402
+from lora.lora_data import Collator, ClassificationDataset, load_split  # noqa: E402
+from lora.lora_model import load_peft_model  # noqa: E402
 
 UNDISCLOSED, INADEQUATE = "undisclosed_advertising", "inadequate_disclosure"
 UNDISCLOSED_IDX, INADEQUATE_IDX = ST3_LABELS.index(UNDISCLOSED), ST3_LABELS.index(INADEQUATE)

@@ -5,17 +5,10 @@ framing as the LLM baselines) and the ST1/ST2/ST3 label orderings from baseline_
 so label indices line up across baselines and predictions round-trip through the same
 submission schema / check_submission.py validator.
 """
-import os
-import sys
-
 import torch
 from torch.utils.data import Dataset
 
-sys.path.insert(0, os.path.dirname(__file__))
-from baseline_gpt import ST1_LABELS, ST2_LABELS, ST3_LABELS  # noqa: E402
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "starting_kit"))
-from load_data import full_context, load_split, transcript_only  # noqa: E402
+from . import ST1_LABELS, ST2_LABELS, ST3_LABELS, full_context, load_split, transcript_only  # noqa: F401
 
 ST1_INDEX = {label: i for i, label in enumerate(ST1_LABELS)}
 ST2_INDEX = {label: i for i, label in enumerate(ST2_LABELS)}
