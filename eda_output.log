@@ -1,0 +1,161 @@
+============================================================
+TRAIN (n=2353)
+============================================================
+Missing/empty transcript text: 40
+Missing/empty product_page text: 0
+Duplicate instanceIDs: 0
+
+ST1 (single-label) distribution:
+  physical_goods                  1125 (47.8%)
+  digital_content_or_services     1069 (45.4%)
+  physical_services                122 (5.2%)
+  none                              35 (1.5%)
+  other                              2 (0.1%)
+
+ST2 (multi-label) avg tags/instance: 1.33
+ST2 tag frequency:
+  apps                             654 (27.8%)
+  hardware_electronics             516 (21.9%)
+  other                            412 (17.5%)
+  food                             293 (12.5%)
+  creator_community                269 (11.4%)
+  fashion                          267 (11.3%)
+  health                           264 (11.2%)
+  education                        140 (5.9%)
+  financial                        135 (5.7%)
+  gambling_adjacent                 92 (3.9%)
+  toys                              77 (3.3%)
+  gambling                          12 (0.5%)
+
+ST3 (multi-label) avg flags/instance: 1.35
+ST3 flag frequency:
+  misleading_claim                        1277 (54.3%)
+  inadequate_disclosure                    611 (26.0%)
+  no_flag                                  529 (22.5%)
+  undisclosed_advertising                  352 (15.0%)
+  direct_exhortation                       304 (12.9%)
+  age_restricted_or_prohibited_product      59 (2.5%)
+  hfss_food_marketing                       40 (1.7%)
+  insufficient_context                      15 (0.6%)
+ST3 family rollup (instance touches family >=1 flag):
+  content          1400 (59.5%)
+  disclosure        962 (40.9%)
+  housekeeping      544 (23.1%)
+  product            94 (4.0%)
+
+Exclusivity violations (no_flag/insufficient_context + others): 0
+undisclosed_advertising & inadequate_disclosure both present: 1
+Flagged instances WITH evidence: 1731, WITHOUT evidence: 78
+
+official_disclosure=true: 1281, =false: 1043, other/missing: 29
+Instances with a disclosure-family st3 flag: 962
+official_disclosure=true but STILL has disclosure flag: 221
+
+Transcript word count: mean=223, median=222, min=0, max=4111
+Product page word count: mean=408, median=230, min=50, max=1531
+Segment duration (s): mean=65.0, median=64.1, min=1.0, max=1471.8
+
+Unique channels: 632
+Top 10 channels by instance count:
+  New Rockstars                     25
+  Dawid Does Tech Stuff             25
+  Toasty Bros                       25
+  Linus Tech Tips                   25
+  Arlo                              25
+  Bjørn Nyland                      25
+  Anything with Alvin               25
+  The Athletic FC                   25
+  JayzTwoCents                      24
+  Good Mythical Morning             24
+
+============================================================
+DEV (n=504)
+============================================================
+Missing/empty transcript text: 11
+Missing/empty product_page text: 0
+Duplicate instanceIDs: 0
+
+ST1 (single-label) distribution:
+  digital_content_or_services      248 (49.2%)
+  physical_goods                   218 (43.3%)
+  physical_services                 24 (4.8%)
+  none                              14 (2.8%)
+
+ST2 (multi-label) avg tags/instance: 1.27
+ST2 tag frequency:
+  apps                             171 (33.9%)
+  hardware_electronics             120 (23.8%)
+  other                             87 (17.3%)
+  health                            55 (10.9%)
+  fashion                           50 (9.9%)
+  food                              49 (9.7%)
+  creator_community                 47 (9.3%)
+  financial                         20 (4.0%)
+  gambling_adjacent                 17 (3.4%)
+  education                         12 (2.4%)
+  toys                               8 (1.6%)
+  gambling                           5 (1.0%)
+
+ST3 (multi-label) avg flags/instance: 1.36
+ST3 flag frequency:
+  misleading_claim                         260 (51.6%)
+  no_flag                                  127 (25.2%)
+  inadequate_disclosure                    118 (23.4%)
+  direct_exhortation                        77 (15.3%)
+  undisclosed_advertising                   74 (14.7%)
+  age_restricted_or_prohibited_product      16 (3.2%)
+  insufficient_context                       7 (1.4%)
+  hfss_food_marketing                        5 (1.0%)
+ST3 family rollup (instance touches family >=1 flag):
+  content           287 (56.9%)
+  disclosure        192 (38.1%)
+  housekeeping      134 (26.6%)
+  product            21 (4.2%)
+
+Exclusivity violations (no_flag/insufficient_context + others): 0
+undisclosed_advertising & inadequate_disclosure both present: 0
+Flagged instances WITH evidence: 350, WITHOUT evidence: 20
+
+official_disclosure=true: 284, =false: 213, other/missing: 7
+Instances with a disclosure-family st3 flag: 192
+official_disclosure=true but STILL has disclosure flag: 47
+
+Transcript word count: mean=221, median=221, min=0, max=938
+Product page word count: mean=372, median=228, min=51, max=1523
+Segment duration (s): mean=64.6, median=64.5, min=2.3, max=267.2
+
+Unique channels: 154
+Top 10 channels by instance count:
+  LetsPlay                          20
+  Let's Game It Out                 19
+  Tolarian Community College        17
+  Noel Philips                      12
+  Element X                         11
+  ChaChaYourVmom                    11
+  FORMULA 1                         10
+  Cold Ones                         10
+  Byte Size Tech                    10
+  Dhar Mann Studios                 10
+
+============================================================
+CROSS-SPLIT CHECKS
+============================================================
+Channels in train: 632, in dev: 154
+Overlapping channels: 0 (0.0% of dev channels also in train)
+
+ST1 distribution shift (train% vs dev%):
+  digital_content_or_services    train=45.4%  dev=49.2%  delta=+3.8%
+  none                           train=1.5%  dev=2.8%  delta=+1.3%
+  other                          train=0.1%  dev=0.0%  delta=-0.1%
+  physical_goods                 train=47.8%  dev=43.3%  delta=-4.6%
+  physical_services              train=5.2%  dev=4.8%  delta=-0.4%
+
+ST3 distribution shift (train% vs dev%):
+  age_restricted_or_prohibited_product   train=2.5%  dev=3.2%  delta=+0.7%
+  direct_exhortation                     train=12.9%  dev=15.3%  delta=+2.4%
+  hfss_food_marketing                    train=1.7%  dev=1.0%  delta=-0.7%
+  inadequate_disclosure                  train=26.0%  dev=23.4%  delta=-2.6%
+  insufficient_context                   train=0.6%  dev=1.4%  delta=+0.8%
+  misleading_claim                       train=54.3%  dev=51.6%  delta=-2.7%
+  no_flag                                train=22.5%  dev=25.2%  delta=+2.7%
+  undisclosed_advertising                train=15.0%  dev=14.7%  delta=-0.3%

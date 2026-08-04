@@ -5,3 +5,5 @@
 2026-08-03 23:48:26,446 | INFO | MainThread | epoch 1 dev metrics: st1_macro_f1=0.384, st2_macro_f1=0.075, st3_macro_f1=0.099, st3_family_macro_f1=0.291, mean_macro_f1=0.186
 2026-08-03 23:48:26,467 | INFO | MainThread | epoch 1: new best mean_macro_f1=0.186, saved to runs/lora_roberta/best
 2026-08-03 23:50:01,574 | INFO | MainThread | epoch 2: mean train loss = 1.1038
+2026-08-03 23:50:11,953 | INFO | MainThread | epoch 2 dev metrics: st1_macro_f1=0.593, st2_macro_f1=0.211, st3_macro_f1=0.098, st3_family_macro_f1=0.291, mean_macro_f1=0.301
+2026-08-03 23:50:11,964 | INFO | MainThread | epoch 2: new best mean_macro_f1=0.301, saved to runs/lora_roberta/best
