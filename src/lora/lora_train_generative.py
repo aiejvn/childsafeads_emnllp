@@ -14,8 +14,9 @@ Usage (run from the repo root):
         --model Qwen/Qwen3.5-0.8B --sample-size 8 --epochs 1 --batch-size 2 \\
         --output-dir runs/lora_smoke_qwen  # smoke test
 
-Per-epoch dev eval decodes via constrained/structured generation (lm-format-enforcer,
-see lora_generative.py) against the same schema, so predictions are always valid JSON.
+Per-epoch dev eval decodes via freeform generation, parsing the JSON completion against the
+same schema (see lora_generative.py); a completion that fails to parse is regenerated up to
+3 times before falling back to a default prediction.
 
 Saves the best-dev-macro-F1 adapter to <output-dir>/best and the final epoch's to
 <output-dir>/last (both loadable with lora_predict_generative.py).

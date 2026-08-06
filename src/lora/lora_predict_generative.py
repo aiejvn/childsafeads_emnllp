@@ -7,10 +7,11 @@ Usage (run from the repo root):
         --out runs/submission_lora_qwen.jsonl
 
 Prints the same macro-F1 metrics as lora_predict.py whenever the target split carries gold
-"labels". Decoding is constrained/structured generation (lm-format-enforcer, see
-lora_generative.py) against baseline_gpt.py's `Prediction` schema, so -- unlike the encoder
-path's independent-sigmoid decode() -- there's no separate disclosure-conflict/empty-st2
-resolution step here: the schema-constrained JSON is already well-formed by construction.
+"labels". Decoding is freeform generation, parsed against baseline_gpt.py's `Prediction`
+schema (see lora_generative.py); a completion that fails to parse is regenerated up to 3
+times before falling back to a default prediction, so -- unlike the encoder path's
+independent-sigmoid decode() -- there's no separate disclosure-conflict/empty-st2 resolution
+step here beyond that fallback.
 """
 import argparse
 import json
