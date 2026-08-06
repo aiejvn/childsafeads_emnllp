@@ -10,14 +10,15 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from baseline_gpt import (  # noqa: E402
-    ST1_LABELS, ST2_LABELS, ST3_LABELS, evaluate, prediction_errors, sanitize_st3, setup_logging,
+    ST1_LABELS, ST2_LABELS, ST3_LABELS, Prediction, SYSTEM_PROMPT,
+    evaluate, prediction_errors, sanitize_st3, setup_logging,
 )
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "starting_kit"))
 from load_data import full_context, load_split, transcript_only  # noqa: E402
 
 __all__ = [
-    "ST1_LABELS", "ST2_LABELS", "ST3_LABELS",
+    "ST1_LABELS", "ST2_LABELS", "ST3_LABELS", "Prediction", "SYSTEM_PROMPT",
     "evaluate", "prediction_errors", "sanitize_st3", "setup_logging",
     "full_context", "load_split", "transcript_only",
 ]

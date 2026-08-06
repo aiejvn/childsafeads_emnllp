@@ -1,0 +1,104 @@
+"""Run a trained generative LoRA causal-LM adapter (see lora_train_generative.py) over a
+split and write a submission.jsonl.
+
+Usage (run from the repo root):
+    python src/lora/lora_predict_generative.py public_data_dev/dev.jsonl \\
+        --model Qwen/Qwen3.5-4B --adapter-dir runs/lora_qwen/best \\
+        --out runs/submission_lora_qwen.jsonl
+
+Prints the same macro-F1 metrics as lora_predict.py whenever the target split carries gold
+"labels". Decoding is constrained/structured generation (lm-format-enforcer, see
+lora_generative.py) against baseline_gpt.py's `Prediction` schema, so -- unlike the encoder
+path's independent-sigmoid decode() -- there's no separate disclosure-conflict/empty-st2
+resolution step here: the schema-constrained JSON is already well-formed by construction.
+"""
+import argparse
+import json
+import os
+import random
+import shutil
+import sys
+from datetime import datetime
+
+import torch
+from torch.utils.data import DataLoader
+from transformers import AutoTokenizer
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))  # so `import lora` resolves src/lora as a package
+from lora import evaluate, load_split, prediction_errors, setup_logging  # noqa: E402
+from lora.lora_data import GenerativeCollator, GenerativeDataset  # noqa: E402
+from lora.lora_generative import generate_predictions  # noqa: E402
+from lora.lora_model import load_peft_model_causal  # noqa: E402
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("target", help="split to predict on, e.g. public_data_dev/dev.jsonl")
+    ap.add_argument("--model", default="Qwen/Qwen3.5-4B", help="must match the base model used in training")
+    ap.add_argument("--adapter-dir", required=True, help="e.g. runs/lora_qwen/best")
+    ap.add_argument("--context", choices=["transcript", "full"], default="full")
+    ap.add_argument("--max-length", type=int, default=4096)
+    ap.add_argument("--batch-size", type=int, default=4)
+    ap.add_argument("--max-new-tokens", type=int, default=128)
+    ap.add_argument("--load-in-4bit", action="store_true", help="must match the flag used in training")
+    ap.add_argument("--sample-size", type=int, default=None, help="predict on a random sample only (smoke test)")
+    ap.add_argument("--seed", type=int, default=42)
+    ap.add_argument("--device", default=None)
+    ap.add_argument("--out", help="defaults to runs/submission_lora_generative_<timestamp>.jsonl")
+    args = ap.parse_args()
+
+    device = args.device or ("cuda" if torch.cuda.is_available() else "cpu")
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    log = setup_logging("runs", "lora_predict_generative", args.model.replace("/", "_"), timestamp)
+
+    tokenizer = AutoTokenizer.from_pretrained(args.model)
+    if tokenizer.pad_token is None:
+        tokenizer.pad_token = tokenizer.eos_token
+    tokenizer.padding_side = "left"  # batched model.generate() needs left-padding
+
+    model = load_peft_model_causal(args.model, args.adapter_dir, load_in_4bit=args.load_in_4bit, device=device)
+    if not args.load_in_4bit:
+        model = model.to(device)
+    model.eval()
+
+    instances = list(load_split(args.target))
+    if args.sample_size:
+        instances = random.Random(args.seed).sample(instances, min(args.sample_size, len(instances)))
+    loader = DataLoader(
+        GenerativeDataset(instances, tokenizer, args.context, args.max_length),
+        batch_size=args.batch_size, shuffle=False, collate_fn=GenerativeCollator(tokenizer),
+    )
+    ids, predictions = generate_predictions(model, loader, tokenizer, device, args.max_new_tokens)
+
+    out = args.out or os.path.join("runs", f"submission_lora_generative_{timestamp}.jsonl")
+    error_out = os.path.join("runs", f"submission_lora_generative_error_{timestamp}.jsonl")
+    os.makedirs(os.path.dirname(out) or ".", exist_ok=True)
+    gold = []
+    n_errors = 0
+    with open(out, "w", encoding="utf-8") as f, open(error_out, "w", encoding="utf-8") as f_err:
+        for iid, inst, pred in zip(ids, instances, predictions):
+            f.write(json.dumps({"instanceID": iid, **pred}) + "\n")
+            if inst.get("labels"):
+                gold.append(inst["labels"])
+                errors = prediction_errors(inst["labels"], pred)
+                if errors:
+                    n_errors += 1
+                    f_err.write(json.dumps({"instanceID": iid, "gold": inst["labels"], "pred": pred, "errors": errors}) + "\n")
+    log.info(f"wrote {len(predictions)} predictions to {out}")
+
+    canonical = "submission_lora_generative.jsonl"
+    shutil.copyfile(out, canonical)
+    log.info(f"copied predictions to {canonical} (canonical submission file)")
+
+    if gold:
+        log.info(f"wrote {n_errors} misclassified instance(s) to {error_out}")
+        metrics = evaluate(gold, predictions)
+        log.info("Evaluation:")
+        for k, v in metrics.items():
+            log.info(f"  {k}: {v:.3f}")
+    else:
+        log.info("target has no gold labels -- skipping evaluation")
+
+
+if __name__ == "__main__":
+    main()

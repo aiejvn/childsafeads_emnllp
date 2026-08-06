@@ -17,6 +17,7 @@ import sys
 from datetime import datetime
 
 import torch
+import wandb
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from transformers import AutoTokenizer, get_linear_schedule_with_warmup
@@ -80,6 +81,7 @@ def main():
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--device", default=None, help="defaults to cuda if available, else cpu")
     ap.add_argument("--output-dir", required=True)
+    ap.add_argument("--no-wandb", action="store_true", help="disable W&B logging")
     args = ap.parse_args()
 
     torch.manual_seed(args.seed)
@@ -88,6 +90,13 @@ def main():
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     log = setup_logging("runs", "lora_train", args.model.replace("/", "_"), timestamp)
     log.info(f"config: {vars(args)} device={device}")
+
+    wandb.init(
+        project="childsafeads-emnllp",
+        name=f"lora_{args.model.replace('/', '_')}_{timestamp}",
+        config=vars(args),
+        mode="disabled" if args.no_wandb else "online",
+    )
 
     train_instances = list(load_split(args.train))
     dev_instances = list(load_split(args.dev))
@@ -143,7 +152,8 @@ def main():
                 optimizer.step()
                 scheduler.step()
                 optimizer.zero_grad()
-        log.info(f"epoch {epoch + 1}: mean train loss = {running_loss / len(train_loader):.4f}")
+        train_loss = running_loss / len(train_loader)
+        log.info(f"epoch {epoch + 1}: mean train loss = {train_loss:.4f}")
 
         preds = []
         model.eval()
@@ -155,6 +165,7 @@ def main():
         gold = [inst["labels"] for inst in dev_instances]
         metrics = evaluate(gold, preds)
         log.info(f"epoch {epoch + 1} dev metrics: " + ", ".join(f"{k}={v:.3f}" for k, v in metrics.items()))
+        wandb.log({"epoch": epoch + 1, "train_loss": train_loss, **{f"dev_{k}": v for k, v in metrics.items()}})
 
         if metrics["mean_macro_f1"] > best_f1:
             best_f1 = metrics["mean_macro_f1"]
@@ -163,6 +174,9 @@ def main():
 
     model.save_pretrained(os.path.join(args.output_dir, "last"))
     log.info(f"saved final epoch adapter to {args.output_dir}/last (best dev mean_macro_f1={best_f1:.3f})")
+    wandb.summary.update({f"final_dev_{k}": v for k, v in metrics.items()})
+    wandb.summary["best_mean_macro_f1"] = best_f1
+    wandb.finish()
 
 
 if __name__ == "__main__":
