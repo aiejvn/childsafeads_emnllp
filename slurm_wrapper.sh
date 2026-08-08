@@ -3,6 +3,8 @@
 #
 # Examples:
 #   bash run_slurm.sh 8 src/lora/lora_train.py public_data_dev/train.jsonl public_data_dev/dev.jsonl --model nlpaueb/legal-bert-base-uncased --epochs 200 --output-dir runs/lora_legalbert --no-wandb
+#   OLD:
+#   bash run_slurm.sh 8 unlimited/train_jepa.py gpubase_l40s_b2
 
 GPUs=$1
 TRAIN_SCRIPT=$2
@@ -34,8 +36,9 @@ JOB_NAME=$(basename "$TRAIN_SCRIPT" .py)
 DATETIME=$(date +%Y%m%d_%H%M%S)
 LOG="slurm_${JOB_NAME}_${DATETIME}.log"
 SLURM_SCRIPT="slurm_${JOB_NAME}.slrm"
+SLURM_SUBMIT_DIR=$(pwd)
 
-TORCHRUN_CMD="python $TRAIN_SCRIPT"
+TORCHRUN_CMD="uv run --with-requirements requirements.txt $TRAIN_SCRIPT"
 
 echo
 echo "Job: $JOB_NAME on $GPUs GPUs"
@@ -61,6 +64,8 @@ echo "---"
 
 
 cd "$SLURM_SUBMIT_DIR"
+bash setup_uv.sh
+
 echo "Python: \$(which python)  Torch: \$(python -c 'import torch; print(torch.__version__)')"
 echo "---"
 
