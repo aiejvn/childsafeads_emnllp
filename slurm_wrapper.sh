@@ -1,10 +1,10 @@
 #!/bin/bash
-# Usage: bash run_slurm.sh <GPUs> <train_script> [PARTITION] [-- train_args...]
+# Usage: bash slurm_wrapper.sh <GPUs> <train_script> [PARTITION] [-- train_args...]
 #
 # Examples:
-#   bash run_slurm.sh 8 src/lora/lora_train.py public_data_dev/train.jsonl public_data_dev/dev.jsonl --model nlpaueb/legal-bert-base-uncased --epochs 200 --output-dir runs/lora_legalbert --no-wandb
+#   bash slurm_wrapper.sh 8 src/lora/lora_train.py public_data_dev/train.jsonl public_data_dev/dev.jsonl --model nlpaueb/legal-bert-base-uncased --epochs 200 --output-dir runs/lora_legalbert --no-wandb
 #   OLD:
-#   bash run_slurm.sh 8 unlimited/train_jepa.py gpubase_l40s_b2
+#   bash slurm_wrapper.sh 8 unlimited/train_jepa.py gpubase_l40s_b2
 
 GPUs=$1
 TRAIN_SCRIPT=$2
