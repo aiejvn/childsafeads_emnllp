@@ -31,17 +31,16 @@ TORCHRUN_CMD="uv run --with-requirements requirements.txt $TRAIN_SCRIPT ${EXTRA_
 echo
 echo "Job: $JOB_NAME on $GPUs GPUs"
 echo "Command: $TORCHRUN_CMD"
-echo "Partition: $PARTITION"
 echo "Log: $LOG"
 echo
 
 cat > "$SLURM_SCRIPT" <<EOF
 #!/bin/bash
 #SBATCH --account=rrg-zhu2048
+#SBATCH --partition=gpubase_l40s_b2
 #SBATCH --nodes=1
-#SBATCH --partition=$PARTITION
-#SBATCH --gres=gpu:$GPUs
-#SBATCH --job-name=${JOB_NAME}
+#SBATCH --gres=gpu:2
+#SBATCH --job-name=lora_generative_qwen
 #SBATCH --output=$LOG
 #SBATCH --ntasks=1
 #SBATCH --time=4:00:00
