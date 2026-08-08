@@ -117,3 +117,174 @@
 2026-08-07 20:48:04,625 | INFO | MainThread | epoch 45 dev metrics: st1_macro_f1=0.581, st2_macro_f1=0.494, st3_macro_f1=0.293, st3_family_macro_f1=0.460, mean_macro_f1=0.456
 2026-08-07 20:49:47,604 | INFO | MainThread | epoch 46: mean train loss = 0.2625
 2026-08-07 20:49:57,528 | INFO | MainThread | epoch 46 dev metrics: st1_macro_f1=0.578, st2_macro_f1=0.468, st3_macro_f1=0.319, st3_family_macro_f1=0.501, mean_macro_f1=0.455
+2026-08-07 20:51:40,893 | INFO | MainThread | epoch 47: mean train loss = 0.2626
+2026-08-07 20:51:51,241 | INFO | MainThread | epoch 47 dev metrics: st1_macro_f1=0.568, st2_macro_f1=0.485, st3_macro_f1=0.288, st3_family_macro_f1=0.431, mean_macro_f1=0.447
+2026-08-07 20:53:34,276 | INFO | MainThread | epoch 48: mean train loss = 0.2671
+2026-08-07 20:53:44,286 | INFO | MainThread | epoch 48 dev metrics: st1_macro_f1=0.605, st2_macro_f1=0.497, st3_macro_f1=0.302, st3_family_macro_f1=0.444, mean_macro_f1=0.468
+2026-08-07 20:53:44,405 | INFO | MainThread | epoch 48: new best mean_macro_f1=0.468, saved to runs/lora_legalbert/best
+2026-08-07 20:55:27,096 | INFO | MainThread | epoch 49: mean train loss = 0.2498
+2026-08-07 20:55:37,101 | INFO | MainThread | epoch 49 dev metrics: st1_macro_f1=0.582, st2_macro_f1=0.491, st3_macro_f1=0.292, st3_family_macro_f1=0.423, mean_macro_f1=0.455
+2026-08-07 20:57:20,017 | INFO | MainThread | epoch 50: mean train loss = 0.2445
+2026-08-07 20:57:29,981 | INFO | MainThread | epoch 50 dev metrics: st1_macro_f1=0.578, st2_macro_f1=0.467, st3_macro_f1=0.306, st3_family_macro_f1=0.481, mean_macro_f1=0.450
+2026-08-07 20:59:13,034 | INFO | MainThread | epoch 51: mean train loss = 0.2364
+2026-08-07 20:59:22,946 | INFO | MainThread | epoch 51 dev metrics: st1_macro_f1=0.565, st2_macro_f1=0.478, st3_macro_f1=0.309, st3_family_macro_f1=0.486, mean_macro_f1=0.451
+2026-08-07 21:01:05,822 | INFO | MainThread | epoch 52: mean train loss = 0.2303
+2026-08-07 21:01:15,824 | INFO | MainThread | epoch 52 dev metrics: st1_macro_f1=0.572, st2_macro_f1=0.511, st3_macro_f1=0.273, st3_family_macro_f1=0.495, mean_macro_f1=0.452
+2026-08-07 21:02:58,633 | INFO | MainThread | epoch 53: mean train loss = 0.2280
+2026-08-07 21:03:08,692 | INFO | MainThread | epoch 53 dev metrics: st1_macro_f1=0.624, st2_macro_f1=0.491, st3_macro_f1=0.291, st3_family_macro_f1=0.456, mean_macro_f1=0.469
+2026-08-07 21:03:08,789 | INFO | MainThread | epoch 53: new best mean_macro_f1=0.469, saved to runs/lora_legalbert/best
+2026-08-07 21:04:51,676 | INFO | MainThread | epoch 54: mean train loss = 0.2245
+2026-08-07 21:05:01,540 | INFO | MainThread | epoch 54 dev metrics: st1_macro_f1=0.585, st2_macro_f1=0.482, st3_macro_f1=0.328, st3_family_macro_f1=0.520, mean_macro_f1=0.465
+2026-08-07 21:06:44,568 | INFO | MainThread | epoch 55: mean train loss = 0.2185
+2026-08-07 21:06:54,493 | INFO | MainThread | epoch 55 dev metrics: st1_macro_f1=0.584, st2_macro_f1=0.536, st3_macro_f1=0.339, st3_family_macro_f1=0.532, mean_macro_f1=0.486
+2026-08-07 21:06:54,578 | INFO | MainThread | epoch 55: new best mean_macro_f1=0.486, saved to runs/lora_legalbert/best
+2026-08-07 21:08:37,444 | INFO | MainThread | epoch 56: mean train loss = 0.2067
+2026-08-07 21:08:47,442 | INFO | MainThread | epoch 56 dev metrics: st1_macro_f1=0.587, st2_macro_f1=0.505, st3_macro_f1=0.303, st3_family_macro_f1=0.477, mean_macro_f1=0.465
+2026-08-07 21:10:30,298 | INFO | MainThread | epoch 57: mean train loss = 0.2007
+2026-08-07 21:10:40,323 | INFO | MainThread | epoch 57 dev metrics: st1_macro_f1=0.581, st2_macro_f1=0.518, st3_macro_f1=0.309, st3_family_macro_f1=0.483, mean_macro_f1=0.469
+2026-08-07 21:12:23,237 | INFO | MainThread | epoch 58: mean train loss = 0.1957
+2026-08-07 21:12:33,160 | INFO | MainThread | epoch 58 dev metrics: st1_macro_f1=0.581, st2_macro_f1=0.503, st3_macro_f1=0.303, st3_family_macro_f1=0.465, mean_macro_f1=0.462
+2026-08-07 21:14:16,193 | INFO | MainThread | epoch 59: mean train loss = 0.1896
+2026-08-07 21:14:26,072 | INFO | MainThread | epoch 59 dev metrics: st1_macro_f1=0.574, st2_macro_f1=0.497, st3_macro_f1=0.290, st3_family_macro_f1=0.460, mean_macro_f1=0.454
+2026-08-07 21:16:08,810 | INFO | MainThread | epoch 60: mean train loss = 0.1822
+2026-08-07 21:16:18,806 | INFO | MainThread | epoch 60 dev metrics: st1_macro_f1=0.573, st2_macro_f1=0.522, st3_macro_f1=0.275, st3_family_macro_f1=0.483, mean_macro_f1=0.456
+2026-08-07 21:18:01,887 | INFO | MainThread | epoch 61: mean train loss = 0.1790
+2026-08-07 21:18:11,996 | INFO | MainThread | epoch 61 dev metrics: st1_macro_f1=0.596, st2_macro_f1=0.484, st3_macro_f1=0.300, st3_family_macro_f1=0.474, mean_macro_f1=0.460
+2026-08-07 21:20:18,865 | INFO | MainThread | epoch 62: mean train loss = 0.1730
+2026-08-07 21:20:41,007 | INFO | MainThread | epoch 62 dev metrics: st1_macro_f1=0.603, st2_macro_f1=0.503, st3_macro_f1=0.297, st3_family_macro_f1=0.470, mean_macro_f1=0.468
+2026-08-07 21:23:26,871 | INFO | MainThread | epoch 63: mean train loss = 0.1694
+2026-08-07 21:23:36,718 | INFO | MainThread | epoch 63 dev metrics: st1_macro_f1=0.604, st2_macro_f1=0.478, st3_macro_f1=0.306, st3_family_macro_f1=0.479, mean_macro_f1=0.463
+2026-08-07 21:25:19,802 | INFO | MainThread | epoch 64: mean train loss = 0.1608
+2026-08-07 21:25:29,833 | INFO | MainThread | epoch 64 dev metrics: st1_macro_f1=0.607, st2_macro_f1=0.507, st3_macro_f1=0.312, st3_family_macro_f1=0.483, mean_macro_f1=0.475
+2026-08-07 21:27:12,807 | INFO | MainThread | epoch 65: mean train loss = 0.1612
+2026-08-07 21:27:22,711 | INFO | MainThread | epoch 65 dev metrics: st1_macro_f1=0.587, st2_macro_f1=0.527, st3_macro_f1=0.314, st3_family_macro_f1=0.462, mean_macro_f1=0.476
+2026-08-07 21:29:05,487 | INFO | MainThread | epoch 66: mean train loss = 0.1549
+2026-08-07 21:29:15,521 | INFO | MainThread | epoch 66 dev metrics: st1_macro_f1=0.577, st2_macro_f1=0.511, st3_macro_f1=0.302, st3_family_macro_f1=0.449, mean_macro_f1=0.463
+2026-08-07 21:30:58,407 | INFO | MainThread | epoch 67: mean train loss = 0.1486
+2026-08-07 21:31:08,320 | INFO | MainThread | epoch 67 dev metrics: st1_macro_f1=0.636, st2_macro_f1=0.545, st3_macro_f1=0.287, st3_family_macro_f1=0.452, mean_macro_f1=0.490
+2026-08-07 21:31:08,988 | INFO | MainThread | epoch 67: new best mean_macro_f1=0.490, saved to runs/lora_legalbert/best
+2026-08-07 21:32:52,007 | INFO | MainThread | epoch 68: mean train loss = 0.1506
+2026-08-07 21:33:01,965 | INFO | MainThread | epoch 68 dev metrics: st1_macro_f1=0.571, st2_macro_f1=0.547, st3_macro_f1=0.361, st3_family_macro_f1=0.523, mean_macro_f1=0.493
+2026-08-07 21:33:02,296 | INFO | MainThread | epoch 68: new best mean_macro_f1=0.493, saved to runs/lora_legalbert/best
+2026-08-07 21:34:45,441 | INFO | MainThread | epoch 69: mean train loss = 0.1400
+2026-08-07 21:34:55,400 | INFO | MainThread | epoch 69 dev metrics: st1_macro_f1=0.582, st2_macro_f1=0.514, st3_macro_f1=0.307, st3_family_macro_f1=0.481, mean_macro_f1=0.468
+2026-08-07 21:36:38,297 | INFO | MainThread | epoch 70: mean train loss = 0.1373
+2026-08-07 21:36:48,386 | INFO | MainThread | epoch 70 dev metrics: st1_macro_f1=0.608, st2_macro_f1=0.520, st3_macro_f1=0.313, st3_family_macro_f1=0.473, mean_macro_f1=0.481
+2026-08-07 21:38:31,237 | INFO | MainThread | epoch 71: mean train loss = 0.1339
+2026-08-07 21:38:41,143 | INFO | MainThread | epoch 71 dev metrics: st1_macro_f1=0.617, st2_macro_f1=0.530, st3_macro_f1=0.306, st3_family_macro_f1=0.469, mean_macro_f1=0.484
+2026-08-07 21:40:24,246 | INFO | MainThread | epoch 72: mean train loss = 0.1307
+2026-08-07 21:40:34,223 | INFO | MainThread | epoch 72 dev metrics: st1_macro_f1=0.592, st2_macro_f1=0.525, st3_macro_f1=0.343, st3_family_macro_f1=0.471, mean_macro_f1=0.487
+2026-08-07 21:42:17,198 | INFO | MainThread | epoch 73: mean train loss = 0.1233
+2026-08-07 21:42:27,059 | INFO | MainThread | epoch 73 dev metrics: st1_macro_f1=0.576, st2_macro_f1=0.539, st3_macro_f1=0.334, st3_family_macro_f1=0.487, mean_macro_f1=0.483
+2026-08-07 21:44:09,840 | INFO | MainThread | epoch 74: mean train loss = 0.1181
+2026-08-07 21:44:19,963 | INFO | MainThread | epoch 74 dev metrics: st1_macro_f1=0.586, st2_macro_f1=0.550, st3_macro_f1=0.371, st3_family_macro_f1=0.534, mean_macro_f1=0.502
+2026-08-07 21:44:20,076 | INFO | MainThread | epoch 74: new best mean_macro_f1=0.502, saved to runs/lora_legalbert/best
+2026-08-07 21:46:02,861 | INFO | MainThread | epoch 75: mean train loss = 0.1140
+2026-08-07 21:46:12,831 | INFO | MainThread | epoch 75 dev metrics: st1_macro_f1=0.585, st2_macro_f1=0.546, st3_macro_f1=0.336, st3_family_macro_f1=0.487, mean_macro_f1=0.489
+2026-08-07 21:47:55,895 | INFO | MainThread | epoch 76: mean train loss = 0.1112
+2026-08-07 21:48:05,843 | INFO | MainThread | epoch 76 dev metrics: st1_macro_f1=0.632, st2_macro_f1=0.505, st3_macro_f1=0.342, st3_family_macro_f1=0.515, mean_macro_f1=0.493
+2026-08-07 21:49:48,817 | INFO | MainThread | epoch 77: mean train loss = 0.1080
+2026-08-07 21:49:58,645 | INFO | MainThread | epoch 77 dev metrics: st1_macro_f1=0.587, st2_macro_f1=0.532, st3_macro_f1=0.349, st3_family_macro_f1=0.517, mean_macro_f1=0.490
+2026-08-07 21:51:41,261 | INFO | MainThread | epoch 78: mean train loss = 0.1009
+2026-08-07 21:51:51,356 | INFO | MainThread | epoch 78 dev metrics: st1_macro_f1=0.673, st2_macro_f1=0.545, st3_macro_f1=0.361, st3_family_macro_f1=0.517, mean_macro_f1=0.526
+2026-08-07 21:51:51,457 | INFO | MainThread | epoch 78: new best mean_macro_f1=0.526, saved to runs/lora_legalbert/best
+2026-08-07 21:53:34,323 | INFO | MainThread | epoch 79: mean train loss = 0.1059
+2026-08-07 21:53:44,140 | INFO | MainThread | epoch 79 dev metrics: st1_macro_f1=0.656, st2_macro_f1=0.522, st3_macro_f1=0.329, st3_family_macro_f1=0.488, mean_macro_f1=0.502
+2026-08-07 21:55:27,242 | INFO | MainThread | epoch 80: mean train loss = 0.1028
+2026-08-07 21:55:37,120 | INFO | MainThread | epoch 80 dev metrics: st1_macro_f1=0.654, st2_macro_f1=0.563, st3_macro_f1=0.360, st3_family_macro_f1=0.531, mean_macro_f1=0.525
+2026-08-07 21:57:20,065 | INFO | MainThread | epoch 81: mean train loss = 0.0958
+2026-08-07 21:57:30,075 | INFO | MainThread | epoch 81 dev metrics: st1_macro_f1=0.634, st2_macro_f1=0.548, st3_macro_f1=0.346, st3_family_macro_f1=0.506, mean_macro_f1=0.509
+2026-08-07 21:59:12,778 | INFO | MainThread | epoch 82: mean train loss = 0.0972
+2026-08-07 21:59:22,997 | INFO | MainThread | epoch 82 dev metrics: st1_macro_f1=0.615, st2_macro_f1=0.531, st3_macro_f1=0.320, st3_family_macro_f1=0.471, mean_macro_f1=0.489
+2026-08-07 22:16:20,075 | INFO | MainThread | epoch 83: mean train loss = 0.0911
+2026-08-07 22:19:35,826 | INFO | MainThread | epoch 83 dev metrics: st1_macro_f1=0.679, st2_macro_f1=0.535, st3_macro_f1=0.323, st3_family_macro_f1=0.483, mean_macro_f1=0.512
+2026-08-07 23:14:46,081 | INFO | MainThread | epoch 84: mean train loss = 0.0930
+2026-08-07 23:14:55,697 | INFO | MainThread | epoch 84 dev metrics: st1_macro_f1=0.642, st2_macro_f1=0.524, st3_macro_f1=0.316, st3_family_macro_f1=0.482, mean_macro_f1=0.494
+2026-08-07 23:16:41,527 | INFO | MainThread | epoch 85: mean train loss = 0.0874
+2026-08-07 23:16:51,357 | INFO | MainThread | epoch 85 dev metrics: st1_macro_f1=0.625, st2_macro_f1=0.552, st3_macro_f1=0.339, st3_family_macro_f1=0.494, mean_macro_f1=0.505
+2026-08-07 23:18:35,635 | INFO | MainThread | epoch 86: mean train loss = 0.0853
+2026-08-07 23:18:46,700 | INFO | MainThread | epoch 86 dev metrics: st1_macro_f1=0.598, st2_macro_f1=0.533, st3_macro_f1=0.340, st3_family_macro_f1=0.506, mean_macro_f1=0.490
+2026-08-07 23:20:31,212 | INFO | MainThread | epoch 87: mean train loss = 0.0795
+2026-08-07 23:20:42,269 | INFO | MainThread | epoch 87 dev metrics: st1_macro_f1=0.625, st2_macro_f1=0.518, st3_macro_f1=0.330, st3_family_macro_f1=0.504, mean_macro_f1=0.491
+2026-08-07 23:22:26,640 | INFO | MainThread | epoch 88: mean train loss = 0.0763
+2026-08-07 23:22:36,406 | INFO | MainThread | epoch 88 dev metrics: st1_macro_f1=0.656, st2_macro_f1=0.551, st3_macro_f1=0.342, st3_family_macro_f1=0.499, mean_macro_f1=0.516
+2026-08-07 23:24:21,969 | INFO | MainThread | epoch 89: mean train loss = 0.0753
+2026-08-07 23:24:31,783 | INFO | MainThread | epoch 89 dev metrics: st1_macro_f1=0.654, st2_macro_f1=0.546, st3_macro_f1=0.398, st3_family_macro_f1=0.543, mean_macro_f1=0.532
+2026-08-07 23:24:32,237 | INFO | MainThread | epoch 89: new best mean_macro_f1=0.532, saved to runs/lora_legalbert/best
+2026-08-07 23:26:16,529 | INFO | MainThread | epoch 90: mean train loss = 0.0763
+2026-08-07 23:26:27,543 | INFO | MainThread | epoch 90 dev metrics: st1_macro_f1=0.619, st2_macro_f1=0.545, st3_macro_f1=0.390, st3_family_macro_f1=0.539, mean_macro_f1=0.518
+2026-08-07 23:28:11,870 | INFO | MainThread | epoch 91: mean train loss = 0.0650
+2026-08-07 23:28:21,683 | INFO | MainThread | epoch 91 dev metrics: st1_macro_f1=0.628, st2_macro_f1=0.538, st3_macro_f1=0.334, st3_family_macro_f1=0.494, mean_macro_f1=0.500
+2026-08-07 23:30:07,186 | INFO | MainThread | epoch 92: mean train loss = 0.0695
+2026-08-07 23:30:16,933 | INFO | MainThread | epoch 92 dev metrics: st1_macro_f1=0.621, st2_macro_f1=0.543, st3_macro_f1=0.335, st3_family_macro_f1=0.495, mean_macro_f1=0.500
+2026-08-07 23:32:01,216 | INFO | MainThread | epoch 93: mean train loss = 0.0681
+2026-08-07 23:32:12,214 | INFO | MainThread | epoch 93 dev metrics: st1_macro_f1=0.614, st2_macro_f1=0.565, st3_macro_f1=0.350, st3_family_macro_f1=0.507, mean_macro_f1=0.509
+2026-08-07 23:33:56,357 | INFO | MainThread | epoch 94: mean train loss = 0.0627
+2026-08-07 23:34:06,164 | INFO | MainThread | epoch 94 dev metrics: st1_macro_f1=0.588, st2_macro_f1=0.554, st3_macro_f1=0.336, st3_family_macro_f1=0.502, mean_macro_f1=0.493
+2026-08-07 23:35:51,525 | INFO | MainThread | epoch 95: mean train loss = 0.0622
+2026-08-07 23:36:01,316 | INFO | MainThread | epoch 95 dev metrics: st1_macro_f1=0.618, st2_macro_f1=0.551, st3_macro_f1=0.336, st3_family_macro_f1=0.491, mean_macro_f1=0.502
+2026-08-07 23:37:45,507 | INFO | MainThread | epoch 96: mean train loss = 0.0683
+2026-08-07 23:37:56,480 | INFO | MainThread | epoch 96 dev metrics: st1_macro_f1=0.631, st2_macro_f1=0.548, st3_macro_f1=0.357, st3_family_macro_f1=0.506, mean_macro_f1=0.512
+2026-08-07 23:39:40,517 | INFO | MainThread | epoch 97: mean train loss = 0.0618
+2026-08-07 23:39:50,279 | INFO | MainThread | epoch 97 dev metrics: st1_macro_f1=0.590, st2_macro_f1=0.554, st3_macro_f1=0.355, st3_family_macro_f1=0.515, mean_macro_f1=0.500
+2026-08-07 23:41:35,692 | INFO | MainThread | epoch 98: mean train loss = 0.0556
+2026-08-07 23:41:45,468 | INFO | MainThread | epoch 98 dev metrics: st1_macro_f1=0.591, st2_macro_f1=0.552, st3_macro_f1=0.310, st3_family_macro_f1=0.477, mean_macro_f1=0.484
+2026-08-07 23:43:29,579 | INFO | MainThread | epoch 99: mean train loss = 0.0616
+2026-08-07 23:43:40,604 | INFO | MainThread | epoch 99 dev metrics: st1_macro_f1=0.639, st2_macro_f1=0.514, st3_macro_f1=0.322, st3_family_macro_f1=0.480, mean_macro_f1=0.491
+2026-08-07 23:45:24,701 | INFO | MainThread | epoch 100: mean train loss = 0.0537
+2026-08-07 23:45:34,458 | INFO | MainThread | epoch 100 dev metrics: st1_macro_f1=0.626, st2_macro_f1=0.528, st3_macro_f1=0.350, st3_family_macro_f1=0.514, mean_macro_f1=0.501
+2026-08-07 23:47:19,784 | INFO | MainThread | epoch 101: mean train loss = 0.0538
+2026-08-07 23:47:29,522 | INFO | MainThread | epoch 101 dev metrics: st1_macro_f1=0.693, st2_macro_f1=0.554, st3_macro_f1=0.360, st3_family_macro_f1=0.525, mean_macro_f1=0.536
+2026-08-07 23:47:29,906 | INFO | MainThread | epoch 101: new best mean_macro_f1=0.536, saved to runs/lora_legalbert/best
+2026-08-07 23:49:13,893 | INFO | MainThread | epoch 102: mean train loss = 0.0506
+2026-08-07 23:49:24,896 | INFO | MainThread | epoch 102 dev metrics: st1_macro_f1=0.602, st2_macro_f1=0.545, st3_macro_f1=0.331, st3_family_macro_f1=0.506, mean_macro_f1=0.493
+2026-08-07 23:51:08,894 | INFO | MainThread | epoch 103: mean train loss = 0.0523
+2026-08-07 23:51:18,689 | INFO | MainThread | epoch 103 dev metrics: st1_macro_f1=0.623, st2_macro_f1=0.543, st3_macro_f1=0.386, st3_family_macro_f1=0.544, mean_macro_f1=0.517
+2026-08-07 23:53:04,116 | INFO | MainThread | epoch 104: mean train loss = 0.0509
+2026-08-07 23:53:13,905 | INFO | MainThread | epoch 104 dev metrics: st1_macro_f1=0.621, st2_macro_f1=0.534, st3_macro_f1=0.360, st3_family_macro_f1=0.507, mean_macro_f1=0.505
+2026-08-07 23:54:57,993 | INFO | MainThread | epoch 105: mean train loss = 0.0497
+2026-08-07 23:55:09,109 | INFO | MainThread | epoch 105 dev metrics: st1_macro_f1=0.620, st2_macro_f1=0.556, st3_macro_f1=0.337, st3_family_macro_f1=0.493, mean_macro_f1=0.504
+2026-08-07 23:56:53,265 | INFO | MainThread | epoch 106: mean train loss = 0.0473
+2026-08-07 23:57:02,969 | INFO | MainThread | epoch 106 dev metrics: st1_macro_f1=0.624, st2_macro_f1=0.543, st3_macro_f1=0.369, st3_family_macro_f1=0.533, mean_macro_f1=0.512
+2026-08-07 23:58:48,461 | INFO | MainThread | epoch 107: mean train loss = 0.0422
+2026-08-07 23:58:58,233 | INFO | MainThread | epoch 107 dev metrics: st1_macro_f1=0.626, st2_macro_f1=0.559, st3_macro_f1=0.380, st3_family_macro_f1=0.532, mean_macro_f1=0.522
+2026-08-08 00:00:42,339 | INFO | MainThread | epoch 108: mean train loss = 0.0421
+2026-08-08 00:00:53,412 | INFO | MainThread | epoch 108 dev metrics: st1_macro_f1=0.619, st2_macro_f1=0.549, st3_macro_f1=0.387, st3_family_macro_f1=0.531, mean_macro_f1=0.518
+2026-08-08 00:02:37,398 | INFO | MainThread | epoch 109: mean train loss = 0.0405
+2026-08-08 00:02:47,087 | INFO | MainThread | epoch 109 dev metrics: st1_macro_f1=0.614, st2_macro_f1=0.536, st3_macro_f1=0.369, st3_family_macro_f1=0.522, mean_macro_f1=0.507
+2026-08-08 00:04:32,410 | INFO | MainThread | epoch 110: mean train loss = 0.0392
+2026-08-08 00:04:42,116 | INFO | MainThread | epoch 110 dev metrics: st1_macro_f1=0.627, st2_macro_f1=0.557, st3_macro_f1=0.365, st3_family_macro_f1=0.526, mean_macro_f1=0.517
+2026-08-08 00:06:26,176 | INFO | MainThread | epoch 111: mean train loss = 0.0421
+2026-08-08 00:06:37,231 | INFO | MainThread | epoch 111 dev metrics: st1_macro_f1=0.624, st2_macro_f1=0.542, st3_macro_f1=0.367, st3_family_macro_f1=0.526, mean_macro_f1=0.511
+2026-08-08 00:08:21,247 | INFO | MainThread | epoch 112: mean train loss = 0.0397
+2026-08-08 00:08:30,998 | INFO | MainThread | epoch 112 dev metrics: st1_macro_f1=0.643, st2_macro_f1=0.531, st3_macro_f1=0.362, st3_family_macro_f1=0.521, mean_macro_f1=0.512
+2026-08-08 00:10:16,209 | INFO | MainThread | epoch 113: mean train loss = 0.0411
+2026-08-08 00:10:25,924 | INFO | MainThread | epoch 113 dev metrics: st1_macro_f1=0.626, st2_macro_f1=0.531, st3_macro_f1=0.355, st3_family_macro_f1=0.520, mean_macro_f1=0.504
+2026-08-08 00:12:09,852 | INFO | MainThread | epoch 114: mean train loss = 0.0406
+2026-08-08 00:12:20,946 | INFO | MainThread | epoch 114 dev metrics: st1_macro_f1=0.630, st2_macro_f1=0.562, st3_macro_f1=0.373, st3_family_macro_f1=0.524, mean_macro_f1=0.521
+2026-08-08 00:14:04,920 | INFO | MainThread | epoch 115: mean train loss = 0.0393
+2026-08-08 00:14:14,574 | INFO | MainThread | epoch 115 dev metrics: st1_macro_f1=0.633, st2_macro_f1=0.531, st3_macro_f1=0.334, st3_family_macro_f1=0.505, mean_macro_f1=0.499
+2026-08-08 00:15:58,623 | INFO | MainThread | epoch 116: mean train loss = 0.0362
+2026-08-08 00:16:09,708 | INFO | MainThread | epoch 116 dev metrics: st1_macro_f1=0.631, st2_macro_f1=0.531, st3_macro_f1=0.332, st3_family_macro_f1=0.497, mean_macro_f1=0.498
+2026-08-08 00:17:53,668 | INFO | MainThread | epoch 117: mean train loss = 0.0441
+2026-08-08 00:18:03,348 | INFO | MainThread | epoch 117 dev metrics: st1_macro_f1=0.622, st2_macro_f1=0.530, st3_macro_f1=0.384, st3_family_macro_f1=0.530, mean_macro_f1=0.512
+2026-08-08 00:19:48,688 | INFO | MainThread | epoch 118: mean train loss = 0.0359
+2026-08-08 00:19:58,376 | INFO | MainThread | epoch 118 dev metrics: st1_macro_f1=0.618, st2_macro_f1=0.516, st3_macro_f1=0.374, st3_family_macro_f1=0.519, mean_macro_f1=0.503
+2026-08-08 00:21:42,468 | INFO | MainThread | epoch 119: mean train loss = 0.0346
+2026-08-08 00:21:53,530 | INFO | MainThread | epoch 119 dev metrics: st1_macro_f1=0.658, st2_macro_f1=0.530, st3_macro_f1=0.343, st3_family_macro_f1=0.505, mean_macro_f1=0.510
+2026-08-08 00:23:37,618 | INFO | MainThread | epoch 120: mean train loss = 0.0308
+2026-08-08 00:23:47,331 | INFO | MainThread | epoch 120 dev metrics: st1_macro_f1=0.625, st2_macro_f1=0.542, st3_macro_f1=0.336, st3_family_macro_f1=0.495, mean_macro_f1=0.501
+2026-08-08 00:25:32,667 | INFO | MainThread | epoch 121: mean train loss = 0.0317
+2026-08-08 00:25:42,420 | INFO | MainThread | epoch 121 dev metrics: st1_macro_f1=0.627, st2_macro_f1=0.542, st3_macro_f1=0.362, st3_family_macro_f1=0.516, mean_macro_f1=0.510
+2026-08-08 00:27:26,519 | INFO | MainThread | epoch 122: mean train loss = 0.0289
+2026-08-08 00:27:37,678 | INFO | MainThread | epoch 122 dev metrics: st1_macro_f1=0.599, st2_macro_f1=0.542, st3_macro_f1=0.320, st3_family_macro_f1=0.488, mean_macro_f1=0.487
+2026-08-08 00:29:21,677 | INFO | MainThread | epoch 123: mean train loss = 0.0290
+2026-08-08 00:29:31,404 | INFO | MainThread | epoch 123 dev metrics: st1_macro_f1=0.618, st2_macro_f1=0.559, st3_macro_f1=0.392, st3_family_macro_f1=0.545, mean_macro_f1=0.523
+2026-08-08 00:31:16,777 | INFO | MainThread | epoch 124: mean train loss = 0.0318
+2026-08-08 00:31:26,460 | INFO | MainThread | epoch 124 dev metrics: st1_macro_f1=0.627, st2_macro_f1=0.550, st3_macro_f1=0.371, st3_family_macro_f1=0.521, mean_macro_f1=0.516
+2026-08-08 00:33:10,300 | INFO | MainThread | epoch 125: mean train loss = 0.0293
+2026-08-08 00:33:21,487 | INFO | MainThread | epoch 125 dev metrics: st1_macro_f1=0.631, st2_macro_f1=0.539, st3_macro_f1=0.322, st3_family_macro_f1=0.480, mean_macro_f1=0.497
+2026-08-08 00:35:04,452 | INFO | MainThread | epoch 126: mean train loss = 0.0300
+2026-08-08 00:35:14,021 | INFO | MainThread | epoch 126 dev metrics: st1_macro_f1=0.631, st2_macro_f1=0.543, st3_macro_f1=0.392, st3_family_macro_f1=0.535, mean_macro_f1=0.522
+2026-08-08 00:36:57,987 | INFO | MainThread | epoch 127: mean train loss = 0.0276
+2026-08-08 00:37:07,536 | INFO | MainThread | epoch 127 dev metrics: st1_macro_f1=0.630, st2_macro_f1=0.539, st3_macro_f1=0.401, st3_family_macro_f1=0.559, mean_macro_f1=0.523
