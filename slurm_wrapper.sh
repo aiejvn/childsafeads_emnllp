@@ -38,7 +38,7 @@ LOG="slurm_${JOB_NAME}_${DATETIME}.log"
 SLURM_SCRIPT="slurm_${JOB_NAME}.slrm"
 SLURM_SUBMIT_DIR=$(pwd)
 
-TORCHRUN_CMD="uv run --with-requirements requirements.txt $TRAIN_SCRIPT"
+TORCHRUN_CMD="uv run --with-requirements requirements.txt $TRAIN_SCRIPT ${EXTRA_ARGS[*]}""
 
 echo
 echo "Job: $JOB_NAME on $GPUs GPUs"
@@ -54,7 +54,7 @@ cat > "$SLURM_SCRIPT" <<EOF
 #SBATCH --job-name=${JOB_NAME}
 #SBATCH --output=$LOG
 #SBATCH --ntasks=1
-#SBATCH --time=12:00:00
+#SBATCH --time=4:00:00
 #SBATCH --mem=40gb
 #SBATCH --cpus-per-task=10
 
