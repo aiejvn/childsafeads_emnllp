@@ -31,6 +31,7 @@ TORCHRUN_CMD="uv run --with-requirements requirements.txt $TRAIN_SCRIPT ${EXTRA_
 echo
 echo "Job: $JOB_NAME on $GPUs GPUs"
 echo "Command: $TORCHRUN_CMD"
+echo "Partition: $PARTITION"
 echo "Log: $LOG"
 echo
 
