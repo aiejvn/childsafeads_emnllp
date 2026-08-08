@@ -49,6 +49,8 @@ cat > "$SLURM_SCRIPT" <<EOF
 
 echo "Running on \$(hostname)"
 echo "Started: \$(date)"
+echo "Account: \$SLURM_JOB_ACCOUNT"
+echo "Partition: \$SLURM_JOB_PARTITION"
 echo "---"
 
 

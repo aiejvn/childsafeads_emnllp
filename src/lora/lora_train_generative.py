@@ -14,6 +14,8 @@ Usage (run from the repo root):
         --model Qwen/Qwen3.5-0.8B --sample-size 8 --epochs 1 --batch-size 2 \\
         --output-dir runs/lora_smoke_qwen  # smoke test
 
+    uv run --with-requirements requirements.txt src/lora/lora_train_generative.py public_data_dev/train.jsonl public_data_dev/dev.jsonl --model Qwen/Qwen3.5-4B --epochs 3 --batch-size 4 --output-dir runs/lora_qwen
+
 Per-epoch dev eval decodes via freeform generation, parsing the JSON completion against the
 same schema (see lora_generative.py); a completion that fails to parse is regenerated up to
 3 times before falling back to a default prediction.
