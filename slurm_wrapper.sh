@@ -1,36 +1,23 @@
 #!/bin/bash
-# Usage: bash slurm_wrapper.sh <GPUs> <train_script> [PARTITION] [-- train_args...]
+# Usage: bash slurm_wrapper.sh <GPUs> <train_script> [train_args...]
 #
-# Examples:
-#   bash slurm_wrapper.sh 8 src/lora/lora_train.py public_data_dev/train.jsonl public_data_dev/dev.jsonl --model nlpaueb/legal-bert-base-uncased --epochs 200 --output-dir runs/lora_legalbert --no-wandb
-#   OLD:
-#   bash slurm_wrapper.sh 8 unlimited/train_jepa.py gpubase_l40s_b2
+# Example:
+#   bash slurm_wrapper.sh 4 src/lora/lora_train_generative.py public_data_dev/train.jsonl public_data_dev/dev.jsonl --epochs 200 --output-dir runs/lora_legalbert --no-wandb
 
 GPUs=$1
 TRAIN_SCRIPT=$2
 
 if [ -z "$GPUs" ] || [ -z "$TRAIN_SCRIPT" ]; then
-    echo "Usage: bash $0 <GPUs> <train_script> [PARTITION] [-- train_args...]"
+    echo "Usage: bash $0 <GPUs> <train_script> [train_args...]"
     echo
     echo "  GPUs          number of GPUs (also sets torchrun --nproc_per_node)"
     echo "  train_script  path to the Python training script"
-    echo "  --            separator before any extra args passed to train_script"
+    echo "  train_args    any remaining args are passed through to train_script"
     exit 1
 fi
 
-# Collect extra args that follow '--'
-shift 3
-EXTRA_ARGS=()
-past_sep=0
-for arg in "$@"; do
-    if [ "$arg" = "--" ]; then
-        past_sep=1
-        continue
-    fi
-    if [ $past_sep -eq 1 ]; then
-        EXTRA_ARGS+=("$arg")
-    fi
-done
+shift 2
+EXTRA_ARGS=("$@")
 
 JOB_NAME=$(basename "$TRAIN_SCRIPT" .py)
 DATETIME=$(date +%Y%m%d_%H%M%S)
@@ -38,7 +25,7 @@ LOG="slurm_${JOB_NAME}_${DATETIME}.log"
 SLURM_SCRIPT="slurm_${JOB_NAME}.slrm"
 SLURM_SUBMIT_DIR=$(pwd)
 
-TORCHRUN_CMD="uv run --with-requirements requirements.txt $TRAIN_SCRIPT ${EXTRA_ARGS[*]}""
+TORCHRUN_CMD="uv run --with-requirements requirements.txt $TRAIN_SCRIPT ${EXTRA_ARGS[*]}"
 
 echo
 echo "Job: $JOB_NAME on $GPUs GPUs"
