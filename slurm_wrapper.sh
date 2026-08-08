@@ -6,6 +6,7 @@
 
 GPUs=$1
 TRAIN_SCRIPT=$2
+PARTITION=gpubase_l40s_b2
 
 if [ -z "$GPUs" ] || [ -z "$TRAIN_SCRIPT" ]; then
     echo "Usage: bash $0 <GPUs> <train_script> [train_args...]"
@@ -37,6 +38,7 @@ cat > "$SLURM_SCRIPT" <<EOF
 #!/bin/bash
 #SBATCH --account=rrg-zhu2048
 #SBATCH --nodes=1
+#SBATCH --partition=$PARTITION
 #SBATCH --gres=gpu:$GPUs
 #SBATCH --job-name=${JOB_NAME}
 #SBATCH --output=$LOG
