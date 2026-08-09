@@ -26,7 +26,7 @@ LOG="slurm_${JOB_NAME}_${DATETIME}.log"
 SLURM_SCRIPT="slurm_${JOB_NAME}.slrm"
 SLURM_SUBMIT_DIR=$(pwd)
 
-TORCHRUN_CMD="uv run --with-requirements requirements.txt $TRAIN_SCRIPT ${EXTRA_ARGS[*]}"
+TORCHRUN_CMD="uv run --with-requirements requirements_no_version.txt $TRAIN_SCRIPT ${EXTRA_ARGS[*]}"
 
 echo
 echo "Job: $JOB_NAME on $GPUs GPUs"
@@ -37,10 +37,9 @@ echo
 cat > "$SLURM_SCRIPT" <<EOF
 #!/bin/bash
 #SBATCH --account=rrg-zhu2048
-#SBATCH --partition=gpubase_l40s_b2
 #SBATCH --nodes=1
-#SBATCH --gres=gpu:2
-#SBATCH --job-name=lora_generative_qwen
+#SBATCH --gres=gpu:$GPUs
+#SBATCH --job-name=$JOB_NAME
 #SBATCH --output=$LOG
 #SBATCH --ntasks=1
 #SBATCH --time=4:00:00
