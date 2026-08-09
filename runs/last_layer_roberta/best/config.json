@@ -1,0 +1,7 @@
+{
+  "base_model_name": "FacebookAI/roberta-base",
+  "num_st1": 5,
+  "num_st2": 12,
+  "num_st3": 8,
+  "num_unfrozen_layers": 1
+}

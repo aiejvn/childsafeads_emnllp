@@ -52,12 +52,22 @@ def main():
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     log = setup_logging("runs", "lora_predict_generative", args.model.replace("/", "_"), timestamp)
 
-    tokenizer = AutoTokenizer.from_pretrained(args.model)
+    model_path = os.path.join("models", args.model)
+    if not os.path.isdir(model_path):
+        raise FileNotFoundError(
+            f"expected local model at {model_path!r} (from --model {args.model!r}); "
+            f"download it first with `hf download {args.model} --local-dir {model_path}`"
+        )
+    log.info(f"loading model/tokenizer from local path {model_path} (no remote download)")
+
+    tokenizer = AutoTokenizer.from_pretrained(model_path, local_files_only=True)
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
     tokenizer.padding_side = "left"  # batched model.generate() needs left-padding
 
-    model = load_peft_model_causal(args.model, args.adapter_dir, load_in_4bit=args.load_in_4bit, device=device)
+    model = load_peft_model_causal(
+        model_path, args.adapter_dir, load_in_4bit=args.load_in_4bit, device=device, local_files_only=True,
+    )
     if not args.load_in_4bit:
         model = model.to(device)
     model.eval()

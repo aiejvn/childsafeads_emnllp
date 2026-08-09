@@ -86,11 +86,23 @@ def build_peft_model_causal(
     plain next-token cross-entropy to generate the gold st1/st2/st3 label as JSON, so unlike
     build_peft_model there are no extra classification heads / modules_to_save. `device` is
     only used to place quantized weights when load_in_4bit=True (see _load_causal_base) --
-    otherwise the caller is expected to `.to(device)` the returned model themselves."""
+    otherwise the caller is expected to `.to(device)` the returned model themselves.
+
+    Gradient checkpointing is always on: with LoRA, the frozen base layers still need their
+    forward activations cached to backprop into the adapters, so peak memory scales with
+    num_layers * batch_size * seq_len same as full fine-tuning unless checkpointing recomputes
+    them instead of retaining them. `use_cache=False` goes with it -- Qwen3.5 has no
+    auto-disable guard for this like some other model classes, and also slows down
+    lora_generative.py's model.generate() calls; deferred for now."""
     model = _load_causal_base(base_model_name, load_in_4bit, device, local_files_only=local_files_only)
+    model.config.use_cache = False
     if load_in_4bit:
         from peft import prepare_model_for_kbit_training
-        model = prepare_model_for_kbit_training(model)
+        # checkpointing enabled below, uniformly for both branches -- this only does the
+        # quantization-specific prep (freezing base params, upcasting norms to fp32)
+        model = prepare_model_for_kbit_training(model, use_gradient_checkpointing=False)
+    model.gradient_checkpointing_enable()
+    model.enable_input_require_grads()
     lora_config = LoraConfig(
         task_type=TaskType.CAUSAL_LM,
         target_modules=target_modules or ["q_proj", "v_proj"],

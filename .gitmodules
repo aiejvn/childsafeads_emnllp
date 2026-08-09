@@ -1,3 +1,6 @@
 [submodule "oj-eval"]
 	path = oj-eval
 	url = git@github.com:chufeiluo/oj-eval.git
+[submodule "GreaseLM"]
+	path = GreaseLM
+	url = https://github.com/snap-stanford/GreaseLM.git
