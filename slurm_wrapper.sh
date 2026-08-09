@@ -26,7 +26,7 @@ LOG="slurm_${JOB_NAME}_${DATETIME}.log"
 SLURM_SCRIPT="slurm_${JOB_NAME}.slrm"
 SLURM_SUBMIT_DIR=$(pwd)
 
-TORCHRUN_CMD="uv run --with-requirements requirements_no_version.txt $TRAIN_SCRIPT ${EXTRA_ARGS[*]}"
+TORCHRUN_CMD="python $TRAIN_SCRIPT ${EXTRA_ARGS[*]}"
 
 echo
 echo "Job: $JOB_NAME on $GPUs GPUs"
@@ -54,7 +54,10 @@ echo "---"
 
 
 cd "$SLURM_SUBMIT_DIR"
-bash setup_uv.sh
+
+# --- Setup workspace  ---
+python3.12 -m  venv .venv && source .venv/bin/activate
+pip install -r requirements_no_version.txt
 
 echo "Python: \$(which python)  Torch: \$(python -c 'import torch; print(torch.__version__)')"
 echo "---"
