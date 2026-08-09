@@ -22,6 +22,10 @@ same schema (see lora_generative.py); a completion that fails to parse is regene
 
 Saves the best-dev-macro-F1 adapter to <output-dir>/best and the final epoch's to
 <output-dir>/last (both loadable with lora_predict_generative.py).
+
+To download a model:
+
+hf download {author}/{model name} --local-dir ./models/{author}/{model name}
 """
 import argparse
 import os
@@ -86,13 +90,22 @@ def main():
         dev_instances = rng.sample(dev_instances, min(args.sample_size, len(dev_instances)))
     log.info(f"train={len(train_instances)} dev={len(dev_instances)}")
 
-    tokenizer = AutoTokenizer.from_pretrained(args.model)
+    model_path = os.path.join("models", args.model)
+    if not os.path.isdir(model_path):
+        raise FileNotFoundError(
+            f"expected local model at {model_path!r} (from --model {args.model!r}); "
+            f"download it first with `hf download {args.model} --local-dir {model_path}`"
+        )
+    log.info(f"loading model/tokenizer from local path {model_path} (no remote download)")
+
+    tokenizer = AutoTokenizer.from_pretrained(model_path, local_files_only=True)
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
     model = build_peft_model_causal(
-        args.model, lora_r=args.lora_r, lora_alpha=args.lora_alpha, lora_dropout=args.lora_dropout,
+        model_path, lora_r=args.lora_r, lora_alpha=args.lora_alpha, lora_dropout=args.lora_dropout,
         target_modules=args.target_modules.split(","), load_in_4bit=args.load_in_4bit, device=device,
+        local_files_only=True,
     )
     if not args.load_in_4bit:
         model = model.to(device)

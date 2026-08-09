@@ -55,9 +55,7 @@ echo "---"
 
 cd "$SLURM_SUBMIT_DIR"
 
-# --- Setup workspace  ---
-python3.12 -m  venv .venv && source .venv/bin/activate
-pip install -r requirements_no_version.txt
+# --- Setup workspace  ---source .venv/bin/activate
 
 echo "Python: \$(which python)  Torch: \$(python -c 'import torch; print(torch.__version__)')"
 echo "---"

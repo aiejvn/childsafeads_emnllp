@@ -44,7 +44,7 @@ def load_peft_model(base_model_name: str, num_st1: int, num_st2: int, num_st3: i
     return PeftModel.from_pretrained(model, adapter_dir)
 
 
-def _load_causal_base(base_model_name: str, load_in_4bit: bool, device: str):
+def _load_causal_base(base_model_name: str, load_in_4bit: bool, device: str, local_files_only: bool = False):
     """Shared AutoModelForCausalLM loading for build/load_peft_model_causal. 4-bit (QLoRA)
     is opt-in and requires `bitsandbytes`, which is not installed by default -- raises with
     a clear message rather than importing it eagerly. Quantized weights are placed directly
@@ -67,6 +67,7 @@ def _load_causal_base(base_model_name: str, load_in_4bit: bool, device: str):
         torch_dtype=torch.bfloat16,
         quantization_config=quantization_config,
         device_map={"": device} if load_in_4bit else None,
+        local_files_only=local_files_only,
     )
 
 
@@ -78,6 +79,7 @@ def build_peft_model_causal(
     target_modules: Optional[list] = None,
     load_in_4bit: bool = False,
     device: str = "cuda",
+    local_files_only: bool = False,
 ) -> PeftModel:
     """Build a fresh causal LM (e.g. Qwen) and LoRA-adapt its attention projections, for the
     generative training path (see lora_train_generative.py): the model is fine-tuned via
@@ -85,7 +87,7 @@ def build_peft_model_causal(
     build_peft_model there are no extra classification heads / modules_to_save. `device` is
     only used to place quantized weights when load_in_4bit=True (see _load_causal_base) --
     otherwise the caller is expected to `.to(device)` the returned model themselves."""
-    model = _load_causal_base(base_model_name, load_in_4bit, device)
+    model = _load_causal_base(base_model_name, load_in_4bit, device, local_files_only=local_files_only)
     if load_in_4bit:
         from peft import prepare_model_for_kbit_training
         model = prepare_model_for_kbit_training(model)
@@ -101,7 +103,8 @@ def build_peft_model_causal(
 
 def load_peft_model_causal(
     base_model_name: str, adapter_dir: str, load_in_4bit: bool = False, device: str = "cuda",
+    local_files_only: bool = False,
 ) -> PeftModel:
     """Rebuild the base causal LM and attach trained LoRA weights from adapter_dir."""
-    model = _load_causal_base(base_model_name, load_in_4bit, device)
+    model = _load_causal_base(base_model_name, load_in_4bit, device, local_files_only=local_files_only)
     return PeftModel.from_pretrained(model, adapter_dir)
