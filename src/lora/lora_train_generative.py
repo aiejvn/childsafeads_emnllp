@@ -28,6 +28,7 @@ To download a model:
 hf download {author}/{model name} --local-dir ./models/{author}/{model name}
 """
 import argparse
+import logging
 import os
 import random
 import sys
@@ -42,7 +43,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))  # so `import 
 from lora import evaluate, load_split, setup_logging  # noqa: E402
 from lora.lora_data import GenerativeCollator, GenerativeDataset  # noqa: E402
 from lora.lora_generative import generate_predictions  # noqa: E402
-from lora.lora_model import build_peft_model_causal  # noqa: E402
+from lora.lora_model import PARALLELISM_CHOICES, build_peft_model_causal  # noqa: E402
 
 
 def to_device(batch: dict, device: str) -> dict:
@@ -68,6 +69,10 @@ def main():
     ap.add_argument("--lora-dropout", type=float, default=0.1)
     ap.add_argument("--target-modules", default="q_proj,v_proj", help="comma-separated module names to LoRA-adapt")
     ap.add_argument("--load-in-4bit", action="store_true", help="QLoRA via bitsandbytes (must be installed separately)")
+    ap.add_argument("--parallelism", choices=PARALLELISM_CHOICES, default="none", help="split the model "
+                     "across GPUs (requires >=2): \"pipeline\" shards layers via device_map=\"auto\"; \"tensor\" "
+                     "shards weight matrices via tp_plan=\"auto\" (must launch with torchrun); \"none\" keeps "
+                     "everything on --device")
     ap.add_argument("--max-new-tokens", type=int, default=128, help="generation budget for the JSON completion during dev eval")
     ap.add_argument("--sample-size", type=int, default=None, help="sample N train and N dev instances (seeded smoke test)")
     ap.add_argument("--seed", type=int, default=42)
@@ -77,9 +82,15 @@ def main():
 
     torch.manual_seed(args.seed)
     device = args.device or ("cuda" if torch.cuda.is_available() else "cpu")
+    is_main = int(os.environ.get("RANK", "0")) == 0  # only rank 0 logs/saves under --parallelism tensor
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    log = setup_logging("runs", "lora_train_generative", args.model.replace("/", "_"), timestamp)
+    if is_main:
+        log = setup_logging("runs", "lora_train_generative", args.model.replace("/", "_"), timestamp)
+    else:
+        log = logging.getLogger("lora_train_generative_worker")
+        log.addHandler(logging.NullHandler())
+        log.propagate = False
     log.info(f"config: {vars(args)} device={device}")
 
     train_instances = list(load_split(args.train))
@@ -105,9 +116,9 @@ def main():
     model = build_peft_model_causal(
         model_path, lora_r=args.lora_r, lora_alpha=args.lora_alpha, lora_dropout=args.lora_dropout,
         target_modules=args.target_modules.split(","), load_in_4bit=args.load_in_4bit, device=device,
-        local_files_only=True,
+        local_files_only=True, parallelism=args.parallelism,
     )
-    if not args.load_in_4bit:
+    if args.parallelism == "none" and not args.load_in_4bit:
         model = model.to(device)
     model.print_trainable_parameters()
 
@@ -131,8 +142,8 @@ def main():
         model.train()
         tokenizer.padding_side = "right"  # loss-masked labels must line up token-for-token
         running_loss = 0.0
-        for step, batch in enumerate(tqdm(train_loader, desc=f"epoch {epoch + 1}/{args.epochs}")):
-            batch = to_device(batch, device)
+        for step, batch in enumerate(tqdm(train_loader, desc=f"epoch {epoch + 1}/{args.epochs}", disable=not is_main)):
+            batch = to_device(batch, model.device)
             out = model(input_ids=batch["input_ids"], attention_mask=batch["attention_mask"], labels=batch["labels"])
             loss = out.loss / args.grad_accum_steps
             loss.backward()
@@ -145,18 +156,20 @@ def main():
         log.info(f"epoch {epoch + 1}: mean train loss = {running_loss / len(train_loader):.4f}")
 
         tokenizer.padding_side = "left"  # batched model.generate() needs left-padding
-        _, preds = generate_predictions(model, dev_loader, tokenizer, device, args.max_new_tokens)
+        _, preds = generate_predictions(model, dev_loader, tokenizer, args.max_new_tokens)
         gold = [inst["labels"] for inst in dev_instances]
         metrics = evaluate(gold, preds)
         log.info(f"epoch {epoch + 1} dev metrics: " + ", ".join(f"{k}={v:.3f}" for k, v in metrics.items()))
 
         if metrics["mean_macro_f1"] > best_f1:
             best_f1 = metrics["mean_macro_f1"]
-            model.save_pretrained(os.path.join(args.output_dir, "best"))
-            log.info(f"epoch {epoch + 1}: new best mean_macro_f1={best_f1:.3f}, saved to {args.output_dir}/best")
+            if is_main:  # avoid every rank racing to write the same adapter dir under --parallelism tensor
+                model.save_pretrained(os.path.join(args.output_dir, "best"))
+                log.info(f"epoch {epoch + 1}: new best mean_macro_f1={best_f1:.3f}, saved to {args.output_dir}/best")
 
-    model.save_pretrained(os.path.join(args.output_dir, "last"))
-    log.info(f"saved final epoch adapter to {args.output_dir}/last (best dev mean_macro_f1={best_f1:.3f})")
+    if is_main:
+        model.save_pretrained(os.path.join(args.output_dir, "last"))
+        log.info(f"saved final epoch adapter to {args.output_dir}/last (best dev mean_macro_f1={best_f1:.3f})")
 
 
 if __name__ == "__main__":

@@ -15,6 +15,7 @@ step here beyond that fallback.
 """
 import argparse
 import json
+import logging
 import os
 import random
 import shutil
@@ -29,7 +30,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))  # so `import 
 from lora import evaluate, load_split, prediction_errors, setup_logging  # noqa: E402
 from lora.lora_data import GenerativeCollator, GenerativeDataset  # noqa: E402
 from lora.lora_generative import generate_predictions  # noqa: E402
-from lora.lora_model import load_peft_model_causal  # noqa: E402
+from lora.lora_model import PARALLELISM_CHOICES, load_peft_model_causal  # noqa: E402
 
 
 def main():
@@ -42,6 +43,10 @@ def main():
     ap.add_argument("--batch-size", type=int, default=4)
     ap.add_argument("--max-new-tokens", type=int, default=128)
     ap.add_argument("--load-in-4bit", action="store_true", help="must match the flag used in training")
+    ap.add_argument("--parallelism", choices=PARALLELISM_CHOICES, default="none", help="split the model "
+                     "across GPUs (requires >=2, must match training if inference-quality matters): "
+                     "\"pipeline\" shards layers via device_map=\"auto\"; \"tensor\" shards weight matrices "
+                     "via tp_plan=\"auto\" (must launch with torchrun); \"none\" keeps everything on --device")
     ap.add_argument("--sample-size", type=int, default=None, help="predict on a random sample only (smoke test)")
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--device", default=None)
@@ -49,8 +54,14 @@ def main():
     args = ap.parse_args()
 
     device = args.device or ("cuda" if torch.cuda.is_available() else "cpu")
+    is_main = int(os.environ.get("RANK", "0")) == 0  # only rank 0 logs/writes output under --parallelism tensor
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    log = setup_logging("runs", "lora_predict_generative", args.model.replace("/", "_"), timestamp)
+    if is_main:
+        log = setup_logging("runs", "lora_predict_generative", args.model.replace("/", "_"), timestamp)
+    else:
+        log = logging.getLogger("lora_predict_generative_worker")
+        log.addHandler(logging.NullHandler())
+        log.propagate = False
 
     model_path = os.path.join("models", args.model)
     if not os.path.isdir(model_path):
@@ -67,8 +78,9 @@ def main():
 
     model = load_peft_model_causal(
         model_path, args.adapter_dir, load_in_4bit=args.load_in_4bit, device=device, local_files_only=True,
+        parallelism=args.parallelism,
     )
-    if not args.load_in_4bit:
+    if args.parallelism == "none" and not args.load_in_4bit:
         model = model.to(device)
     model.eval()
 
@@ -79,7 +91,10 @@ def main():
         GenerativeDataset(instances, tokenizer, args.context, args.max_length),
         batch_size=args.batch_size, shuffle=False, collate_fn=GenerativeCollator(tokenizer),
     )
-    ids, predictions = generate_predictions(model, loader, tokenizer, device, args.max_new_tokens)
+    ids, predictions = generate_predictions(model, loader, tokenizer, args.max_new_tokens)
+
+    if not is_main:  # avoid every rank racing to write the same output files under --parallelism tensor
+        return
 
     out = args.out or os.path.join("runs", f"submission_lora_generative_{timestamp}.jsonl")
     error_out = os.path.join("runs", f"submission_lora_generative_error_{timestamp}.jsonl")

@@ -9,6 +9,7 @@ If a generation doesn't parse into a valid `Prediction`, we regenerate (sampling
 actually differ from the failed attempt) up to MAX_ATTEMPTS times per item before giving up and
 falling back to a safe default, the same way baseline_gpt.py does on API errors.
 """
+import os
 import re
 
 import torch
@@ -44,7 +45,7 @@ def _to_device(batch: dict, device: str) -> dict:
 
 
 @torch.no_grad()
-def generate_predictions(model, loader, tokenizer, device: str, max_new_tokens: int) -> tuple:
+def generate_predictions(model, loader, tokenizer, max_new_tokens: int) -> tuple:
     """Batched freeform generation over `loader`. Requires `loader`'s collator to have
     left-padded input_ids/attention_mask (set tokenizer.padding_side = "left" before building
     it) so every sequence's prompt ends at the same position and `out[:, prompt_len:]` is
@@ -54,10 +55,16 @@ def generate_predictions(model, loader, tokenizer, device: str, max_new_tokens: 
     up to MAX_ATTEMPTS times; anything still unparseable after that falls back to a default
     prediction rather than retrying forever. Returns (instanceIDs, predictions), both in
     loader-iteration order.
+
+    Batches are moved to `model.device` rather than a caller-supplied device string, since
+    that's correct whether the model sits on one GPU or is dispatched across several via
+    `--parallelism pipeline`/`tensor` (see lora_model.py's build/load_peft_model_causal).
     """
     ids, preds = [], []
     model.eval()
-    for batch in tqdm(loader, desc="generating"):
+    device = model.device
+    is_main = int(os.environ.get("RANK", "0")) == 0  # avoid duplicate progress bars under --parallelism tensor
+    for batch in tqdm(loader, desc="generating", disable=not is_main):
         batch = _to_device(batch, device)
         prompt_len = batch["input_ids"].shape[1]
         pending = list(range(batch["input_ids"].shape[0]))
