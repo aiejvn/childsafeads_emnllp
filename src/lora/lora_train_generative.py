@@ -41,7 +41,7 @@ from transformers import AutoTokenizer, get_linear_schedule_with_warmup
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))  # so `import lora` resolves src/lora as a package
 from common.dialog_flow import df_pre_context  # noqa: E402
-from lora import SFT_TAXONOMY, SYSTEM_PROMPT, evaluate, load_split, setup_logging  # noqa: E402
+from lora import CONTEXT_CHOICES, SFT_TAXONOMY, SYSTEM_PROMPT, evaluate, load_split, setup_logging  # noqa: E402
 from lora.lora_data import GenerativeCollator, GenerativeDataset  # noqa: E402
 from lora.lora_generative import generate_predictions  # noqa: E402
 from lora.lora_model import PARALLELISM_CHOICES, build_peft_model_causal  # noqa: E402
@@ -56,7 +56,8 @@ def main():
     ap.add_argument("train", help="training split, e.g. public_data_dev/train.jsonl")
     ap.add_argument("dev", help="dev split for per-epoch evaluation, e.g. public_data_dev/dev.jsonl")
     ap.add_argument("--model", default="Qwen/Qwen3.5-4B")
-    ap.add_argument("--context", choices=["transcript", "full"], default="full")
+    ap.add_argument("--context", choices=CONTEXT_CHOICES, default="full",
+                    help="which rungs of the instance the model sees; no_product_page keeps the transcript and video metadata but drops the linked page (a median 38%% of full_context's tokens)")
     ap.add_argument("--lean-prompt", action="store_true", help="swap the GPT baseline's zero-shot "
                      "SYSTEM_PROMPT (3,533 tokens of instructions + full taxonomy, which leaves 467 "
                      "of 4,096 for the segment and truncates 98%% of instances) for common.SFT_TAXONOMY "

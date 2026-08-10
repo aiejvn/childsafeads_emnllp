@@ -26,7 +26,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))  # so `import 
 from common.dialog_flow import df_pre_context  # noqa: E402
 from common.predict_utils import save_thresholds, tune_and_decode  # noqa: E402
 from common.train_utils import compute_pos_weight, to_device  # noqa: E402
-from lora import ST1_LABELS, ST2_LABELS, ST3_LABELS, evaluate, setup_logging  # noqa: E402
+from lora import CONTEXT_CHOICES, ST1_LABELS, ST2_LABELS, ST3_LABELS, evaluate, setup_logging  # noqa: E402
 from lora.lora_data import Collator, ClassificationDataset, load_split  # noqa: E402
 from lora.lora_model import build_peft_model  # noqa: E402
 
@@ -41,7 +41,8 @@ def main():
         "--local", action="store_true",
         help="load --model from ./models/{model} instead of the HF hub (must already be downloaded there)",
     )
-    ap.add_argument("--context", choices=["transcript", "full"], default="full")
+    ap.add_argument("--context", choices=CONTEXT_CHOICES, default="full",
+                    help="which rungs of the instance the model sees; no_product_page keeps the transcript and video metadata but drops the linked page (a median 38%% of full_context's tokens)")
     ap.add_argument(
         "--df-path", default=None,
         help="path to an autoDF-generated dialog-flow JSON (e.g. emnllp-dialog-flow-dialog-flow.json) to "

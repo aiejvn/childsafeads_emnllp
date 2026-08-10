@@ -28,7 +28,7 @@ from transformers import AutoTokenizer
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))  # so `import lora` resolves src/lora as a package
 from common.dialog_flow import df_pre_context  # noqa: E402
-from lora import SFT_TAXONOMY, SYSTEM_PROMPT, evaluate, load_split, prediction_errors, setup_logging  # noqa: E402
+from lora import CONTEXT_CHOICES, SFT_TAXONOMY, SYSTEM_PROMPT, evaluate, load_split, prediction_errors, setup_logging  # noqa: E402
 from lora.lora_data import GenerativeCollator, GenerativeDataset  # noqa: E402
 from lora.lora_generative import generate_predictions  # noqa: E402
 from lora.lora_model import PARALLELISM_CHOICES, load_peft_model_causal  # noqa: E402
@@ -39,7 +39,8 @@ def main():
     ap.add_argument("target", help="split to predict on, e.g. public_data_dev/dev.jsonl")
     ap.add_argument("--model", default="Qwen/Qwen3.5-4B", help="must match the base model used in training")
     ap.add_argument("--adapter-dir", required=True, help="e.g. runs/lora_qwen/best")
-    ap.add_argument("--context", choices=["transcript", "full"], default="full")
+    ap.add_argument("--context", choices=CONTEXT_CHOICES, default="full",
+                    help="which rungs of the instance the model sees; no_product_page keeps the transcript and video metadata but drops the linked page (a median 38%% of full_context's tokens)")
     ap.add_argument("--lean-prompt", action="store_true",
                     help="must match the flag used in training -- the adapter was fit against "
                          "whichever system prompt was in front of it")

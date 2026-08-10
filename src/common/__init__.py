@@ -39,9 +39,47 @@ _unnamed = [label for label in ST1_LABELS + ST2_LABELS + ST3_LABELS if f"`{label
 if _unnamed:
     raise ValueError(f"{SFT_TAXONOMY_PATH} no longer names these labels: {_unnamed}")
 
+# The rungs of an instance a model is allowed to see. starting_kit/load_data.py ships
+# the two ends -- transcript_only (rung 1) and full_context (everything) -- and
+# no_product_page is the step between them.
+CONTEXT_CHOICES = ["transcript", "no_product_page", "full"]
+
+
+def no_product_page(instance: dict) -> str:
+    """full_context minus its trailing PAGE block: transcript plus video metadata, with
+    OFFICIAL_DISCLOSURE kept. Mirrors full_context's first two rungs verbatim, so
+    --context full and --context no_product_page differ by exactly the page.
+
+    The page is the largest rung (a median 38% of full_context's tokens, up to 92%) and
+    the one furthest from the segment: it is the destination of a link in the
+    description, not something the viewer is known to have seen. Only 0.9% of train
+    instances carry a sponsorship/affiliate cue there and nowhere else, so it is cheap
+    to test whether it earns its budget -- though ST2 may well need it, since the
+    product category is often clearer on the page than in the read.
+    """
+    v = instance["video_context"]
+    return (f"TRANSCRIPT:\n{instance['transcript']['text']}\n\n"
+            f"VIDEO: {v['title']}\nDESCRIPTION:\n{v['description']}\n"
+            f"OFFICIAL_DISCLOSURE: {v['official_disclosure']}")
+
+
+def render_context(instance: dict, context: str = "full") -> str:
+    """Single resolver for --context, so a new rung cannot be silently mishandled: the
+    `full_context(x) if context == "full" else transcript_only(x)` idiom this replaces
+    quietly degrades every unrecognised value to transcript-only."""
+    if context == "full":
+        return full_context(instance)
+    if context == "no_product_page":
+        return no_product_page(instance)
+    if context == "transcript":
+        return transcript_only(instance)
+    raise ValueError(f"unknown context {context!r}, expected one of {CONTEXT_CHOICES}")
+
+
 __all__ = [
     "ST1_LABELS", "ST2_LABELS", "ST3_LABELS", "Prediction", "SYSTEM_PROMPT",
     "SFT_TAXONOMY", "SFT_TAXONOMY_PATH",
     "evaluate", "prediction_errors", "sanitize_st3", "setup_logging",
     "full_context", "load_split", "transcript_only",
+    "CONTEXT_CHOICES", "no_product_page", "render_context",
 ]

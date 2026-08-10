@@ -14,7 +14,7 @@ import warnings
 import torch
 from torch.utils.data import Dataset
 
-from . import SYSTEM_PROMPT, full_context, load_split, transcript_only  # noqa: F401 (load_split re-exported)
+from . import SYSTEM_PROMPT, load_split, render_context  # noqa: F401 (load_split re-exported)
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from common.classification_data import (  # noqa: E402,F401 (re-exported for lora_train.py/lora_predict.py)
@@ -98,7 +98,7 @@ class GenerativeDataset(Dataset):
 
     def __getitem__(self, idx: int) -> dict:
         inst = self.instances[idx]
-        text = full_context(inst) if self.context == "full" else transcript_only(inst)
+        text = render_context(inst, self.context)
 
         text_budget = max(1, self.max_length - len(self.prefix_ids) - len(self.suffix_ids) - COMPLETION_TOKEN_BUDGET)
         text_ids = self.tokenizer(text, truncation=True, max_length=text_budget, add_special_tokens=False)["input_ids"]
