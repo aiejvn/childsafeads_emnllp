@@ -1,0 +1,350 @@
+{
+  "version": "1.0",
+  "exportedAt": "2026-08-09T00:28:39.726Z",
+  "exportedByUserId": "google-oauth2|104665096231439384306",
+  "dialogFlow": {
+    "name": "emnllp-dialog-flow",
+    "visibility": "private"
+  },
+  "nodes": [
+    {
+      "id": "49a52b63-34ef-4649-b9b8-5df6c90b6a91",
+      "type": "start",
+      "position": {
+        "x": 100,
+        "y": 182
+      },
+      "data": {
+        "label": "Start",
+        "config": {}
+      },
+      "selectable": false,
+      "measured": {
+        "width": 171,
+        "height": 93
+      }
+    },
+    {
+      "id": "e756a723-616e-4751-a20b-dd38ccf2041c",
+      "type": "fact",
+      "position": {
+        "x": 455,
+        "y": 182
+      },
+      "data": {
+        "label": "Segment Text",
+        "config": {
+          "factDefinitions": [
+            {
+              "label": "Segment",
+              "dataType": "text",
+              "required": true,
+              "instructions": "What is the text or transcript of the child-facing commercial segment?",
+              "customEnumValues": [],
+              "sourcePreference": "either"
+            }
+          ]
+        }
+      },
+      "measured": {
+        "width": 234,
+        "height": 93
+      },
+      "selected": false
+    },
+    {
+      "id": "5b950d19-3565-4387-8126-ea9d19ff747f",
+      "type": "reasoning",
+      "position": {
+        "x": 806,
+        "y": 182
+      },
+      "data": {
+        "label": "Assessability",
+        "config": {
+          "question": "Is the segment assessable enough to classify?",
+          "instructions": "The task is to determine whether the segment contains enough context to support a reliable classification. If the segment is too short, too vague, or too ambiguous to evaluate, treat the result as insufficient context. Otherwise, the segment can be assessed for commercial type, product categories, and compliance flags. Do not consider destination-page issues or other out-of-scope context.",
+          "annotations": [],
+          "dataType": "custom",
+          "customEnumValues": [
+            "null",
+            "assessable",
+            "insufficient_context"
+          ],
+          "childNodeIds": []
+        },
+        "prompt": ""
+      },
+      "measured": {
+        "width": 229,
+        "height": 93
+      },
+      "selected": false
+    },
+    {
+      "id": "c13220e6-381d-4eac-88ae-aa24601b7713",
+      "type": "switch",
+      "position": {
+        "x": 1198,
+        "y": 182
+      },
+      "data": {
+        "label": "Assessability Check",
+        "config": {
+          "branches": [
+            {
+              "id": "br_98b1b3da",
+              "isDefault": false,
+              "conditions": [
+                {
+                  "operator": "==",
+                  "compareValue": "insufficient_context",
+                  "sourceNodeId": "5b950d19-3565-4387-8126-ea9d19ff747f",
+                  "conditionOperator": "AND"
+                }
+              ],
+              "targetNodeId": "1c986f18-142e-4f39-b3c2-274c6e106572",
+              "branchId": "br_98b1b3da",
+              "color": "border-blue-500"
+            },
+            {
+              "id": "br_89b99590",
+              "isDefault": true,
+              "conditions": [],
+              "targetNodeId": "2fa37b43-35ff-4c57-9587-397e3fb5907f",
+              "branchId": "br_89b99590",
+              "color": "border-orange-500"
+            }
+          ]
+        }
+      },
+      "measured": {
+        "width": 279,
+        "height": 93
+      },
+      "selected": false
+    },
+    {
+      "id": "1c986f18-142e-4f39-b3c2-274c6e106572",
+      "type": "outcome",
+      "position": {
+        "x": 1565,
+        "y": 91
+      },
+      "data": {
+        "label": "Insufficient Context",
+        "config": {
+          "responseType": "structured",
+          "template": "ST1: insufficient\\_context\nST2: insufficient\\_context\nST3: insufficient\\_context\n\nRationale:\n\n\n{{ Explain briefly that the segment does not provide enough context to reliably classify the commercial type, product categories, or compliance flags. Tie the explanation to the absence of sufficient textual evidence. }}\n\n",
+          "mustIncludeOutcomeNode": []
+        },
+        "prompt": ""
+      },
+      "measured": {
+        "width": 273,
+        "height": 93
+      },
+      "selected": false
+    },
+    {
+      "id": "2fa37b43-35ff-4c57-9587-397e3fb5907f",
+      "type": "reasoning",
+      "position": {
+        "x": 1565,
+        "y": 273
+      },
+      "data": {
+        "label": "Commercial Type",
+        "config": {
+          "question": "What commercial type is being promoted in the segment?",
+          "instructions": "Classify the segment based on what the buyer receives from the promotion. Choose exactly one label: physical_goods, digital_content_or_services, physical_services, none, or other. Use the content of the segment itself, not the marketing context. If the segment does not clearly promote any identifiable commercial offering, choose none. If it promotes something that does not fit the listed categories, choose other.",
+          "annotations": [],
+          "dataType": "custom",
+          "customEnumValues": [
+            "null",
+            "physical_goods",
+            "digital_content_or_services",
+            "physical_services",
+            "none",
+            "other"
+          ],
+          "childNodeIds": []
+        },
+        "prompt": ""
+      },
+      "measured": {
+        "width": 261,
+        "height": 93
+      },
+      "selected": false
+    },
+    {
+      "id": "11100d62-ce9c-4011-a3b7-5b81cdcb0af1",
+      "type": "reasoning",
+      "position": {
+        "x": 1957,
+        "y": 182
+      },
+      "data": {
+        "label": "Product Categories",
+        "config": {
+          "question": "Which product categories apply to the segment?",
+          "instructions": "Identify all product category labels that fit what is being sold or promoted. Multiple categories may apply. Classify from the segment content itself. If none of the listed categories fit, use other. Return every applicable category label and avoid adding labels that are not supported by the text.",
+          "annotations": [],
+          "dataType": "custom",
+          "customEnumValues": [
+            "null",
+            "other"
+          ],
+          "childNodeIds": []
+        },
+        "prompt": ""
+      },
+      "measured": {
+        "width": 274,
+        "height": 93
+      },
+      "selected": false
+    },
+    {
+      "id": "054641bf-a65c-4c90-81fe-77c7a8f8425a",
+      "type": "reasoning",
+      "position": {
+        "x": 2349,
+        "y": 182
+      },
+      "data": {
+        "label": "Disclosure and Claims",
+        "config": {
+          "dataType": "custom",
+          "question": "Are there disclosure or misleading-claim concerns in the segment?",
+          "annotations": [],
+          "childNodeIds": [],
+          "instructions": "Assess the segment for advertising-law concerns arising from disclosure and content. If no commercial disclosure is present anywhere available to the viewer, the concern is undisclosed_advertising. If a disclosure exists but would be unclear to a child, the concern is inadequate_disclosure. If the segment contains a direct appeal for children to buy or to persuade adults to buy, the concern is direct_exhortation. If it makes unsubstantiated or high-risk claims about characteristics, results, or price, the concern is misleading_claim. Apply the disclosure branches exclusively so that undisclosed_advertising and inadequate_disclosure do not both apply. If no concern exists in this branch, the output may be no_flag for this branch only.",
+          "customEnumValues": [
+            "undisclosed_advertising",
+            "inadequate_disclosure",
+            "direct_exhortation",
+            "misleading_claim",
+            "no_flag"
+          ]
+        }
+      },
+      "measured": {
+        "width": 296,
+        "height": 93
+      }
+    },
+    {
+      "id": "ef4f582e-c7d4-4251-9d00-e031399e9509",
+      "type": "reasoning",
+      "position": {
+        "x": 2741,
+        "y": 182
+      },
+      "data": {
+        "label": "Product Risk",
+        "config": {
+          "dataType": "custom",
+          "question": "Does the promoted product create age-restriction or HFSS concerns?",
+          "annotations": [],
+          "childNodeIds": [],
+          "instructions": "Assess whether the promoted product is age-restricted or prohibited, and whether the content clearly markets HFSS food. If the product is age-restricted or prohibited, the appropriate flag is age_restricted_or_prohibited_product. If the content clearly markets HFSS food, the appropriate flag is hfss_food_marketing. If neither applies, the output may be no_flag for this branch only. Do not consider destination-page issues or any out-of-scope materials.",
+          "customEnumValues": [
+            "age_restricted_or_prohibited_product",
+            "hfss_food_marketing",
+            "no_flag"
+          ]
+        }
+      },
+      "measured": {
+        "width": 228,
+        "height": 93
+      }
+    },
+    {
+      "id": "35196c6c-cbc3-46f8-9227-9f463c441940",
+      "type": "outcome",
+      "position": {
+        "x": 3133,
+        "y": 182
+      },
+      "data": {
+        "label": "Classification Report",
+        "config": {
+          "template": "ST1: {{State the single commercial type label and give a short rationale tied to the segment text.}}\nST2: {{List all applicable product category labels, or other if none fit, and give a short rationale for each label tied to the segment text.}}\nST3: {{List all applicable compliance flags, respecting exclusivity rules. If no substantive flag applies, return no_flag. Provide a short rationale for each flag tied to the segment text. Do not include destination-page issues.}}",
+          "responseType": "structured"
+        }
+      },
+      "measured": {
+        "width": 284,
+        "height": 93
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge_49a52b63-34ef-4649-b9b8-5df6c90b6a91_e756a723-616e-4751-a20b-dd38ccf2041c",
+      "source": "49a52b63-34ef-4649-b9b8-5df6c90b6a91",
+      "target": "e756a723-616e-4751-a20b-dd38ccf2041c",
+      "sourceHandle": "out_49a52b63-34ef-4649-b9b8-5df6c90b6a91",
+      "targetHandle": "in_e756a723-616e-4751-a20b-dd38ccf2041c"
+    },
+    {
+      "id": "edge_e756a723-616e-4751-a20b-dd38ccf2041c_5b950d19-3565-4387-8126-ea9d19ff747f",
+      "source": "e756a723-616e-4751-a20b-dd38ccf2041c",
+      "target": "5b950d19-3565-4387-8126-ea9d19ff747f",
+      "sourceHandle": "out_e756a723-616e-4751-a20b-dd38ccf2041c",
+      "targetHandle": "in_5b950d19-3565-4387-8126-ea9d19ff747f"
+    },
+    {
+      "id": "edge_5b950d19-3565-4387-8126-ea9d19ff747f_c13220e6-381d-4eac-88ae-aa24601b7713",
+      "source": "5b950d19-3565-4387-8126-ea9d19ff747f",
+      "target": "c13220e6-381d-4eac-88ae-aa24601b7713",
+      "sourceHandle": "out_5b950d19-3565-4387-8126-ea9d19ff747f",
+      "targetHandle": "in_c13220e6-381d-4eac-88ae-aa24601b7713"
+    },
+    {
+      "id": "edge_c13220e6-381d-4eac-88ae-aa24601b7713_1c986f18-142e-4f39-b3c2-274c6e106572_br_98b1b3da",
+      "source": "c13220e6-381d-4eac-88ae-aa24601b7713",
+      "target": "1c986f18-142e-4f39-b3c2-274c6e106572",
+      "sourceHandle": "br_98b1b3da",
+      "targetHandle": "in_1c986f18-142e-4f39-b3c2-274c6e106572"
+    },
+    {
+      "id": "edge_c13220e6-381d-4eac-88ae-aa24601b7713_2fa37b43-35ff-4c57-9587-397e3fb5907f_br_89b99590",
+      "source": "c13220e6-381d-4eac-88ae-aa24601b7713",
+      "target": "2fa37b43-35ff-4c57-9587-397e3fb5907f",
+      "sourceHandle": "br_89b99590",
+      "targetHandle": "in_2fa37b43-35ff-4c57-9587-397e3fb5907f"
+    },
+    {
+      "id": "edge_2fa37b43-35ff-4c57-9587-397e3fb5907f_11100d62-ce9c-4011-a3b7-5b81cdcb0af1",
+      "source": "2fa37b43-35ff-4c57-9587-397e3fb5907f",
+      "target": "11100d62-ce9c-4011-a3b7-5b81cdcb0af1",
+      "sourceHandle": "out_2fa37b43-35ff-4c57-9587-397e3fb5907f",
+      "targetHandle": "in_11100d62-ce9c-4011-a3b7-5b81cdcb0af1"
+    },
+    {
+      "id": "edge_11100d62-ce9c-4011-a3b7-5b81cdcb0af1_054641bf-a65c-4c90-81fe-77c7a8f8425a",
+      "source": "11100d62-ce9c-4011-a3b7-5b81cdcb0af1",
+      "target": "054641bf-a65c-4c90-81fe-77c7a8f8425a",
+      "sourceHandle": "out_11100d62-ce9c-4011-a3b7-5b81cdcb0af1",
+      "targetHandle": "in_054641bf-a65c-4c90-81fe-77c7a8f8425a"
+    },
+    {
+      "id": "edge_054641bf-a65c-4c90-81fe-77c7a8f8425a_ef4f582e-c7d4-4251-9d00-e031399e9509",
+      "source": "054641bf-a65c-4c90-81fe-77c7a8f8425a",
+      "target": "ef4f582e-c7d4-4251-9d00-e031399e9509",
+      "sourceHandle": "out_054641bf-a65c-4c90-81fe-77c7a8f8425a",
+      "targetHandle": "in_ef4f582e-c7d4-4251-9d00-e031399e9509"
+    },
+    {
+      "id": "edge_ef4f582e-c7d4-4251-9d00-e031399e9509_35196c6c-cbc3-46f8-9227-9f463c441940",
+      "source": "ef4f582e-c7d4-4251-9d00-e031399e9509",
+      "target": "35196c6c-cbc3-46f8-9227-9f463c441940",
+      "sourceHandle": "out_ef4f582e-c7d4-4251-9d00-e031399e9509",
+      "targetHandle": "in_35196c6c-cbc3-46f8-9227-9f463c441940"
+    }
+  ]
+}

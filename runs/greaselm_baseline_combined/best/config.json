@@ -1,0 +1,8 @@
+{
+  "kg_mode": "combined",
+  "base_model_name": "FacebookAI/roberta-base",
+  "k": 3,
+  "concept_dim": 100,
+  "max_length": 256,
+  "num_unfrozen_layers": 2
+}

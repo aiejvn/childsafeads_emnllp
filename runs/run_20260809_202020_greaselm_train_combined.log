@@ -1,0 +1,294 @@
+2026-08-09 20:20:20,681 | INFO | MainThread | logging to runs/run_20260809_202020_greaselm_train_combined.log
+2026-08-09 20:20:20,681 | INFO | MainThread | config: {'train': 'public_data_dev/train.jsonl', 'dev': 'public_data_dev/dev.jsonl', 'kg_mode': 'combined', 'base_model': 'FacebookAI/roberta-base', 'max_length': 256, 'k': 3, 'concept_dim': 100, 'transe_epochs': 200, 'epochs': 200, 'batch_size': 4, 'grad_accum_steps': 1, 'lr': 2e-05, 'warmup_ratio': 0.06, 'num_unfrozen_layers': 2, 'st2_loss_weight': 1.0, 'st3_loss_weight': 1.0, 'pos_weight': False, 'threshold': 0.5, 'sample_size': 300, 'eval_every': 5, 'seed': 42, 'device': 'cuda', 'output_dir': 'runs/greaselm_baseline_combined', 'no_wandb': True} device=cuda
+2026-08-09 20:20:21,205 | INFO | MainThread | train=300 dev=300
+2026-08-09 20:20:22,439 | INFO | MainThread | model built in 1.2s; trainable params: 14959181/125435569 (11.93%)
+2026-08-09 20:21:40,728 | INFO | MainThread | epoch 1: mean train loss = 2.9227
+2026-08-09 20:22:57,899 | INFO | MainThread | epoch 2: mean train loss = 2.7732
+2026-08-09 20:24:15,081 | INFO | MainThread | epoch 3: mean train loss = 2.5758
+2026-08-09 20:25:32,299 | INFO | MainThread | epoch 4: mean train loss = 2.4641
+2026-08-09 20:26:49,438 | INFO | MainThread | epoch 5: mean train loss = 2.4250
+2026-08-09 20:27:46,546 | INFO | MainThread | epoch 5 dev metrics (tuned thresholds): st1_macro_f1=0.139, st2_macro_f1=0.194, st3_macro_f1=0.056, st3_family_macro_f1=0.100, mean_macro_f1=0.130
+2026-08-09 20:27:46,629 | INFO | MainThread | epoch 5: new best mean_macro_f1=0.130, saved to runs/greaselm_baseline_combined/best
+2026-08-09 20:27:46,698 | INFO | MainThread | epoch 5: saved running checkpoint to runs/greaselm_baseline_combined/last
+2026-08-09 20:29:03,858 | INFO | MainThread | epoch 6: mean train loss = 2.4174
+2026-08-09 20:30:21,047 | INFO | MainThread | epoch 7: mean train loss = 2.4484
+2026-08-09 20:31:37,966 | INFO | MainThread | epoch 8: mean train loss = 2.4278
+2026-08-09 20:32:54,791 | INFO | MainThread | epoch 9: mean train loss = 2.4201
+2026-08-09 20:34:11,906 | INFO | MainThread | epoch 10: mean train loss = 2.3064
+2026-08-09 20:35:08,884 | INFO | MainThread | epoch 10 dev metrics (tuned thresholds): st1_macro_f1=0.166, st2_macro_f1=0.185, st3_macro_f1=0.049, st3_family_macro_f1=0.100, mean_macro_f1=0.133
+2026-08-09 20:35:08,973 | INFO | MainThread | epoch 10: new best mean_macro_f1=0.133, saved to runs/greaselm_baseline_combined/best
+2026-08-09 20:35:09,058 | INFO | MainThread | epoch 10: saved running checkpoint to runs/greaselm_baseline_combined/last
+2026-08-09 20:36:26,217 | INFO | MainThread | epoch 11: mean train loss = 1.8527
+2026-08-09 20:37:43,328 | INFO | MainThread | epoch 12: mean train loss = 1.7128
+2026-08-09 20:39:00,538 | INFO | MainThread | epoch 13: mean train loss = 1.6836
+2026-08-09 20:40:17,736 | INFO | MainThread | epoch 14: mean train loss = 1.6100
+2026-08-09 20:41:34,820 | INFO | MainThread | epoch 15: mean train loss = 1.5456
+2026-08-09 20:42:31,750 | INFO | MainThread | epoch 15 dev metrics (tuned thresholds): st1_macro_f1=0.409, st2_macro_f1=0.253, st3_macro_f1=0.063, st3_family_macro_f1=0.128, mean_macro_f1=0.242
+2026-08-09 20:42:31,842 | INFO | MainThread | epoch 15: new best mean_macro_f1=0.242, saved to runs/greaselm_baseline_combined/best
+2026-08-09 20:42:31,931 | INFO | MainThread | epoch 15: saved running checkpoint to runs/greaselm_baseline_combined/last
+2026-08-09 20:43:49,096 | INFO | MainThread | epoch 16: mean train loss = 1.5708
+2026-08-09 20:45:06,223 | INFO | MainThread | epoch 17: mean train loss = 1.5085
+2026-08-09 20:46:23,362 | INFO | MainThread | epoch 18: mean train loss = 1.4849
+2026-08-09 20:47:40,474 | INFO | MainThread | epoch 19: mean train loss = 1.4031
+2026-08-09 20:48:57,560 | INFO | MainThread | epoch 20: mean train loss = 1.3447
+2026-08-09 20:49:54,724 | INFO | MainThread | epoch 20 dev metrics (tuned thresholds): st1_macro_f1=0.257, st2_macro_f1=0.240, st3_macro_f1=0.116, st3_family_macro_f1=0.228, mean_macro_f1=0.205
+2026-08-09 20:49:54,835 | INFO | MainThread | epoch 20: saved running checkpoint to runs/greaselm_baseline_combined/last
+2026-08-09 20:51:11,818 | INFO | MainThread | epoch 21: mean train loss = 1.3783
+2026-08-09 20:52:29,098 | INFO | MainThread | epoch 22: mean train loss = 1.3248
+2026-08-09 20:53:46,339 | INFO | MainThread | epoch 23: mean train loss = 1.2812
+2026-08-09 20:55:03,340 | INFO | MainThread | epoch 24: mean train loss = 1.2540
+2026-08-09 20:56:20,305 | INFO | MainThread | epoch 25: mean train loss = 1.2392
+2026-08-09 20:57:17,191 | INFO | MainThread | epoch 25 dev metrics (tuned thresholds): st1_macro_f1=0.582, st2_macro_f1=0.305, st3_macro_f1=0.174, st3_family_macro_f1=0.210, mean_macro_f1=0.354
+2026-08-09 20:57:17,287 | INFO | MainThread | epoch 25: new best mean_macro_f1=0.354, saved to runs/greaselm_baseline_combined/best
+2026-08-09 20:57:17,363 | INFO | MainThread | epoch 25: saved running checkpoint to runs/greaselm_baseline_combined/last
+2026-08-09 20:58:34,464 | INFO | MainThread | epoch 26: mean train loss = 1.2089
+2026-08-09 20:59:51,551 | INFO | MainThread | epoch 27: mean train loss = 1.1370
+2026-08-09 21:01:08,795 | INFO | MainThread | epoch 28: mean train loss = 1.1677
+2026-08-09 21:02:25,895 | INFO | MainThread | epoch 29: mean train loss = 1.0976
+2026-08-09 21:03:42,981 | INFO | MainThread | epoch 30: mean train loss = 1.0886
+2026-08-09 21:04:39,971 | INFO | MainThread | epoch 30 dev metrics (tuned thresholds): st1_macro_f1=0.574, st2_macro_f1=0.333, st3_macro_f1=0.133, st3_family_macro_f1=0.239, mean_macro_f1=0.346
+2026-08-09 21:04:40,062 | INFO | MainThread | epoch 30: saved running checkpoint to runs/greaselm_baseline_combined/last
+2026-08-09 21:05:56,947 | INFO | MainThread | epoch 31: mean train loss = 1.0512
+2026-08-09 21:07:14,134 | INFO | MainThread | epoch 32: mean train loss = 1.0030
+2026-08-09 21:08:31,241 | INFO | MainThread | epoch 33: mean train loss = 1.0089
+2026-08-09 21:09:48,398 | INFO | MainThread | epoch 34: mean train loss = 0.9602
+2026-08-09 21:11:05,394 | INFO | MainThread | epoch 35: mean train loss = 0.9526
+2026-08-09 21:12:02,081 | INFO | MainThread | epoch 35 dev metrics (tuned thresholds): st1_macro_f1=0.579, st2_macro_f1=0.413, st3_macro_f1=0.170, st3_family_macro_f1=0.293, mean_macro_f1=0.387
+2026-08-09 21:12:02,167 | INFO | MainThread | epoch 35: new best mean_macro_f1=0.387, saved to runs/greaselm_baseline_combined/best
+2026-08-09 21:12:02,251 | INFO | MainThread | epoch 35: saved running checkpoint to runs/greaselm_baseline_combined/last
+2026-08-09 21:13:19,316 | INFO | MainThread | epoch 36: mean train loss = 0.9084
+2026-08-09 21:14:36,436 | INFO | MainThread | epoch 37: mean train loss = 0.8805
+2026-08-09 21:15:53,689 | INFO | MainThread | epoch 38: mean train loss = 0.8898
+2026-08-09 21:17:10,873 | INFO | MainThread | epoch 39: mean train loss = 0.8104
+2026-08-09 21:18:28,024 | INFO | MainThread | epoch 40: mean train loss = 0.7993
+2026-08-09 21:19:24,812 | INFO | MainThread | epoch 40 dev metrics (tuned thresholds): st1_macro_f1=0.443, st2_macro_f1=0.391, st3_macro_f1=0.228, st3_family_macro_f1=0.353, mean_macro_f1=0.354
+2026-08-09 21:19:24,902 | INFO | MainThread | epoch 40: saved running checkpoint to runs/greaselm_baseline_combined/last
+2026-08-09 21:20:41,982 | INFO | MainThread | epoch 41: mean train loss = 0.7883
+2026-08-09 21:21:59,160 | INFO | MainThread | epoch 42: mean train loss = 0.7318
+2026-08-09 21:23:16,221 | INFO | MainThread | epoch 43: mean train loss = 0.7185
+2026-08-09 21:24:33,291 | INFO | MainThread | epoch 44: mean train loss = 0.6893
+2026-08-09 21:25:50,280 | INFO | MainThread | epoch 45: mean train loss = 0.7175
+2026-08-09 21:26:46,843 | INFO | MainThread | epoch 45 dev metrics (tuned thresholds): st1_macro_f1=0.452, st2_macro_f1=0.438, st3_macro_f1=0.270, st3_family_macro_f1=0.420, mean_macro_f1=0.387
+2026-08-09 21:26:46,934 | INFO | MainThread | epoch 45: saved running checkpoint to runs/greaselm_baseline_combined/last
+2026-08-09 21:28:04,235 | INFO | MainThread | epoch 46: mean train loss = 0.6387
+2026-08-09 21:29:21,244 | INFO | MainThread | epoch 47: mean train loss = 0.5790
+2026-08-09 21:30:38,376 | INFO | MainThread | epoch 48: mean train loss = 0.5908
+2026-08-09 21:31:55,552 | INFO | MainThread | epoch 49: mean train loss = 0.5895
+2026-08-09 21:33:12,513 | INFO | MainThread | epoch 50: mean train loss = 0.6618
+2026-08-09 21:34:09,417 | INFO | MainThread | epoch 50 dev metrics (tuned thresholds): st1_macro_f1=0.442, st2_macro_f1=0.418, st3_macro_f1=0.270, st3_family_macro_f1=0.394, mean_macro_f1=0.377
+2026-08-09 21:34:09,491 | INFO | MainThread | epoch 50: saved running checkpoint to runs/greaselm_baseline_combined/last
+2026-08-09 21:35:26,638 | INFO | MainThread | epoch 51: mean train loss = 0.5439
+2026-08-09 21:36:43,834 | INFO | MainThread | epoch 52: mean train loss = 0.5552
+2026-08-09 21:38:01,006 | INFO | MainThread | epoch 53: mean train loss = 0.5202
+2026-08-09 21:39:18,138 | INFO | MainThread | epoch 54: mean train loss = 0.5644
+2026-08-09 21:40:35,359 | INFO | MainThread | epoch 55: mean train loss = 0.5254
+2026-08-09 21:41:32,076 | INFO | MainThread | epoch 55 dev metrics (tuned thresholds): st1_macro_f1=0.438, st2_macro_f1=0.450, st3_macro_f1=0.373, st3_family_macro_f1=0.455, mean_macro_f1=0.420
+2026-08-09 21:41:32,154 | INFO | MainThread | epoch 55: new best mean_macro_f1=0.420, saved to runs/greaselm_baseline_combined/best
+2026-08-09 21:41:32,226 | INFO | MainThread | epoch 55: saved running checkpoint to runs/greaselm_baseline_combined/last
+2026-08-09 21:42:49,344 | INFO | MainThread | epoch 56: mean train loss = 0.5029
+2026-08-09 21:44:06,389 | INFO | MainThread | epoch 57: mean train loss = 0.4807
+2026-08-09 21:45:23,497 | INFO | MainThread | epoch 58: mean train loss = 0.4512
+2026-08-09 21:46:40,781 | INFO | MainThread | epoch 59: mean train loss = 0.4373
+2026-08-09 21:47:57,576 | INFO | MainThread | epoch 60: mean train loss = 0.4502
+2026-08-09 21:48:54,438 | INFO | MainThread | epoch 60 dev metrics (tuned thresholds): st1_macro_f1=0.446, st2_macro_f1=0.444, st3_macro_f1=0.373, st3_family_macro_f1=0.496, mean_macro_f1=0.421
+2026-08-09 21:48:54,513 | INFO | MainThread | epoch 60: new best mean_macro_f1=0.421, saved to runs/greaselm_baseline_combined/best
+2026-08-09 21:48:54,584 | INFO | MainThread | epoch 60: saved running checkpoint to runs/greaselm_baseline_combined/last
+2026-08-09 21:50:11,427 | INFO | MainThread | epoch 61: mean train loss = 0.4089
+2026-08-09 21:51:28,752 | INFO | MainThread | epoch 62: mean train loss = 0.3964
+2026-08-09 21:52:45,806 | INFO | MainThread | epoch 63: mean train loss = 0.3921
+2026-08-09 21:54:03,047 | INFO | MainThread | epoch 64: mean train loss = 0.3690
+2026-08-09 21:55:19,911 | INFO | MainThread | epoch 65: mean train loss = 0.4043
+2026-08-09 21:56:16,775 | INFO | MainThread | epoch 65 dev metrics (tuned thresholds): st1_macro_f1=0.506, st2_macro_f1=0.427, st3_macro_f1=0.323, st3_family_macro_f1=0.444, mean_macro_f1=0.419
+2026-08-09 21:56:16,856 | INFO | MainThread | epoch 65: saved running checkpoint to runs/greaselm_baseline_combined/last
+2026-08-09 21:57:34,057 | INFO | MainThread | epoch 66: mean train loss = 0.3734
+2026-08-09 21:58:51,052 | INFO | MainThread | epoch 67: mean train loss = 0.3587
+2026-08-09 22:00:08,068 | INFO | MainThread | epoch 68: mean train loss = 0.3416
+2026-08-09 22:01:25,092 | INFO | MainThread | epoch 69: mean train loss = 0.3470
+2026-08-09 22:02:42,192 | INFO | MainThread | epoch 70: mean train loss = 0.3304
+2026-08-09 22:03:38,997 | INFO | MainThread | epoch 70 dev metrics (tuned thresholds): st1_macro_f1=0.526, st2_macro_f1=0.439, st3_macro_f1=0.371, st3_family_macro_f1=0.468, mean_macro_f1=0.446
+2026-08-09 22:03:39,110 | INFO | MainThread | epoch 70: new best mean_macro_f1=0.446, saved to runs/greaselm_baseline_combined/best
+2026-08-09 22:03:39,178 | INFO | MainThread | epoch 70: saved running checkpoint to runs/greaselm_baseline_combined/last
+2026-08-09 22:04:56,337 | INFO | MainThread | epoch 71: mean train loss = 0.3260
+2026-08-09 22:06:13,386 | INFO | MainThread | epoch 72: mean train loss = 0.3658
+2026-08-09 22:07:30,389 | INFO | MainThread | epoch 73: mean train loss = 0.3061
+2026-08-09 22:08:47,382 | INFO | MainThread | epoch 74: mean train loss = 0.2958
+2026-08-09 22:10:04,551 | INFO | MainThread | epoch 75: mean train loss = 0.2976
+2026-08-09 22:11:01,256 | INFO | MainThread | epoch 75 dev metrics (tuned thresholds): st1_macro_f1=0.671, st2_macro_f1=0.450, st3_macro_f1=0.346, st3_family_macro_f1=0.491, mean_macro_f1=0.489
+2026-08-09 22:11:01,375 | INFO | MainThread | epoch 75: new best mean_macro_f1=0.489, saved to runs/greaselm_baseline_combined/best
+2026-08-09 22:11:01,457 | INFO | MainThread | epoch 75: saved running checkpoint to runs/greaselm_baseline_combined/last
+2026-08-09 22:12:18,513 | INFO | MainThread | epoch 76: mean train loss = 0.2790
+2026-08-09 22:13:35,495 | INFO | MainThread | epoch 77: mean train loss = 0.2862
+2026-08-09 22:14:52,505 | INFO | MainThread | epoch 78: mean train loss = 0.2628
+2026-08-09 22:16:09,660 | INFO | MainThread | epoch 79: mean train loss = 0.2561
+2026-08-09 22:17:26,798 | INFO | MainThread | epoch 80: mean train loss = 0.2405
+2026-08-09 22:18:23,610 | INFO | MainThread | epoch 80 dev metrics (tuned thresholds): st1_macro_f1=0.643, st2_macro_f1=0.438, st3_macro_f1=0.319, st3_family_macro_f1=0.474, mean_macro_f1=0.467
+2026-08-09 22:18:23,699 | INFO | MainThread | epoch 80: saved running checkpoint to runs/greaselm_baseline_combined/last
+2026-08-09 22:19:40,664 | INFO | MainThread | epoch 81: mean train loss = 0.2225
+2026-08-09 22:20:57,849 | INFO | MainThread | epoch 82: mean train loss = 0.2524
+2026-08-09 22:22:14,869 | INFO | MainThread | epoch 83: mean train loss = 0.2264
+2026-08-09 22:23:31,973 | INFO | MainThread | epoch 84: mean train loss = 0.2319
+2026-08-09 22:24:48,908 | INFO | MainThread | epoch 85: mean train loss = 0.2152
+2026-08-09 22:25:45,644 | INFO | MainThread | epoch 85 dev metrics (tuned thresholds): st1_macro_f1=0.515, st2_macro_f1=0.426, st3_macro_f1=0.248, st3_family_macro_f1=0.418, mean_macro_f1=0.396
+2026-08-09 22:25:45,732 | INFO | MainThread | epoch 85: saved running checkpoint to runs/greaselm_baseline_combined/last
+2026-08-09 22:27:02,859 | INFO | MainThread | epoch 86: mean train loss = 0.2138
+2026-08-09 22:28:19,926 | INFO | MainThread | epoch 87: mean train loss = 0.2604
+2026-08-09 22:29:37,029 | INFO | MainThread | epoch 88: mean train loss = 0.2437
+2026-08-09 22:30:53,990 | INFO | MainThread | epoch 89: mean train loss = 0.2381
+2026-08-09 22:32:11,193 | INFO | MainThread | epoch 90: mean train loss = 0.1844
+2026-08-09 22:33:07,922 | INFO | MainThread | epoch 90 dev metrics (tuned thresholds): st1_macro_f1=0.547, st2_macro_f1=0.396, st3_macro_f1=0.243, st3_family_macro_f1=0.420, mean_macro_f1=0.396
+2026-08-09 22:33:08,010 | INFO | MainThread | epoch 90: saved running checkpoint to runs/greaselm_baseline_combined/last
+2026-08-09 22:34:25,136 | INFO | MainThread | epoch 91: mean train loss = 0.1945
+2026-08-09 22:35:42,282 | INFO | MainThread | epoch 92: mean train loss = 0.1843
+2026-08-09 22:36:59,405 | INFO | MainThread | epoch 93: mean train loss = 0.2081
+2026-08-09 22:38:16,462 | INFO | MainThread | epoch 94: mean train loss = 0.1908
+2026-08-09 22:39:33,491 | INFO | MainThread | epoch 95: mean train loss = 0.1742
+2026-08-09 22:40:30,283 | INFO | MainThread | epoch 95 dev metrics (tuned thresholds): st1_macro_f1=0.534, st2_macro_f1=0.418, st3_macro_f1=0.255, st3_family_macro_f1=0.408, mean_macro_f1=0.402
+2026-08-09 22:40:30,374 | INFO | MainThread | epoch 95: saved running checkpoint to runs/greaselm_baseline_combined/last
+2026-08-09 22:41:47,434 | INFO | MainThread | epoch 96: mean train loss = 0.1603
+2026-08-09 22:43:04,612 | INFO | MainThread | epoch 97: mean train loss = 0.1573
+2026-08-09 22:44:21,780 | INFO | MainThread | epoch 98: mean train loss = 0.2074
+2026-08-09 22:45:38,900 | INFO | MainThread | epoch 99: mean train loss = 0.1546
+2026-08-09 22:46:55,916 | INFO | MainThread | epoch 100: mean train loss = 0.1692
+2026-08-09 22:47:52,887 | INFO | MainThread | epoch 100 dev metrics (tuned thresholds): st1_macro_f1=0.540, st2_macro_f1=0.424, st3_macro_f1=0.263, st3_family_macro_f1=0.433, mean_macro_f1=0.409
+2026-08-09 22:47:52,975 | INFO | MainThread | epoch 100: saved running checkpoint to runs/greaselm_baseline_combined/last
+2026-08-09 22:49:09,889 | INFO | MainThread | epoch 101: mean train loss = 0.1460
+2026-08-09 22:50:27,056 | INFO | MainThread | epoch 102: mean train loss = 0.1615
+2026-08-09 22:51:44,056 | INFO | MainThread | epoch 103: mean train loss = 0.1301
+2026-08-09 22:53:00,973 | INFO | MainThread | epoch 104: mean train loss = 0.1309
+2026-08-09 22:54:17,975 | INFO | MainThread | epoch 105: mean train loss = 0.1254
+2026-08-09 22:55:14,647 | INFO | MainThread | epoch 105 dev metrics (tuned thresholds): st1_macro_f1=0.671, st2_macro_f1=0.403, st3_macro_f1=0.240, st3_family_macro_f1=0.427, mean_macro_f1=0.438
+2026-08-09 22:55:14,738 | INFO | MainThread | epoch 105: saved running checkpoint to runs/greaselm_baseline_combined/last
+2026-08-09 22:56:31,861 | INFO | MainThread | epoch 106: mean train loss = 0.1293
+2026-08-09 22:57:48,844 | INFO | MainThread | epoch 107: mean train loss = 0.1737
+2026-08-09 22:59:05,979 | INFO | MainThread | epoch 108: mean train loss = 0.1762
+2026-08-09 23:00:22,986 | INFO | MainThread | epoch 109: mean train loss = 0.1182
+2026-08-09 23:01:40,002 | INFO | MainThread | epoch 110: mean train loss = 0.1184
+2026-08-09 23:02:36,703 | INFO | MainThread | epoch 110 dev metrics (tuned thresholds): st1_macro_f1=0.662, st2_macro_f1=0.413, st3_macro_f1=0.267, st3_family_macro_f1=0.447, mean_macro_f1=0.447
+2026-08-09 23:02:36,800 | INFO | MainThread | epoch 110: saved running checkpoint to runs/greaselm_baseline_combined/last
+2026-08-09 23:03:53,843 | INFO | MainThread | epoch 111: mean train loss = 0.1159
+2026-08-09 23:05:10,912 | INFO | MainThread | epoch 112: mean train loss = 0.1195
+2026-08-09 23:06:27,816 | INFO | MainThread | epoch 113: mean train loss = 0.1120
+2026-08-09 23:07:44,852 | INFO | MainThread | epoch 114: mean train loss = 0.1023
+2026-08-09 23:09:01,962 | INFO | MainThread | epoch 115: mean train loss = 0.1119
+2026-08-09 23:09:58,831 | INFO | MainThread | epoch 115 dev metrics (tuned thresholds): st1_macro_f1=0.678, st2_macro_f1=0.416, st3_macro_f1=0.225, st3_family_macro_f1=0.408, mean_macro_f1=0.439
+2026-08-09 23:09:58,929 | INFO | MainThread | epoch 115: saved running checkpoint to runs/greaselm_baseline_combined/last
+2026-08-09 23:11:15,852 | INFO | MainThread | epoch 116: mean train loss = 0.1444
+2026-08-09 23:12:32,989 | INFO | MainThread | epoch 117: mean train loss = 0.1117
+2026-08-09 23:13:50,004 | INFO | MainThread | epoch 118: mean train loss = 0.0996
+2026-08-09 23:15:07,079 | INFO | MainThread | epoch 119: mean train loss = 0.1083
+2026-08-09 23:16:24,042 | INFO | MainThread | epoch 120: mean train loss = 0.0904
+2026-08-09 23:17:20,760 | INFO | MainThread | epoch 120 dev metrics (tuned thresholds): st1_macro_f1=0.664, st2_macro_f1=0.422, st3_macro_f1=0.243, st3_family_macro_f1=0.428, mean_macro_f1=0.443
+2026-08-09 23:17:20,867 | INFO | MainThread | epoch 120: saved running checkpoint to runs/greaselm_baseline_combined/last
+2026-08-09 23:18:37,842 | INFO | MainThread | epoch 121: mean train loss = 0.0944
+2026-08-09 23:19:54,641 | INFO | MainThread | epoch 122: mean train loss = 0.1282
+2026-08-09 23:21:11,742 | INFO | MainThread | epoch 123: mean train loss = 0.0918
+2026-08-09 23:22:28,754 | INFO | MainThread | epoch 124: mean train loss = 0.0823
+2026-08-09 23:23:45,887 | INFO | MainThread | epoch 125: mean train loss = 0.1214
+2026-08-09 23:24:42,709 | INFO | MainThread | epoch 125 dev metrics (tuned thresholds): st1_macro_f1=0.656, st2_macro_f1=0.417, st3_macro_f1=0.273, st3_family_macro_f1=0.447, mean_macro_f1=0.449
+2026-08-09 23:24:42,812 | INFO | MainThread | epoch 125: saved running checkpoint to runs/greaselm_baseline_combined/last
+2026-08-09 23:25:59,737 | INFO | MainThread | epoch 126: mean train loss = 0.1266
+2026-08-09 23:27:16,750 | INFO | MainThread | epoch 127: mean train loss = 0.0984
+2026-08-09 23:28:33,875 | INFO | MainThread | epoch 128: mean train loss = 0.0885
+2026-08-09 23:29:50,952 | INFO | MainThread | epoch 129: mean train loss = 0.0846
+2026-08-09 23:31:07,899 | INFO | MainThread | epoch 130: mean train loss = 0.1349
+2026-08-09 23:32:04,212 | INFO | MainThread | epoch 130 dev metrics (tuned thresholds): st1_macro_f1=0.661, st2_macro_f1=0.408, st3_macro_f1=0.217, st3_family_macro_f1=0.411, mean_macro_f1=0.429
+2026-08-09 23:32:04,304 | INFO | MainThread | epoch 130: saved running checkpoint to runs/greaselm_baseline_combined/last
+2026-08-09 23:33:21,488 | INFO | MainThread | epoch 131: mean train loss = 0.0939
+2026-08-09 23:34:38,589 | INFO | MainThread | epoch 132: mean train loss = 0.0664
+2026-08-09 23:35:55,564 | INFO | MainThread | epoch 133: mean train loss = 0.1028
+2026-08-09 23:37:12,522 | INFO | MainThread | epoch 134: mean train loss = 0.0782
+2026-08-09 23:38:29,564 | INFO | MainThread | epoch 135: mean train loss = 0.0698
+2026-08-09 23:39:26,284 | INFO | MainThread | epoch 135 dev metrics (tuned thresholds): st1_macro_f1=0.579, st2_macro_f1=0.412, st3_macro_f1=0.222, st3_family_macro_f1=0.397, mean_macro_f1=0.404
+2026-08-09 23:39:26,378 | INFO | MainThread | epoch 135: saved running checkpoint to runs/greaselm_baseline_combined/last
+2026-08-09 23:40:43,629 | INFO | MainThread | epoch 136: mean train loss = 0.0799
+2026-08-09 23:42:00,667 | INFO | MainThread | epoch 137: mean train loss = 0.0721
+2026-08-09 23:43:17,767 | INFO | MainThread | epoch 138: mean train loss = 0.0733
+2026-08-09 23:44:34,715 | INFO | MainThread | epoch 139: mean train loss = 0.0894
+2026-08-09 23:45:51,578 | INFO | MainThread | epoch 140: mean train loss = 0.1121
+2026-08-09 23:46:48,237 | INFO | MainThread | epoch 140 dev metrics (tuned thresholds): st1_macro_f1=0.630, st2_macro_f1=0.406, st3_macro_f1=0.238, st3_family_macro_f1=0.413, mean_macro_f1=0.425
+2026-08-09 23:46:48,338 | INFO | MainThread | epoch 140: saved running checkpoint to runs/greaselm_baseline_combined/last
+2026-08-09 23:48:05,406 | INFO | MainThread | epoch 141: mean train loss = 0.0676
+2026-08-09 23:49:22,284 | INFO | MainThread | epoch 142: mean train loss = 0.0811
+2026-08-09 23:50:39,385 | INFO | MainThread | epoch 143: mean train loss = 0.0913
+2026-08-09 23:51:56,333 | INFO | MainThread | epoch 144: mean train loss = 0.0927
+2026-08-09 23:53:13,289 | INFO | MainThread | epoch 145: mean train loss = 0.0649
+2026-08-09 23:54:10,221 | INFO | MainThread | epoch 145 dev metrics (tuned thresholds): st1_macro_f1=0.623, st2_macro_f1=0.406, st3_macro_f1=0.231, st3_family_macro_f1=0.402, mean_macro_f1=0.420
+2026-08-09 23:54:10,305 | INFO | MainThread | epoch 145: saved running checkpoint to runs/greaselm_baseline_combined/last
+2026-08-09 23:55:27,359 | INFO | MainThread | epoch 146: mean train loss = 0.1401
+2026-08-09 23:56:44,423 | INFO | MainThread | epoch 147: mean train loss = 0.0686
+2026-08-09 23:58:01,185 | INFO | MainThread | epoch 148: mean train loss = 0.0507
+2026-08-09 23:59:18,291 | INFO | MainThread | epoch 149: mean train loss = 0.0629
+2026-08-10 00:00:35,435 | INFO | MainThread | epoch 150: mean train loss = 0.0585
+2026-08-10 00:01:32,362 | INFO | MainThread | epoch 150 dev metrics (tuned thresholds): st1_macro_f1=0.662, st2_macro_f1=0.402, st3_macro_f1=0.240, st3_family_macro_f1=0.410, mean_macro_f1=0.434
+2026-08-10 00:01:32,440 | INFO | MainThread | epoch 150: saved running checkpoint to runs/greaselm_baseline_combined/last
+2026-08-10 00:02:49,477 | INFO | MainThread | epoch 151: mean train loss = 0.0783
+2026-08-10 00:04:06,585 | INFO | MainThread | epoch 152: mean train loss = 0.0749
+2026-08-10 00:05:23,667 | INFO | MainThread | epoch 153: mean train loss = 0.0865
+2026-08-10 00:06:40,919 | INFO | MainThread | epoch 154: mean train loss = 0.1233
+2026-08-10 00:07:57,834 | INFO | MainThread | epoch 155: mean train loss = 0.0488
+2026-08-10 00:08:54,749 | INFO | MainThread | epoch 155 dev metrics (tuned thresholds): st1_macro_f1=0.670, st2_macro_f1=0.420, st3_macro_f1=0.237, st3_family_macro_f1=0.407, mean_macro_f1=0.442
+2026-08-10 00:08:54,821 | INFO | MainThread | epoch 155: saved running checkpoint to runs/greaselm_baseline_combined/last
+2026-08-10 00:10:12,028 | INFO | MainThread | epoch 156: mean train loss = 0.0619
+2026-08-10 00:11:28,980 | INFO | MainThread | epoch 157: mean train loss = 0.0757
+2026-08-10 00:12:45,909 | INFO | MainThread | epoch 158: mean train loss = 0.0956
+2026-08-10 00:14:02,928 | INFO | MainThread | epoch 159: mean train loss = 0.0589
+2026-08-10 00:15:20,066 | INFO | MainThread | epoch 160: mean train loss = 0.0522
+2026-08-10 00:16:17,086 | INFO | MainThread | epoch 160 dev metrics (tuned thresholds): st1_macro_f1=0.668, st2_macro_f1=0.409, st3_macro_f1=0.237, st3_family_macro_f1=0.415, mean_macro_f1=0.438
+2026-08-10 00:16:17,164 | INFO | MainThread | epoch 160: saved running checkpoint to runs/greaselm_baseline_combined/last
+2026-08-10 00:17:34,055 | INFO | MainThread | epoch 161: mean train loss = 0.0950
+2026-08-10 00:18:51,094 | INFO | MainThread | epoch 162: mean train loss = 0.0922
+2026-08-10 00:20:07,983 | INFO | MainThread | epoch 163: mean train loss = 0.0477
+2026-08-10 00:21:24,905 | INFO | MainThread | epoch 164: mean train loss = 0.0755
+2026-08-10 00:22:41,983 | INFO | MainThread | epoch 165: mean train loss = 0.0525
+2026-08-10 00:23:38,692 | INFO | MainThread | epoch 165 dev metrics (tuned thresholds): st1_macro_f1=0.657, st2_macro_f1=0.407, st3_macro_f1=0.231, st3_family_macro_f1=0.401, mean_macro_f1=0.432
+2026-08-10 00:23:38,768 | INFO | MainThread | epoch 165: saved running checkpoint to runs/greaselm_baseline_combined/last
+2026-08-10 00:24:55,762 | INFO | MainThread | epoch 166: mean train loss = 0.0536
+2026-08-10 00:26:12,820 | INFO | MainThread | epoch 167: mean train loss = 0.0389
+2026-08-10 00:27:29,932 | INFO | MainThread | epoch 168: mean train loss = 0.0571
+2026-08-10 00:28:47,103 | INFO | MainThread | epoch 169: mean train loss = 0.0567
+2026-08-10 00:30:04,167 | INFO | MainThread | epoch 170: mean train loss = 0.0533
+2026-08-10 00:31:00,889 | INFO | MainThread | epoch 170 dev metrics (tuned thresholds): st1_macro_f1=0.613, st2_macro_f1=0.402, st3_macro_f1=0.230, st3_family_macro_f1=0.408, mean_macro_f1=0.415
+2026-08-10 00:31:00,971 | INFO | MainThread | epoch 170: saved running checkpoint to runs/greaselm_baseline_combined/last
+2026-08-10 00:32:17,783 | INFO | MainThread | epoch 171: mean train loss = 0.0439
+2026-08-10 00:33:34,708 | INFO | MainThread | epoch 172: mean train loss = 0.0463
+2026-08-10 00:34:51,884 | INFO | MainThread | epoch 173: mean train loss = 0.0504
+2026-08-10 00:36:08,942 | INFO | MainThread | epoch 174: mean train loss = 0.0719
+2026-08-10 00:37:25,945 | INFO | MainThread | epoch 175: mean train loss = 0.0483
+2026-08-10 00:38:22,665 | INFO | MainThread | epoch 175 dev metrics (tuned thresholds): st1_macro_f1=0.662, st2_macro_f1=0.406, st3_macro_f1=0.229, st3_family_macro_f1=0.415, mean_macro_f1=0.432
+2026-08-10 00:38:22,740 | INFO | MainThread | epoch 175: saved running checkpoint to runs/greaselm_baseline_combined/last
+2026-08-10 00:39:39,696 | INFO | MainThread | epoch 176: mean train loss = 0.0458
+2026-08-10 00:40:56,680 | INFO | MainThread | epoch 177: mean train loss = 0.0373
+2026-08-10 00:42:13,816 | INFO | MainThread | epoch 178: mean train loss = 0.0767
+2026-08-10 00:43:30,591 | INFO | MainThread | epoch 179: mean train loss = 0.0570
+2026-08-10 00:44:47,643 | INFO | MainThread | epoch 180: mean train loss = 0.0359
+2026-08-10 00:45:44,502 | INFO | MainThread | epoch 180 dev metrics (tuned thresholds): st1_macro_f1=0.660, st2_macro_f1=0.410, st3_macro_f1=0.234, st3_family_macro_f1=0.403, mean_macro_f1=0.434
+2026-08-10 00:45:44,589 | INFO | MainThread | epoch 180: saved running checkpoint to runs/greaselm_baseline_combined/last
+2026-08-10 00:47:01,465 | INFO | MainThread | epoch 181: mean train loss = 0.0955
+2026-08-10 00:48:18,526 | INFO | MainThread | epoch 182: mean train loss = 0.0395
+2026-08-10 00:49:35,247 | INFO | MainThread | epoch 183: mean train loss = 0.0435
+2026-08-10 00:50:52,372 | INFO | MainThread | epoch 184: mean train loss = 0.0622
+2026-08-10 00:52:09,554 | INFO | MainThread | epoch 185: mean train loss = 0.0443
+2026-08-10 00:53:06,281 | INFO | MainThread | epoch 185 dev metrics (tuned thresholds): st1_macro_f1=0.660, st2_macro_f1=0.393, st3_macro_f1=0.228, st3_family_macro_f1=0.411, mean_macro_f1=0.427
+2026-08-10 00:53:06,355 | INFO | MainThread | epoch 185: saved running checkpoint to runs/greaselm_baseline_combined/last
+2026-08-10 00:54:23,380 | INFO | MainThread | epoch 186: mean train loss = 0.0483
+2026-08-10 00:55:40,206 | INFO | MainThread | epoch 187: mean train loss = 0.0622
+2026-08-10 00:56:57,275 | INFO | MainThread | epoch 188: mean train loss = 0.0415
+2026-08-10 00:58:14,514 | INFO | MainThread | epoch 189: mean train loss = 0.0766
+2026-08-10 00:59:31,468 | INFO | MainThread | epoch 190: mean train loss = 0.1271
+2026-08-10 01:00:28,339 | INFO | MainThread | epoch 190 dev metrics (tuned thresholds): st1_macro_f1=0.658, st2_macro_f1=0.403, st3_macro_f1=0.231, st3_family_macro_f1=0.409, mean_macro_f1=0.431
+2026-08-10 01:00:28,418 | INFO | MainThread | epoch 190: saved running checkpoint to runs/greaselm_baseline_combined/last
+2026-08-10 01:01:45,421 | INFO | MainThread | epoch 191: mean train loss = 0.0304
+2026-08-10 01:03:02,466 | INFO | MainThread | epoch 192: mean train loss = 0.0562
+2026-08-10 01:04:19,766 | INFO | MainThread | epoch 193: mean train loss = 0.0761
+2026-08-10 01:05:36,832 | INFO | MainThread | epoch 194: mean train loss = 0.0478
+2026-08-10 01:06:54,051 | INFO | MainThread | epoch 195: mean train loss = 0.0513
+2026-08-10 01:07:50,851 | INFO | MainThread | epoch 195 dev metrics (tuned thresholds): st1_macro_f1=0.662, st2_macro_f1=0.407, st3_macro_f1=0.229, st3_family_macro_f1=0.409, mean_macro_f1=0.432
+2026-08-10 01:07:50,925 | INFO | MainThread | epoch 195: saved running checkpoint to runs/greaselm_baseline_combined/last
+2026-08-10 01:09:07,989 | INFO | MainThread | epoch 196: mean train loss = 0.0393
+2026-08-10 01:10:25,075 | INFO | MainThread | epoch 197: mean train loss = 0.0795
+2026-08-10 01:11:42,161 | INFO | MainThread | epoch 198: mean train loss = 0.1293
+2026-08-10 01:12:59,135 | INFO | MainThread | epoch 199: mean train loss = 0.0531
+2026-08-10 01:14:16,325 | INFO | MainThread | epoch 200: mean train loss = 0.0516
+2026-08-10 01:15:13,211 | INFO | MainThread | epoch 200 dev metrics (tuned thresholds): st1_macro_f1=0.623, st2_macro_f1=0.408, st3_macro_f1=0.227, st3_family_macro_f1=0.406, mean_macro_f1=0.419
+2026-08-10 01:15:13,292 | INFO | MainThread | epoch 200: saved running checkpoint to runs/greaselm_baseline_combined/last
+2026-08-10 01:15:13,292 | INFO | MainThread | training complete (best dev mean_macro_f1=0.489)
