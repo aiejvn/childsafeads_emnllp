@@ -7,7 +7,7 @@ through the same submission schema / check_submission.py validator.
 import torch
 from torch.utils.data import Dataset
 
-from . import ST1_LABELS, ST2_LABELS, ST3_LABELS, full_context, transcript_only
+from . import ST1_LABELS, ST2_LABELS, ST3_LABELS, render_context
 
 ST1_INDEX = {label: i for i, label in enumerate(ST1_LABELS)}
 ST2_INDEX = {label: i for i, label in enumerate(ST2_LABELS)}
@@ -36,7 +36,7 @@ class ClassificationDataset(Dataset):
 
     def __getitem__(self, idx: int) -> dict:
         inst = self.instances[idx]
-        text = full_context(inst) if self.context == "full" else transcript_only(inst)
+        text = render_context(inst, self.context)
         if self.df_text:
             text = self.df_text + "\n\n" + text
         enc = self.tokenizer(text, truncation=True, max_length=self.max_length)

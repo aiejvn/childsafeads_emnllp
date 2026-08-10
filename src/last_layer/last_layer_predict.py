@@ -28,7 +28,7 @@ from transformers import AutoTokenizer
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))  # so `import last_layer`/`import common` resolve
 from common.classification_data import Collator, ClassificationDataset  # noqa: E402
 from common.predict_utils import decode, load_thresholds, multi_hot_matrix, run_inference, tune_per_label_thresholds  # noqa: E402
-from last_layer import ST1_LABELS, ST2_LABELS, ST3_LABELS, evaluate, load_split, prediction_errors, setup_logging  # noqa: E402
+from last_layer import CONTEXT_CHOICES, ST1_LABELS, ST2_LABELS, ST3_LABELS, evaluate, load_split, prediction_errors, setup_logging  # noqa: E402
 from last_layer.last_layer_model import load_frozen_model  # noqa: E402
 
 
@@ -37,7 +37,10 @@ def main():
     ap.add_argument("target", help="split to predict on, e.g. public_data_dev/dev.jsonl")
     ap.add_argument("--model", default="FacebookAI/roberta-base", help="must match the base model used in training")
     ap.add_argument("--checkpoint-dir", required=True, help="e.g. runs/last_layer_roberta/best")
-    ap.add_argument("--context", choices=["transcript", "full"], default="full")
+    ap.add_argument("--context", choices=CONTEXT_CHOICES, default="full",
+                    help="which rungs of the instance the model sees. no_product_page drops the linked page "
+                         "entirely (a median 38%% of full_context's tokens); st2_page keeps only its "
+                         "ST2-bearing lines, see common/page_filter.py")
     ap.add_argument("--max-length", type=int, default=512)
     ap.add_argument("--batch-size", type=int, default=16)
     ap.add_argument(

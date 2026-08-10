@@ -28,7 +28,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))  # so `import 
 from common.classification_data import Collator, ClassificationDataset  # noqa: E402
 from common.predict_utils import save_thresholds, tune_and_decode  # noqa: E402
 from common.train_utils import compute_pos_weight, to_device  # noqa: E402
-from last_layer import ST1_LABELS, ST2_LABELS, ST3_LABELS, evaluate, load_split, setup_logging  # noqa: E402
+from last_layer import CONTEXT_CHOICES, ST1_LABELS, ST2_LABELS, ST3_LABELS, evaluate, load_split, setup_logging  # noqa: E402
 from last_layer.last_layer_model import build_frozen_model, count_trainable_parameters, save_frozen_model  # noqa: E402
 
 
@@ -37,7 +37,10 @@ def main():
     ap.add_argument("train", help="training split, e.g. public_data_dev/train.jsonl")
     ap.add_argument("dev", help="dev split for per-epoch evaluation, e.g. public_data_dev/dev.jsonl")
     ap.add_argument("--model", default="FacebookAI/roberta-base")
-    ap.add_argument("--context", choices=["transcript", "full"], default="full")
+    ap.add_argument("--context", choices=CONTEXT_CHOICES, default="full",
+                    help="which rungs of the instance the model sees. no_product_page drops the linked page "
+                         "entirely (a median 38%% of full_context's tokens); st2_page keeps only its "
+                         "ST2-bearing lines, see common/page_filter.py")
     ap.add_argument("--max-length", type=int, default=512)
     ap.add_argument("--epochs", type=int, default=5)
     ap.add_argument("--batch-size", type=int, default=16)

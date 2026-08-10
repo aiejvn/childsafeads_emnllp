@@ -40,7 +40,8 @@ from tqdm import tqdm
 from transformers import AutoTokenizer, get_linear_schedule_with_warmup
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))  # so `import lora` resolves src/lora as a package
-from lora import evaluate, load_split, setup_logging  # noqa: E402
+from common.dialog_flow import df_pre_context  # noqa: E402
+from lora import CONTEXT_CHOICES, SFT_TAXONOMY, SYSTEM_PROMPT, evaluate, load_split, setup_logging  # noqa: E402
 from lora.lora_data import GenerativeCollator, GenerativeDataset  # noqa: E402
 from lora.lora_generative import generate_predictions  # noqa: E402
 from lora.lora_model import PARALLELISM_CHOICES, build_peft_model_causal  # noqa: E402
@@ -55,10 +56,24 @@ def main():
     ap.add_argument("train", help="training split, e.g. public_data_dev/train.jsonl")
     ap.add_argument("dev", help="dev split for per-epoch evaluation, e.g. public_data_dev/dev.jsonl")
     ap.add_argument("--model", default="Qwen/Qwen3.5-4B")
-    ap.add_argument("--context", choices=["transcript", "full"], default="full")
-    ap.add_argument("--max-length", type=int, default=4096, help="prompt now includes the full "
-                     "SYSTEM_PROMPT + labels taxonomy, not just the segment text, so this is much "
-                     "larger than lora_train.py's default")
+    ap.add_argument("--context", choices=CONTEXT_CHOICES, default="full",
+                    help="which rungs of the instance the model sees. no_product_page drops the linked page "
+                         "entirely (a median 38%% of full_context's tokens); st2_page keeps only its "
+                         "ST2-bearing lines, see common/page_filter.py")
+    ap.add_argument("--lean-prompt", action="store_true", help="swap the GPT baseline's zero-shot "
+                     "SYSTEM_PROMPT (3,533 tokens of instructions + full taxonomy, which leaves 467 "
+                     "of 4,096 for the segment and truncates 98%% of instances) for common.SFT_TAXONOMY "
+                     "(440), and render --df-path as stripped text rather than the raw export. Pair "
+                     "with --df-path: the lean taxonomy drops the ST1/ST3 definitions on the "
+                     "understanding that the dialog flow carries them")
+    ap.add_argument(
+        "--df-path", default=None,
+        help="path to the autoDF-generated dialog-flow JSON (e.g. emnllp-dialog-flow-dialog-flow.json) "
+        "to add to the system message, ahead of the segment text; omit to train without it",
+    )
+    ap.add_argument("--max-length", type=int, default=4096, help="prompt includes the system "
+                     "prompt/taxonomy and any --df-path flow, not just the segment text, so this is "
+                     "much larger than lora_train.py's default")
     ap.add_argument("--epochs", type=int, default=3)
     ap.add_argument("--batch-size", type=int, default=4)
     ap.add_argument("--grad-accum-steps", type=int, default=4)
@@ -122,9 +137,20 @@ def main():
         model = model.to(device)
     model.print_trainable_parameters()
 
+    system_prompt = SFT_TAXONOMY if args.lean_prompt else SYSTEM_PROMPT
+    df_text = df_pre_context(args.df_path, lean=args.lean_prompt) if args.df_path else None
+    if args.lean_prompt and not args.df_path:
+        log.warning("--lean-prompt without --df-path: the lean taxonomy gives bare ST1/ST3 label "
+                    "lists because the dialog flow is expected to supply their definitions, so "
+                    "nothing in this prompt defines them. Intended only as an ablation.")
+    log.info(f"system prompt: {'lean' if args.lean_prompt else 'full'} ({len(system_prompt)} chars)"
+             + (f" + dialog flow from {args.df_path} ({len(df_text)} chars)" if df_text else ""))
+
     collate = GenerativeCollator(tokenizer)
-    train_ds = GenerativeDataset(train_instances, tokenizer, args.context, args.max_length)
-    dev_ds = GenerativeDataset(dev_instances, tokenizer, args.context, args.max_length)
+    train_ds = GenerativeDataset(train_instances, tokenizer, args.context, args.max_length,
+                                 system_prompt, df_text)
+    dev_ds = GenerativeDataset(dev_instances, tokenizer, args.context, args.max_length,
+                               system_prompt, df_text)
     train_loader = DataLoader(train_ds, batch_size=args.batch_size, shuffle=True, collate_fn=collate)
     dev_loader = DataLoader(dev_ds, batch_size=args.batch_size, shuffle=False, collate_fn=collate)
 

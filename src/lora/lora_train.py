@@ -23,10 +23,10 @@ from tqdm import tqdm
 from transformers import AutoTokenizer, get_linear_schedule_with_warmup
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))  # so `import lora` resolves src/lora as a package
+from common.dialog_flow import df_pre_context  # noqa: E402
 from common.predict_utils import save_thresholds, tune_and_decode  # noqa: E402
 from common.train_utils import compute_pos_weight, to_device  # noqa: E402
-from greaselm.kg.build_kg import build_flow_kg  # noqa: E402
-from lora import ST1_LABELS, ST2_LABELS, ST3_LABELS, evaluate, setup_logging  # noqa: E402
+from lora import CONTEXT_CHOICES, ST1_LABELS, ST2_LABELS, ST3_LABELS, evaluate, setup_logging  # noqa: E402
 from lora.lora_data import Collator, ClassificationDataset, load_split  # noqa: E402
 from lora.lora_model import build_peft_model  # noqa: E402
 
@@ -41,13 +41,19 @@ def main():
         "--local", action="store_true",
         help="load --model from ./models/{model} instead of the HF hub (must already be downloaded there)",
     )
-    ap.add_argument("--context", choices=["transcript", "full"], default="full")
+    ap.add_argument("--context", choices=CONTEXT_CHOICES, default="full",
+                    help="which rungs of the instance the model sees. no_product_page drops the linked page "
+                         "entirely (a median 38%% of full_context's tokens); st2_page keeps only its "
+                         "ST2-bearing lines, see common/page_filter.py")
     ap.add_argument(
         "--df-path", default=None,
-        help="path to an autoDF-generated dialog-flow JSON (e.g. emnllp-dialog-flow-dialog-flow.json), "
-        "rendered as a Mermaid flowchart (see greaselm.kg.build_kg.build_flow_kg) and prepended before "
-        "each instance's text, so its tokens come first; omit to train without it",
+        help="path to an autoDF-generated dialog-flow JSON (e.g. emnllp-dialog-flow-dialog-flow.json) to "
+        "prepend before each instance's text, so its tokens come first; omit to train without it",
     )
+    ap.add_argument("--lean-prompt", action="store_true", help="render --df-path as stripped text "
+                     "(943 tokens) instead of the raw editor export (4,003, of which 81%% is UUIDs, "
+                     "canvas positions and CSS classes). No effect without --df-path: this path has "
+                     "no system prompt to trim")
     ap.add_argument("--max-length", type=int, default=512) # 512?! seems a bit short, if this is sequence length
     ap.add_argument("--epochs", type=int, default=5)
     ap.add_argument("--batch-size", type=int, default=16)
@@ -103,8 +109,9 @@ def main():
 
     df_text = None
     if args.df_path:
-        df_text = build_flow_kg(args.df_path).to_mermaid()
-        log.info(f"prepending Mermaid flow graph from {args.df_path} ({len(df_text)} chars) before each instance's text")
+        df_text = df_pre_context(args.df_path, lean=args.lean_prompt)
+        form = "stripped dialog flow" if args.lean_prompt else "raw autoDF JSON"
+        log.info(f"prepending {form} from {args.df_path} ({len(df_text)} chars) before each instance's text")
 
     tokenizer = AutoTokenizer.from_pretrained(model_path)
     train_ds = ClassificationDataset(train_instances, tokenizer, args.context, args.max_length, df_text)

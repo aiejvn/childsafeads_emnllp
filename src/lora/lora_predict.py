@@ -26,9 +26,9 @@ from torch.utils.data import DataLoader
 from transformers import AutoTokenizer
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))  # so `import lora` resolves src/lora as a package
+from common.dialog_flow import df_pre_context  # noqa: E402
 from common.predict_utils import decode, load_thresholds, multi_hot_matrix, run_inference, tune_per_label_thresholds  # noqa: E402
-from greaselm.kg.build_kg import build_flow_kg  # noqa: E402
-from lora import ST1_LABELS, ST2_LABELS, ST3_LABELS, evaluate, prediction_errors, setup_logging  # noqa: E402
+from lora import CONTEXT_CHOICES, ST1_LABELS, ST2_LABELS, ST3_LABELS, evaluate, prediction_errors, setup_logging  # noqa: E402
 from lora.lora_data import Collator, ClassificationDataset, load_split  # noqa: E402
 from lora.lora_model import load_peft_model  # noqa: E402
 
@@ -38,13 +38,17 @@ def main():
     ap.add_argument("target", help="split to predict on, e.g. public_data_dev/dev.jsonl")
     ap.add_argument("--model", default="FacebookAI/roberta-base", help="must match the base model used in training")
     ap.add_argument("--adapter-dir", required=True, help="e.g. runs/lora_roberta/best")
-    ap.add_argument("--context", choices=["transcript", "full"], default="full")
+    ap.add_argument("--context", choices=CONTEXT_CHOICES, default="full",
+                    help="which rungs of the instance the model sees. no_product_page drops the linked page "
+                         "entirely (a median 38%% of full_context's tokens); st2_page keeps only its "
+                         "ST2-bearing lines, see common/page_filter.py")
     ap.add_argument(
         "--df-path", default=None,
         help="path to the autoDF-generated dialog-flow JSON used at train time (must match, if the "
-        "adapter was trained with --df-path) -- rendered as a Mermaid flowchart and prepended before "
-        "each instance's text",
+        "adapter was trained with --df-path) -- prepended before each instance's text",
     )
+    ap.add_argument("--lean-prompt", action="store_true",
+                    help="must match the flag used in training -- it changes how --df-path is rendered")
     ap.add_argument("--max-length", type=int, default=512)
     ap.add_argument("--batch-size", type=int, default=16)
     ap.add_argument(
@@ -64,8 +68,9 @@ def main():
 
     df_text = None
     if args.df_path:
-        df_text = build_flow_kg(args.df_path).to_mermaid()
-        log.info(f"prepending Mermaid flow graph from {args.df_path} ({len(df_text)} chars) before each instance's text")
+        df_text = df_pre_context(args.df_path, lean=args.lean_prompt)
+        form = "stripped dialog flow" if args.lean_prompt else "raw autoDF JSON"
+        log.info(f"prepending {form} from {args.df_path} ({len(df_text)} chars) before each instance's text")
 
     tokenizer = AutoTokenizer.from_pretrained(args.model)
     model = load_peft_model(args.model, len(ST1_LABELS), len(ST2_LABELS), len(ST3_LABELS), args.adapter_dir)
