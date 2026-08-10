@@ -201,7 +201,9 @@ def main():
     for filename, graph in to_write.items():
         path = os.path.join(KG_DIR, filename)
         graph.save(path)
-        print(f"[{filename}] wrote {len(graph.nodes)} nodes, {len(graph.edges)} edges")
+        mmd_filename = filename.replace(".json", ".mmd")
+        graph.save_mermaid(os.path.join(KG_DIR, mmd_filename))
+        print(f"[{filename}] wrote {len(graph.nodes)} nodes, {len(graph.edges)} edges (+ {mmd_filename})")
         print(f"[{filename}] node types: {graph.node_types()}")
         print(f"[{filename}] relation types: {graph.relation_types()}")
 

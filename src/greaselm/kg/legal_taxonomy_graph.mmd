@@ -1,0 +1,102 @@
+flowchart LR
+    n0["content"]:::family
+    n1["destination"]:::family
+    n2["disclosure"]:::family
+    n3["housekeeping"]:::family
+    n4["product"]:::family
+    n5["conditional"]:::severity
+    n6["per_se"]:::severity
+    n7["soft_law"]:::severity
+    n8["AI Act"]:::instrument
+    n9["AVMSD"]:::instrument
+    n10["CRD"]:::instrument
+    n11["DSA"]:::instrument
+    n12["GDPR"]:::instrument
+    n13["GPSR"]:::instrument
+    n14["UCPD"]:::instrument
+    n15["UCTD"]:::instrument
+    n16["national"]:::instrument
+    n17["sectoral"]:::instrument
+    n18["soft_law"]:::instrument
+    n19["undisclosed_advertising"]:::st3_flag
+    n20["inadequate_disclosure"]:::st3_flag
+    n21["direct_exhortation"]:::st3_flag
+    n22["misleading_claim"]:::st3_flag
+    n23["age_restricted_or_prohibited_product"]:::st3_flag
+    n24["hfss_food_marketing"]:::st3_flag
+    n25["undisclosed_synthetic_content"]:::st3_flag
+    n26["no_flag"]:::st3_flag
+    n27["insufficient_context"]:::st3_flag
+    n28["defective_precontractual_information"]:::st3_flag
+    n29["unfair_contract_terms"]:::st3_flag
+    n30["gambling_like_mechanics_at_destination"]:::st3_flag
+    n31["unlawful_data_practices_toward_minors"]:::st3_flag
+    n32["age_assurance_failure_at_destination"]:::st3_flag
+    n33["harmful_or_addictive_design_at_destination"]:::st3_flag
+    n34["unsafe_or_non_compliant_product"]:::st3_flag
+    n19 -->|in_family| n2
+    n19 -->|has_severity| n6
+    n19 -->|grounded_in| n14
+    n19 -->|grounded_in| n9
+    n19 -->|grounded_in| n11
+    n20 -->|in_family| n2
+    n20 -->|has_severity| n5
+    n20 -->|grounded_in| n14
+    n20 -->|grounded_in| n11
+    n21 -->|in_family| n0
+    n21 -->|has_severity| n6
+    n21 -->|grounded_in| n14
+    n22 -->|in_family| n0
+    n22 -->|has_severity| n5
+    n22 -->|grounded_in| n14
+    n22 -->|grounded_in| n9
+    n22 -->|grounded_in| n17
+    n23 -->|in_family| n4
+    n23 -->|has_severity| n5
+    n23 -->|grounded_in| n9
+    n23 -->|grounded_in| n11
+    n23 -->|grounded_in| n16
+    n24 -->|in_family| n4
+    n24 -->|has_severity| n7
+    n24 -->|grounded_in| n9
+    n24 -->|grounded_in| n14
+    n25 -->|in_family| n0
+    n25 -->|has_severity| n5
+    n25 -->|grounded_in| n8
+    n25 -->|grounded_in| n14
+    n26 -->|in_family| n3
+    n27 -->|in_family| n3
+    n28 -->|in_family| n1
+    n28 -->|has_severity| n5
+    n28 -->|grounded_in| n10
+    n28 -->|grounded_in| n14
+    n29 -->|in_family| n1
+    n29 -->|has_severity| n5
+    n29 -->|grounded_in| n15
+    n30 -->|in_family| n1
+    n30 -->|has_severity| n5
+    n30 -->|grounded_in| n11
+    n30 -->|grounded_in| n14
+    n30 -->|grounded_in| n8
+    n30 -->|grounded_in| n16
+    n31 -->|in_family| n1
+    n31 -->|has_severity| n5
+    n31 -->|grounded_in| n12
+    n32 -->|in_family| n1
+    n32 -->|has_severity| n5
+    n32 -->|grounded_in| n11
+    n32 -->|grounded_in| n9
+    n32 -->|grounded_in| n18
+    n33 -->|in_family| n1
+    n33 -->|has_severity| n5
+    n33 -->|grounded_in| n11
+    n33 -->|grounded_in| n8
+    n33 -->|grounded_in| n13
+    n34 -->|in_family| n1
+    n34 -->|has_severity| n5
+    n34 -->|grounded_in| n13
+    n34 -->|grounded_in| n11
+    classDef family stroke-width:1px
+    classDef instrument stroke-width:1px
+    classDef severity stroke-width:1px
+    classDef st3_flag stroke-width:1px

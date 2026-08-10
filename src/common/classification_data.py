@@ -28,7 +28,8 @@ class ClassificationDataset(Dataset):
         self.tokenizer = tokenizer
         self.context = context
         self.max_length = max_length
-        self.df_text = df_text  # autoDF-generated JSON, prepended before each instance's text so it's tokenized first
+        self.df_text = df_text  # autoDF flow graph rendered as Mermaid (see greaselm.kg.build_kg.build_flow_kg /
+        # KnowledgeGraph.to_mermaid), prepended before each instance's text so it's tokenized first
 
     def __len__(self) -> int:
         return len(self.instances)

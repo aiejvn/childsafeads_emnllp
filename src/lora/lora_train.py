@@ -11,7 +11,6 @@ Saves the best-dev-macro-F1 adapter+heads to <output-dir>/best and the final epo
 to <output-dir>/last (both loadable with lora_predict.py).
 """
 import argparse
-import json
 import os
 import random
 import sys
@@ -26,6 +25,7 @@ from transformers import AutoTokenizer, get_linear_schedule_with_warmup
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))  # so `import lora` resolves src/lora as a package
 from common.predict_utils import save_thresholds, tune_and_decode  # noqa: E402
 from common.train_utils import compute_pos_weight, to_device  # noqa: E402
+from greaselm.kg.build_kg import build_flow_kg  # noqa: E402
 from lora import ST1_LABELS, ST2_LABELS, ST3_LABELS, evaluate, setup_logging  # noqa: E402
 from lora.lora_data import Collator, ClassificationDataset, load_split  # noqa: E402
 from lora.lora_model import build_peft_model  # noqa: E402
@@ -44,8 +44,9 @@ def main():
     ap.add_argument("--context", choices=["transcript", "full"], default="full")
     ap.add_argument(
         "--df-path", default=None,
-        help="path to an autoDF-generated dialog-flow JSON (e.g. emnllp-dialog-flow-dialog-flow.json) to "
-        "prepend before each instance's text, so its tokens come first; omit to train without it",
+        help="path to an autoDF-generated dialog-flow JSON (e.g. emnllp-dialog-flow-dialog-flow.json), "
+        "rendered as a Mermaid flowchart (see greaselm.kg.build_kg.build_flow_kg) and prepended before "
+        "each instance's text, so its tokens come first; omit to train without it",
     )
     ap.add_argument("--max-length", type=int, default=512) # 512?! seems a bit short, if this is sequence length
     ap.add_argument("--epochs", type=int, default=5)
@@ -102,9 +103,8 @@ def main():
 
     df_text = None
     if args.df_path:
-        with open(args.df_path, encoding="utf-8") as f:
-            df_text = json.dumps(json.load(f), separators=(",", ":"))
-        log.info(f"prepending autoDF JSON from {args.df_path} ({len(df_text)} chars) before each instance's text")
+        df_text = build_flow_kg(args.df_path).to_mermaid()
+        log.info(f"prepending Mermaid flow graph from {args.df_path} ({len(df_text)} chars) before each instance's text")
 
     tokenizer = AutoTokenizer.from_pretrained(model_path)
     train_ds = ClassificationDataset(train_instances, tokenizer, args.context, args.max_length, df_text)

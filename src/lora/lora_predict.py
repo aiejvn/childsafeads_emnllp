@@ -27,6 +27,7 @@ from transformers import AutoTokenizer
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))  # so `import lora` resolves src/lora as a package
 from common.predict_utils import decode, load_thresholds, multi_hot_matrix, run_inference, tune_per_label_thresholds  # noqa: E402
+from greaselm.kg.build_kg import build_flow_kg  # noqa: E402
 from lora import ST1_LABELS, ST2_LABELS, ST3_LABELS, evaluate, prediction_errors, setup_logging  # noqa: E402
 from lora.lora_data import Collator, ClassificationDataset, load_split  # noqa: E402
 from lora.lora_model import load_peft_model  # noqa: E402
@@ -41,7 +42,8 @@ def main():
     ap.add_argument(
         "--df-path", default=None,
         help="path to the autoDF-generated dialog-flow JSON used at train time (must match, if the "
-        "adapter was trained with --df-path) -- prepended before each instance's text",
+        "adapter was trained with --df-path) -- rendered as a Mermaid flowchart and prepended before "
+        "each instance's text",
     )
     ap.add_argument("--max-length", type=int, default=512)
     ap.add_argument("--batch-size", type=int, default=16)
@@ -62,9 +64,8 @@ def main():
 
     df_text = None
     if args.df_path:
-        with open(args.df_path, encoding="utf-8") as f:
-            df_text = json.dumps(json.load(f), separators=(",", ":"))
-        log.info(f"prepending autoDF JSON from {args.df_path} ({len(df_text)} chars) before each instance's text")
+        df_text = build_flow_kg(args.df_path).to_mermaid()
+        log.info(f"prepending Mermaid flow graph from {args.df_path} ({len(df_text)} chars) before each instance's text")
 
     tokenizer = AutoTokenizer.from_pretrained(args.model)
     model = load_peft_model(args.model, len(ST1_LABELS), len(ST2_LABELS), len(ST3_LABELS), args.adapter_dir)
