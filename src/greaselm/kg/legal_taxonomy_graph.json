@@ -1,0 +1,1091 @@
+{
+  "version": "1.0",
+  "knowledgeGraph": {
+    "name": "legal_taxonomy"
+  },
+  "nodes": [
+    {
+      "id": "family:content",
+      "type": "family",
+      "data": {
+        "label": "content",
+        "meta": {}
+      }
+    },
+    {
+      "id": "family:destination",
+      "type": "family",
+      "data": {
+        "label": "destination",
+        "meta": {}
+      }
+    },
+    {
+      "id": "family:disclosure",
+      "type": "family",
+      "data": {
+        "label": "disclosure",
+        "meta": {}
+      }
+    },
+    {
+      "id": "family:housekeeping",
+      "type": "family",
+      "data": {
+        "label": "housekeeping",
+        "meta": {}
+      }
+    },
+    {
+      "id": "family:product",
+      "type": "family",
+      "data": {
+        "label": "product",
+        "meta": {}
+      }
+    },
+    {
+      "id": "severity:conditional",
+      "type": "severity",
+      "data": {
+        "label": "conditional",
+        "meta": {}
+      }
+    },
+    {
+      "id": "severity:per_se",
+      "type": "severity",
+      "data": {
+        "label": "per_se",
+        "meta": {}
+      }
+    },
+    {
+      "id": "severity:soft_law",
+      "type": "severity",
+      "data": {
+        "label": "soft_law",
+        "meta": {}
+      }
+    },
+    {
+      "id": "instrument:AI Act",
+      "type": "instrument",
+      "data": {
+        "label": "AI Act",
+        "meta": {}
+      }
+    },
+    {
+      "id": "instrument:AVMSD",
+      "type": "instrument",
+      "data": {
+        "label": "AVMSD",
+        "meta": {}
+      }
+    },
+    {
+      "id": "instrument:CRD",
+      "type": "instrument",
+      "data": {
+        "label": "CRD",
+        "meta": {}
+      }
+    },
+    {
+      "id": "instrument:DSA",
+      "type": "instrument",
+      "data": {
+        "label": "DSA",
+        "meta": {}
+      }
+    },
+    {
+      "id": "instrument:GDPR",
+      "type": "instrument",
+      "data": {
+        "label": "GDPR",
+        "meta": {}
+      }
+    },
+    {
+      "id": "instrument:GPSR",
+      "type": "instrument",
+      "data": {
+        "label": "GPSR",
+        "meta": {}
+      }
+    },
+    {
+      "id": "instrument:UCPD",
+      "type": "instrument",
+      "data": {
+        "label": "UCPD",
+        "meta": {}
+      }
+    },
+    {
+      "id": "instrument:UCTD",
+      "type": "instrument",
+      "data": {
+        "label": "UCTD",
+        "meta": {}
+      }
+    },
+    {
+      "id": "instrument:national",
+      "type": "instrument",
+      "data": {
+        "label": "national",
+        "meta": {}
+      }
+    },
+    {
+      "id": "instrument:sectoral",
+      "type": "instrument",
+      "data": {
+        "label": "sectoral",
+        "meta": {}
+      }
+    },
+    {
+      "id": "instrument:soft_law",
+      "type": "instrument",
+      "data": {
+        "label": "soft_law",
+        "meta": {}
+      }
+    },
+    {
+      "id": "st3_flag:undisclosed_advertising",
+      "type": "st3_flag",
+      "data": {
+        "label": "undisclosed_advertising",
+        "meta": {
+          "code": "T1.1",
+          "tier": 1,
+          "scored": true,
+          "severity": "per_se"
+        }
+      }
+    },
+    {
+      "id": "st3_flag:inadequate_disclosure",
+      "type": "st3_flag",
+      "data": {
+        "label": "inadequate_disclosure",
+        "meta": {
+          "code": "T1.2",
+          "tier": 1,
+          "scored": true,
+          "severity": "conditional"
+        }
+      }
+    },
+    {
+      "id": "st3_flag:direct_exhortation",
+      "type": "st3_flag",
+      "data": {
+        "label": "direct_exhortation",
+        "meta": {
+          "code": "T1.3",
+          "tier": 1,
+          "scored": true,
+          "severity": "per_se"
+        }
+      }
+    },
+    {
+      "id": "st3_flag:misleading_claim",
+      "type": "st3_flag",
+      "data": {
+        "label": "misleading_claim",
+        "meta": {
+          "code": "T1.4",
+          "tier": 1,
+          "scored": true,
+          "severity": "conditional"
+        }
+      }
+    },
+    {
+      "id": "st3_flag:age_restricted_or_prohibited_product",
+      "type": "st3_flag",
+      "data": {
+        "label": "age_restricted_or_prohibited_product",
+        "meta": {
+          "code": "T1.5",
+          "tier": 1,
+          "scored": true,
+          "severity": "conditional"
+        }
+      }
+    },
+    {
+      "id": "st3_flag:hfss_food_marketing",
+      "type": "st3_flag",
+      "data": {
+        "label": "hfss_food_marketing",
+        "meta": {
+          "code": "T1.6",
+          "tier": 1,
+          "scored": true,
+          "severity": "soft_law"
+        }
+      }
+    },
+    {
+      "id": "st3_flag:undisclosed_synthetic_content",
+      "type": "st3_flag",
+      "data": {
+        "label": "undisclosed_synthetic_content",
+        "meta": {
+          "code": "T1.7",
+          "tier": 1,
+          "scored": false,
+          "severity": "conditional"
+        }
+      }
+    },
+    {
+      "id": "st3_flag:no_flag",
+      "type": "st3_flag",
+      "data": {
+        "label": "no_flag",
+        "meta": {
+          "code": "T1.8",
+          "tier": 1,
+          "scored": true,
+          "severity": "none"
+        }
+      }
+    },
+    {
+      "id": "st3_flag:insufficient_context",
+      "type": "st3_flag",
+      "data": {
+        "label": "insufficient_context",
+        "meta": {
+          "code": "T1.9",
+          "tier": 1,
+          "scored": true,
+          "severity": "none"
+        }
+      }
+    },
+    {
+      "id": "st3_flag:defective_precontractual_information",
+      "type": "st3_flag",
+      "data": {
+        "label": "defective_precontractual_information",
+        "meta": {
+          "code": "T2.1",
+          "tier": 2,
+          "scored": false,
+          "severity": "conditional"
+        }
+      }
+    },
+    {
+      "id": "st3_flag:unfair_contract_terms",
+      "type": "st3_flag",
+      "data": {
+        "label": "unfair_contract_terms",
+        "meta": {
+          "code": "T2.2",
+          "tier": 2,
+          "scored": false,
+          "severity": "conditional"
+        }
+      }
+    },
+    {
+      "id": "st3_flag:gambling_like_mechanics_at_destination",
+      "type": "st3_flag",
+      "data": {
+        "label": "gambling_like_mechanics_at_destination",
+        "meta": {
+          "code": "T2.3",
+          "tier": 2,
+          "scored": false,
+          "severity": "conditional"
+        }
+      }
+    },
+    {
+      "id": "st3_flag:unlawful_data_practices_toward_minors",
+      "type": "st3_flag",
+      "data": {
+        "label": "unlawful_data_practices_toward_minors",
+        "meta": {
+          "code": "T2.4",
+          "tier": 2,
+          "scored": false,
+          "severity": "conditional"
+        }
+      }
+    },
+    {
+      "id": "st3_flag:age_assurance_failure_at_destination",
+      "type": "st3_flag",
+      "data": {
+        "label": "age_assurance_failure_at_destination",
+        "meta": {
+          "code": "T2.5",
+          "tier": 2,
+          "scored": false,
+          "severity": "conditional"
+        }
+      }
+    },
+    {
+      "id": "st3_flag:harmful_or_addictive_design_at_destination",
+      "type": "st3_flag",
+      "data": {
+        "label": "harmful_or_addictive_design_at_destination",
+        "meta": {
+          "code": "T2.6",
+          "tier": 2,
+          "scored": false,
+          "severity": "conditional"
+        }
+      }
+    },
+    {
+      "id": "st3_flag:unsafe_or_non_compliant_product",
+      "type": "st3_flag",
+      "data": {
+        "label": "unsafe_or_non_compliant_product",
+        "meta": {
+          "code": "T2.7",
+          "tier": 2,
+          "scored": false,
+          "severity": "conditional"
+        }
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge_st3_flag:undisclosed_advertising_in_family_family:disclosure",
+      "source": "st3_flag:undisclosed_advertising",
+      "target": "family:disclosure",
+      "relation": "in_family",
+      "data": {
+        "meta": {}
+      }
+    },
+    {
+      "id": "edge_st3_flag:undisclosed_advertising_has_severity_severity:per_se",
+      "source": "st3_flag:undisclosed_advertising",
+      "target": "severity:per_se",
+      "relation": "has_severity",
+      "data": {
+        "meta": {}
+      }
+    },
+    {
+      "id": "edge_st3_flag:undisclosed_advertising_grounded_in_instrument:UCPD",
+      "source": "st3_flag:undisclosed_advertising",
+      "target": "instrument:UCPD",
+      "relation": "grounded_in",
+      "data": {
+        "meta": {
+          "provisions": [
+            "Annex I point 11",
+            "Arts. 5-9"
+          ],
+          "note": "Advertorial without identification; unfair, misleading and aggressive practices."
+        }
+      }
+    },
+    {
+      "id": "edge_st3_flag:undisclosed_advertising_grounded_in_instrument:AVMSD",
+      "source": "st3_flag:undisclosed_advertising",
+      "target": "instrument:AVMSD",
+      "relation": "grounded_in",
+      "data": {
+        "meta": {
+          "provisions": [
+            "Arts. 9-11",
+            "Art. 28b"
+          ],
+          "note": "Identification requirements for audiovisual commercial communications (sponsorship, product placement); video-sharing platforms must reflect them in their terms."
+        }
+      }
+    },
+    {
+      "id": "edge_st3_flag:undisclosed_advertising_grounded_in_instrument:DSA",
+      "source": "st3_flag:undisclosed_advertising",
+      "target": "instrument:DSA",
+      "relation": "grounded_in",
+      "data": {
+        "meta": {
+          "provisions": [
+            "Art. 26",
+            "Art. 28"
+          ],
+          "note": "Advertising-transparency duties on the platform side; protection of minors including the Art. 28 guidelines."
+        }
+      }
+    },
+    {
+      "id": "edge_st3_flag:inadequate_disclosure_in_family_family:disclosure",
+      "source": "st3_flag:inadequate_disclosure",
+      "target": "family:disclosure",
+      "relation": "in_family",
+      "data": {
+        "meta": {}
+      }
+    },
+    {
+      "id": "edge_st3_flag:inadequate_disclosure_has_severity_severity:conditional",
+      "source": "st3_flag:inadequate_disclosure",
+      "target": "severity:conditional",
+      "relation": "has_severity",
+      "data": {
+        "meta": {}
+      }
+    },
+    {
+      "id": "edge_st3_flag:inadequate_disclosure_grounded_in_instrument:UCPD",
+      "source": "st3_flag:inadequate_disclosure",
+      "target": "instrument:UCPD",
+      "relation": "grounded_in",
+      "data": {
+        "meta": {
+          "provisions": [
+            "Arts. 6-7",
+            "Art. 5(3)"
+          ],
+          "note": "Misleading actions and omissions read with the vulnerable-consumer benchmark: the average member of a child audience."
+        }
+      }
+    },
+    {
+      "id": "edge_st3_flag:inadequate_disclosure_grounded_in_instrument:DSA",
+      "source": "st3_flag:inadequate_disclosure",
+      "target": "instrument:DSA",
+      "relation": "grounded_in",
+      "data": {
+        "meta": {
+          "provisions": [
+            "Art. 28 guidelines"
+          ],
+          "note": "Information addressed to minors must be child-friendly, age-appropriate, presented at the relevant point of use."
+        }
+      }
+    },
+    {
+      "id": "edge_st3_flag:direct_exhortation_in_family_family:content",
+      "source": "st3_flag:direct_exhortation",
+      "target": "family:content",
+      "relation": "in_family",
+      "data": {
+        "meta": {}
+      }
+    },
+    {
+      "id": "edge_st3_flag:direct_exhortation_has_severity_severity:per_se",
+      "source": "st3_flag:direct_exhortation",
+      "target": "severity:per_se",
+      "relation": "has_severity",
+      "data": {
+        "meta": {}
+      }
+    },
+    {
+      "id": "edge_st3_flag:direct_exhortation_grounded_in_instrument:UCPD",
+      "source": "st3_flag:direct_exhortation",
+      "target": "instrument:UCPD",
+      "relation": "grounded_in",
+      "data": {
+        "meta": {
+          "provisions": [
+            "Annex I point 28"
+          ],
+          "note": "Direct exhortation to children to buy, or to persuade parents or other adults to buy for them. Blacklisted; highest-severity Tier-1 flag."
+        }
+      }
+    },
+    {
+      "id": "edge_st3_flag:misleading_claim_in_family_family:content",
+      "source": "st3_flag:misleading_claim",
+      "target": "family:content",
+      "relation": "in_family",
+      "data": {
+        "meta": {}
+      }
+    },
+    {
+      "id": "edge_st3_flag:misleading_claim_has_severity_severity:conditional",
+      "source": "st3_flag:misleading_claim",
+      "target": "severity:conditional",
+      "relation": "has_severity",
+      "data": {
+        "meta": {}
+      }
+    },
+    {
+      "id": "edge_st3_flag:misleading_claim_grounded_in_instrument:UCPD",
+      "source": "st3_flag:misleading_claim",
+      "target": "instrument:UCPD",
+      "relation": "grounded_in",
+      "data": {
+        "meta": {
+          "provisions": [
+            "Arts. 6-7"
+          ],
+          "note": "Misleading actions and omissions."
+        }
+      }
+    },
+    {
+      "id": "edge_st3_flag:misleading_claim_grounded_in_instrument:AVMSD",
+      "source": "st3_flag:misleading_claim",
+      "target": "instrument:AVMSD",
+      "relation": "grounded_in",
+      "data": {
+        "meta": {
+          "provisions": [
+            "Art. 9(1)"
+          ],
+          "note": "Commercial communications must not cause physical, mental or moral detriment to minors."
+        }
+      }
+    },
+    {
+      "id": "edge_st3_flag:misleading_claim_grounded_in_instrument:sectoral",
+      "source": "st3_flag:misleading_claim",
+      "target": "instrument:sectoral",
+      "relation": "grounded_in",
+      "data": {
+        "meta": {
+          "provisions": [
+            "food and health-claims rules"
+          ],
+          "note": "Sectoral instruments in the legal reference corpus; elevated severity given eating-disorder-adjacent harms."
+        }
+      }
+    },
+    {
+      "id": "edge_st3_flag:age_restricted_or_prohibited_product_in_family_family:product",
+      "source": "st3_flag:age_restricted_or_prohibited_product",
+      "target": "family:product",
+      "relation": "in_family",
+      "data": {
+        "meta": {}
+      }
+    },
+    {
+      "id": "edge_st3_flag:age_restricted_or_prohibited_product_has_severity_severity:conditional",
+      "source": "st3_flag:age_restricted_or_prohibited_product",
+      "target": "severity:conditional",
+      "relation": "has_severity",
+      "data": {
+        "meta": {}
+      }
+    },
+    {
+      "id": "edge_st3_flag:age_restricted_or_prohibited_product_grounded_in_instrument:AVMSD",
+      "source": "st3_flag:age_restricted_or_prohibited_product",
+      "target": "instrument:AVMSD",
+      "relation": "grounded_in",
+      "data": {
+        "meta": {
+          "provisions": [
+            "Art. 9"
+          ],
+          "note": "Content restrictions on commercial communications (alcohol, tobacco)."
+        }
+      }
+    },
+    {
+      "id": "edge_st3_flag:age_restricted_or_prohibited_product_grounded_in_instrument:DSA",
+      "source": "st3_flag:age_restricted_or_prohibited_product",
+      "target": "instrument:DSA",
+      "relation": "grounded_in",
+      "data": {
+        "meta": {
+          "provisions": [
+            "Art. 28 guidelines"
+          ],
+          "note": "Age verification where products pose a high risk to minors."
+        }
+      }
+    },
+    {
+      "id": "edge_st3_flag:age_restricted_or_prohibited_product_grounded_in_instrument:national",
+      "source": "st3_flag:age_restricted_or_prohibited_product",
+      "target": "instrument:national",
+      "relation": "grounded_in",
+      "data": {
+        "meta": {
+          "provisions": [
+            "age-restriction laws"
+          ],
+          "note": "Member-State laws prohibiting or age-gating specific product categories."
+        }
+      }
+    },
+    {
+      "id": "edge_st3_flag:hfss_food_marketing_in_family_family:product",
+      "source": "st3_flag:hfss_food_marketing",
+      "target": "family:product",
+      "relation": "in_family",
+      "data": {
+        "meta": {}
+      }
+    },
+    {
+      "id": "edge_st3_flag:hfss_food_marketing_has_severity_severity:soft_law",
+      "source": "st3_flag:hfss_food_marketing",
+      "target": "severity:soft_law",
+      "relation": "has_severity",
+      "data": {
+        "meta": {}
+      }
+    },
+    {
+      "id": "edge_st3_flag:hfss_food_marketing_grounded_in_instrument:AVMSD",
+      "source": "st3_flag:hfss_food_marketing",
+      "target": "instrument:AVMSD",
+      "relation": "grounded_in",
+      "data": {
+        "meta": {
+          "provisions": [
+            "Art. 9(4)"
+          ],
+          "note": "Codes of conduct on HFSS food marketing to children."
+        }
+      }
+    },
+    {
+      "id": "edge_st3_flag:hfss_food_marketing_grounded_in_instrument:UCPD",
+      "source": "st3_flag:hfss_food_marketing",
+      "target": "instrument:UCPD",
+      "relation": "grounded_in",
+      "data": {
+        "meta": {
+          "provisions": [
+            "Arts. 5-9"
+          ],
+          "note": "Backstop where the practice is also unfair or misleading."
+        }
+      }
+    },
+    {
+      "id": "edge_st3_flag:undisclosed_synthetic_content_in_family_family:content",
+      "source": "st3_flag:undisclosed_synthetic_content",
+      "target": "family:content",
+      "relation": "in_family",
+      "data": {
+        "meta": {}
+      }
+    },
+    {
+      "id": "edge_st3_flag:undisclosed_synthetic_content_has_severity_severity:conditional",
+      "source": "st3_flag:undisclosed_synthetic_content",
+      "target": "severity:conditional",
+      "relation": "has_severity",
+      "data": {
+        "meta": {}
+      }
+    },
+    {
+      "id": "edge_st3_flag:undisclosed_synthetic_content_grounded_in_instrument:AI Act",
+      "source": "st3_flag:undisclosed_synthetic_content",
+      "target": "instrument:AI Act",
+      "relation": "grounded_in",
+      "data": {
+        "meta": {
+          "provisions": [
+            "transparency obligations",
+            "Art. 5"
+          ],
+          "note": "Marking AI-generated content and labelling deepfakes; prohibitions where synthetic content manipulates or exploits children's vulnerabilities."
+        }
+      }
+    },
+    {
+      "id": "edge_st3_flag:undisclosed_synthetic_content_grounded_in_instrument:UCPD",
+      "source": "st3_flag:undisclosed_synthetic_content",
+      "target": "instrument:UCPD",
+      "relation": "grounded_in",
+      "data": {
+        "meta": {
+          "provisions": [
+            "Arts. 5-9"
+          ],
+          "note": "Misleading-practice provisions."
+        }
+      }
+    },
+    {
+      "id": "edge_st3_flag:no_flag_in_family_family:housekeeping",
+      "source": "st3_flag:no_flag",
+      "target": "family:housekeeping",
+      "relation": "in_family",
+      "data": {
+        "meta": {}
+      }
+    },
+    {
+      "id": "edge_st3_flag:insufficient_context_in_family_family:housekeeping",
+      "source": "st3_flag:insufficient_context",
+      "target": "family:housekeeping",
+      "relation": "in_family",
+      "data": {
+        "meta": {}
+      }
+    },
+    {
+      "id": "edge_st3_flag:defective_precontractual_information_in_family_family:destination",
+      "source": "st3_flag:defective_precontractual_information",
+      "target": "family:destination",
+      "relation": "in_family",
+      "data": {
+        "meta": {}
+      }
+    },
+    {
+      "id": "edge_st3_flag:defective_precontractual_information_has_severity_severity:conditional",
+      "source": "st3_flag:defective_precontractual_information",
+      "target": "severity:conditional",
+      "relation": "has_severity",
+      "data": {
+        "meta": {}
+      }
+    },
+    {
+      "id": "edge_st3_flag:defective_precontractual_information_grounded_in_instrument:CRD",
+      "source": "st3_flag:defective_precontractual_information",
+      "target": "instrument:CRD",
+      "relation": "grounded_in",
+      "data": {
+        "meta": {
+          "provisions": [
+            "Arts. 6 and 8"
+          ],
+          "note": "Pre-contractual and formal requirements for distance contracts; applies to all digital transactions including those involving minors."
+        }
+      }
+    },
+    {
+      "id": "edge_st3_flag:defective_precontractual_information_grounded_in_instrument:UCPD",
+      "source": "st3_flag:defective_precontractual_information",
+      "target": "instrument:UCPD",
+      "relation": "grounded_in",
+      "data": {
+        "meta": {
+          "provisions": [
+            "Arts. 5-9"
+          ],
+          "note": "Where the practice is also unfair, misleading or aggressive."
+        }
+      }
+    },
+    {
+      "id": "edge_st3_flag:unfair_contract_terms_in_family_family:destination",
+      "source": "st3_flag:unfair_contract_terms",
+      "target": "family:destination",
+      "relation": "in_family",
+      "data": {
+        "meta": {}
+      }
+    },
+    {
+      "id": "edge_st3_flag:unfair_contract_terms_has_severity_severity:conditional",
+      "source": "st3_flag:unfair_contract_terms",
+      "target": "severity:conditional",
+      "relation": "has_severity",
+      "data": {
+        "meta": {}
+      }
+    },
+    {
+      "id": "edge_st3_flag:unfair_contract_terms_grounded_in_instrument:UCTD",
+      "source": "st3_flag:unfair_contract_terms",
+      "target": "instrument:UCTD",
+      "relation": "grounded_in",
+      "data": {
+        "meta": {
+          "provisions": [
+            "Art. 3"
+          ],
+          "note": "Non-individually-negotiated terms creating significant imbalance are unfair and non-binding, including for minor consumers; interacts with national rules on minors' contractual capacity."
+        }
+      }
+    },
+    {
+      "id": "edge_st3_flag:gambling_like_mechanics_at_destination_in_family_family:destination",
+      "source": "st3_flag:gambling_like_mechanics_at_destination",
+      "target": "family:destination",
+      "relation": "in_family",
+      "data": {
+        "meta": {}
+      }
+    },
+    {
+      "id": "edge_st3_flag:gambling_like_mechanics_at_destination_has_severity_severity:conditional",
+      "source": "st3_flag:gambling_like_mechanics_at_destination",
+      "target": "severity:conditional",
+      "relation": "has_severity",
+      "data": {
+        "meta": {}
+      }
+    },
+    {
+      "id": "edge_st3_flag:gambling_like_mechanics_at_destination_grounded_in_instrument:DSA",
+      "source": "st3_flag:gambling_like_mechanics_at_destination",
+      "target": "instrument:DSA",
+      "relation": "grounded_in",
+      "data": {
+        "meta": {
+          "provisions": [
+            "Art. 28 guidelines"
+          ],
+          "note": "Paid loot boxes as economically exploitative practices."
+        }
+      }
+    },
+    {
+      "id": "edge_st3_flag:gambling_like_mechanics_at_destination_grounded_in_instrument:UCPD",
+      "source": "st3_flag:gambling_like_mechanics_at_destination",
+      "target": "instrument:UCPD",
+      "relation": "grounded_in",
+      "data": {
+        "meta": {
+          "provisions": [],
+          "note": "General clauses."
+        }
+      }
+    },
+    {
+      "id": "edge_st3_flag:gambling_like_mechanics_at_destination_grounded_in_instrument:AI Act",
+      "source": "st3_flag:gambling_like_mechanics_at_destination",
+      "target": "instrument:AI Act",
+      "relation": "grounded_in",
+      "data": {
+        "meta": {
+          "provisions": [
+            "Art. 5"
+          ],
+          "note": "Where AI-personalised reward schedules exploit children's vulnerabilities."
+        }
+      }
+    },
+    {
+      "id": "edge_st3_flag:gambling_like_mechanics_at_destination_grounded_in_instrument:national",
+      "source": "st3_flag:gambling_like_mechanics_at_destination",
+      "target": "instrument:national",
+      "relation": "grounded_in",
+      "data": {
+        "meta": {
+          "provisions": [
+            "loot-box precedents"
+          ],
+          "note": "National precedents in the reference corpus."
+        }
+      }
+    },
+    {
+      "id": "edge_st3_flag:unlawful_data_practices_toward_minors_in_family_family:destination",
+      "source": "st3_flag:unlawful_data_practices_toward_minors",
+      "target": "family:destination",
+      "relation": "in_family",
+      "data": {
+        "meta": {}
+      }
+    },
+    {
+      "id": "edge_st3_flag:unlawful_data_practices_toward_minors_has_severity_severity:conditional",
+      "source": "st3_flag:unlawful_data_practices_toward_minors",
+      "target": "severity:conditional",
+      "relation": "has_severity",
+      "data": {
+        "meta": {}
+      }
+    },
+    {
+      "id": "edge_st3_flag:unlawful_data_practices_toward_minors_grounded_in_instrument:GDPR",
+      "source": "st3_flag:unlawful_data_practices_toward_minors",
+      "target": "instrument:GDPR",
+      "relation": "grounded_in",
+      "data": {
+        "meta": {
+          "provisions": [
+            "Art. 8",
+            "Art. 25",
+            "Art. 6(1)(f)",
+            "Art. 22",
+            "Recital 38"
+          ],
+          "note": "Age of digital consent (13-16, Member-State dependent); data protection by design and default (TikTok EUR 345m, Instagram EUR 450m); legitimate-interest balancing per Meta v. Bundeskartellamt (C-252/21); EDPB position against profiling children for marketing."
+        }
+      }
+    },
+    {
+      "id": "edge_st3_flag:age_assurance_failure_at_destination_in_family_family:destination",
+      "source": "st3_flag:age_assurance_failure_at_destination",
+      "target": "family:destination",
+      "relation": "in_family",
+      "data": {
+        "meta": {}
+      }
+    },
+    {
+      "id": "edge_st3_flag:age_assurance_failure_at_destination_has_severity_severity:conditional",
+      "source": "st3_flag:age_assurance_failure_at_destination",
+      "target": "severity:conditional",
+      "relation": "has_severity",
+      "data": {
+        "meta": {}
+      }
+    },
+    {
+      "id": "edge_st3_flag:age_assurance_failure_at_destination_grounded_in_instrument:DSA",
+      "source": "st3_flag:age_assurance_failure_at_destination",
+      "target": "instrument:DSA",
+      "relation": "grounded_in",
+      "data": {
+        "meta": {
+          "provisions": [
+            "Art. 28 and guidelines"
+          ],
+          "note": "Age verification where risks cannot be mitigated by less restrictive measures; 2026 preliminary findings against pornographic platforms and Meta under-13 findings as benchmark."
+        }
+      }
+    },
+    {
+      "id": "edge_st3_flag:age_assurance_failure_at_destination_grounded_in_instrument:AVMSD",
+      "source": "st3_flag:age_assurance_failure_at_destination",
+      "target": "instrument:AVMSD",
+      "relation": "grounded_in",
+      "data": {
+        "meta": {
+          "provisions": [
+            "Art. 28b"
+          ],
+          "note": "For video-sharing-platform destinations."
+        }
+      }
+    },
+    {
+      "id": "edge_st3_flag:age_assurance_failure_at_destination_grounded_in_instrument:soft_law",
+      "source": "st3_flag:age_assurance_failure_at_destination",
+      "target": "instrument:soft_law",
+      "relation": "grounded_in",
+      "data": {
+        "meta": {
+          "provisions": [
+            "Commission Recommendation on EU-wide age verification"
+          ],
+          "note": "Soft-law reference."
+        }
+      }
+    },
+    {
+      "id": "edge_st3_flag:harmful_or_addictive_design_at_destination_in_family_family:destination",
+      "source": "st3_flag:harmful_or_addictive_design_at_destination",
+      "target": "family:destination",
+      "relation": "in_family",
+      "data": {
+        "meta": {}
+      }
+    },
+    {
+      "id": "edge_st3_flag:harmful_or_addictive_design_at_destination_has_severity_severity:conditional",
+      "source": "st3_flag:harmful_or_addictive_design_at_destination",
+      "target": "severity:conditional",
+      "relation": "has_severity",
+      "data": {
+        "meta": {}
+      }
+    },
+    {
+      "id": "edge_st3_flag:harmful_or_addictive_design_at_destination_grounded_in_instrument:DSA",
+      "source": "st3_flag:harmful_or_addictive_design_at_destination",
+      "target": "instrument:DSA",
+      "relation": "grounded_in",
+      "data": {
+        "meta": {
+          "provisions": [
+            "Arts. 28, 34-35"
+          ],
+          "note": "Systemic-risk assessment where the destination is a VLOP; TikTok addictive-design preliminary findings as benchmark."
+        }
+      }
+    },
+    {
+      "id": "edge_st3_flag:harmful_or_addictive_design_at_destination_grounded_in_instrument:AI Act",
+      "source": "st3_flag:harmful_or_addictive_design_at_destination",
+      "target": "instrument:AI Act",
+      "relation": "grounded_in",
+      "data": {
+        "meta": {
+          "provisions": [
+            "Art. 5"
+          ],
+          "note": "Prohibited practices for AI-driven addictive design exploiting children's vulnerabilities."
+        }
+      }
+    },
+    {
+      "id": "edge_st3_flag:harmful_or_addictive_design_at_destination_grounded_in_instrument:GPSR",
+      "source": "st3_flag:harmful_or_addictive_design_at_destination",
+      "target": "instrument:GPSR",
+      "relation": "grounded_in",
+      "data": {
+        "meta": {
+          "provisions": [],
+          "note": "Safety net covering physical and mental health of child consumers. PLD cited as context only (civil-liability layer), not a classification ground."
+        }
+      }
+    },
+    {
+      "id": "edge_st3_flag:unsafe_or_non_compliant_product_in_family_family:destination",
+      "source": "st3_flag:unsafe_or_non_compliant_product",
+      "target": "family:destination",
+      "relation": "in_family",
+      "data": {
+        "meta": {}
+      }
+    },
+    {
+      "id": "edge_st3_flag:unsafe_or_non_compliant_product_has_severity_severity:conditional",
+      "source": "st3_flag:unsafe_or_non_compliant_product",
+      "target": "severity:conditional",
+      "relation": "has_severity",
+      "data": {
+        "meta": {}
+      }
+    },
+    {
+      "id": "edge_st3_flag:unsafe_or_non_compliant_product_grounded_in_instrument:GPSR",
+      "source": "st3_flag:unsafe_or_non_compliant_product",
+      "target": "instrument:GPSR",
+      "relation": "grounded_in",
+      "data": {
+        "meta": {
+          "provisions": [],
+          "note": "Manufacturers must assess risk for vulnerable consumers including children, covering physical and mental health."
+        }
+      }
+    },
+    {
+      "id": "edge_st3_flag:unsafe_or_non_compliant_product_grounded_in_instrument:DSA",
+      "source": "st3_flag:unsafe_or_non_compliant_product",
+      "target": "instrument:DSA",
+      "relation": "grounded_in",
+      "data": {
+        "meta": {
+          "provisions": [
+            "marketplace due-diligence"
+          ],
+          "note": "Where the destination is an online marketplace; Shein and Temu proceedings as precedent."
+        }
+      }
+    }
+  ]
+}

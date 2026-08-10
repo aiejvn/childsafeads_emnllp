@@ -23,11 +23,12 @@ def multi_hot(flags, index: dict) -> list:
 
 
 class ClassificationDataset(Dataset):
-    def __init__(self, instances: list, tokenizer, context: str = "full", max_length: int = 512):
+    def __init__(self, instances: list, tokenizer, context: str = "full", max_length: int = 512, df_text: str = None):
         self.instances = instances
         self.tokenizer = tokenizer
         self.context = context
         self.max_length = max_length
+        self.df_text = df_text  # autoDF-generated JSON, prepended before each instance's text so it's tokenized first
 
     def __len__(self) -> int:
         return len(self.instances)
@@ -35,6 +36,8 @@ class ClassificationDataset(Dataset):
     def __getitem__(self, idx: int) -> dict:
         inst = self.instances[idx]
         text = full_context(inst) if self.context == "full" else transcript_only(inst)
+        if self.df_text:
+            text = self.df_text + "\n\n" + text
         enc = self.tokenizer(text, truncation=True, max_length=self.max_length)
         item = {
             "instanceID": inst["instanceID"],

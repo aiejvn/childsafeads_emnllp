@@ -1,0 +1,207 @@
+{
+  "version": "1.0",
+  "knowledgeGraph": {
+    "name": "emnllp-dialog-flow"
+  },
+  "nodes": [
+    {
+      "id": "49a52b63-34ef-4649-b9b8-5df6c90b6a91",
+      "type": "start",
+      "data": {
+        "label": "Start",
+        "meta": {}
+      }
+    },
+    {
+      "id": "e756a723-616e-4751-a20b-dd38ccf2041c",
+      "type": "fact",
+      "data": {
+        "label": "Segment Text",
+        "meta": {}
+      }
+    },
+    {
+      "id": "5b950d19-3565-4387-8126-ea9d19ff747f",
+      "type": "reasoning",
+      "data": {
+        "label": "Assessability",
+        "meta": {
+          "customEnumValues": [
+            "assessable",
+            "insufficient_context"
+          ],
+          "question": "Is the segment assessable enough to classify?"
+        }
+      }
+    },
+    {
+      "id": "c13220e6-381d-4eac-88ae-aa24601b7713",
+      "type": "switch",
+      "data": {
+        "label": "Assessability Check",
+        "meta": {}
+      }
+    },
+    {
+      "id": "1c986f18-142e-4f39-b3c2-274c6e106572",
+      "type": "outcome",
+      "data": {
+        "label": "Insufficient Context",
+        "meta": {}
+      }
+    },
+    {
+      "id": "2fa37b43-35ff-4c57-9587-397e3fb5907f",
+      "type": "reasoning",
+      "data": {
+        "label": "Commercial Type",
+        "meta": {
+          "customEnumValues": [
+            "physical_goods",
+            "digital_content_or_services",
+            "physical_services",
+            "none",
+            "other"
+          ],
+          "question": "What commercial type is being promoted in the segment?"
+        }
+      }
+    },
+    {
+      "id": "11100d62-ce9c-4011-a3b7-5b81cdcb0af1",
+      "type": "reasoning",
+      "data": {
+        "label": "Product Categories",
+        "meta": {
+          "customEnumValues": [
+            "other"
+          ],
+          "question": "Which product categories apply to the segment?"
+        }
+      }
+    },
+    {
+      "id": "054641bf-a65c-4c90-81fe-77c7a8f8425a",
+      "type": "reasoning",
+      "data": {
+        "label": "Disclosure and Claims",
+        "meta": {
+          "customEnumValues": [
+            "undisclosed_advertising",
+            "inadequate_disclosure",
+            "direct_exhortation",
+            "misleading_claim",
+            "no_flag"
+          ],
+          "question": "Are there disclosure or misleading-claim concerns in the segment?"
+        }
+      }
+    },
+    {
+      "id": "ef4f582e-c7d4-4251-9d00-e031399e9509",
+      "type": "reasoning",
+      "data": {
+        "label": "Product Risk",
+        "meta": {
+          "customEnumValues": [
+            "age_restricted_or_prohibited_product",
+            "hfss_food_marketing",
+            "no_flag"
+          ],
+          "question": "Does the promoted product create age-restriction or HFSS concerns?"
+        }
+      }
+    },
+    {
+      "id": "35196c6c-cbc3-46f8-9227-9f463c441940",
+      "type": "outcome",
+      "data": {
+        "label": "Classification Report",
+        "meta": {}
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge_49a52b63-34ef-4649-b9b8-5df6c90b6a91_next_e756a723-616e-4751-a20b-dd38ccf2041c",
+      "source": "49a52b63-34ef-4649-b9b8-5df6c90b6a91",
+      "target": "e756a723-616e-4751-a20b-dd38ccf2041c",
+      "relation": "next",
+      "data": {
+        "meta": {}
+      }
+    },
+    {
+      "id": "edge_e756a723-616e-4751-a20b-dd38ccf2041c_next_5b950d19-3565-4387-8126-ea9d19ff747f",
+      "source": "e756a723-616e-4751-a20b-dd38ccf2041c",
+      "target": "5b950d19-3565-4387-8126-ea9d19ff747f",
+      "relation": "next",
+      "data": {
+        "meta": {}
+      }
+    },
+    {
+      "id": "edge_5b950d19-3565-4387-8126-ea9d19ff747f_next_c13220e6-381d-4eac-88ae-aa24601b7713",
+      "source": "5b950d19-3565-4387-8126-ea9d19ff747f",
+      "target": "c13220e6-381d-4eac-88ae-aa24601b7713",
+      "relation": "next",
+      "data": {
+        "meta": {}
+      }
+    },
+    {
+      "id": "edge_c13220e6-381d-4eac-88ae-aa24601b7713_branch:insufficient_context_1c986f18-142e-4f39-b3c2-274c6e106572",
+      "source": "c13220e6-381d-4eac-88ae-aa24601b7713",
+      "target": "1c986f18-142e-4f39-b3c2-274c6e106572",
+      "relation": "branch:insufficient_context",
+      "data": {
+        "meta": {}
+      }
+    },
+    {
+      "id": "edge_c13220e6-381d-4eac-88ae-aa24601b7713_branch:default_2fa37b43-35ff-4c57-9587-397e3fb5907f",
+      "source": "c13220e6-381d-4eac-88ae-aa24601b7713",
+      "target": "2fa37b43-35ff-4c57-9587-397e3fb5907f",
+      "relation": "branch:default",
+      "data": {
+        "meta": {}
+      }
+    },
+    {
+      "id": "edge_2fa37b43-35ff-4c57-9587-397e3fb5907f_next_11100d62-ce9c-4011-a3b7-5b81cdcb0af1",
+      "source": "2fa37b43-35ff-4c57-9587-397e3fb5907f",
+      "target": "11100d62-ce9c-4011-a3b7-5b81cdcb0af1",
+      "relation": "next",
+      "data": {
+        "meta": {}
+      }
+    },
+    {
+      "id": "edge_11100d62-ce9c-4011-a3b7-5b81cdcb0af1_next_054641bf-a65c-4c90-81fe-77c7a8f8425a",
+      "source": "11100d62-ce9c-4011-a3b7-5b81cdcb0af1",
+      "target": "054641bf-a65c-4c90-81fe-77c7a8f8425a",
+      "relation": "next",
+      "data": {
+        "meta": {}
+      }
+    },
+    {
+      "id": "edge_054641bf-a65c-4c90-81fe-77c7a8f8425a_next_ef4f582e-c7d4-4251-9d00-e031399e9509",
+      "source": "054641bf-a65c-4c90-81fe-77c7a8f8425a",
+      "target": "ef4f582e-c7d4-4251-9d00-e031399e9509",
+      "relation": "next",
+      "data": {
+        "meta": {}
+      }
+    },
+    {
+      "id": "edge_ef4f582e-c7d4-4251-9d00-e031399e9509_next_35196c6c-cbc3-46f8-9227-9f463c441940",
+      "source": "ef4f582e-c7d4-4251-9d00-e031399e9509",
+      "target": "35196c6c-cbc3-46f8-9227-9f463c441940",
+      "relation": "next",
+      "data": {
+        "meta": {}
+      }
+    }
+  ]
+}

@@ -38,6 +38,11 @@ def main():
     ap.add_argument("--model", default="FacebookAI/roberta-base", help="must match the base model used in training")
     ap.add_argument("--adapter-dir", required=True, help="e.g. runs/lora_roberta/best")
     ap.add_argument("--context", choices=["transcript", "full"], default="full")
+    ap.add_argument(
+        "--df-path", default=None,
+        help="path to the autoDF-generated dialog-flow JSON used at train time (must match, if the "
+        "adapter was trained with --df-path) -- prepended before each instance's text",
+    )
     ap.add_argument("--max-length", type=int, default=512)
     ap.add_argument("--batch-size", type=int, default=16)
     ap.add_argument(
@@ -55,6 +60,12 @@ def main():
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     log = setup_logging("runs", "lora_predict", args.model.replace("/", "_"), timestamp)
 
+    df_text = None
+    if args.df_path:
+        with open(args.df_path, encoding="utf-8") as f:
+            df_text = json.dumps(json.load(f), separators=(",", ":"))
+        log.info(f"prepending autoDF JSON from {args.df_path} ({len(df_text)} chars) before each instance's text")
+
     tokenizer = AutoTokenizer.from_pretrained(args.model)
     model = load_peft_model(args.model, len(ST1_LABELS), len(ST2_LABELS), len(ST3_LABELS), args.adapter_dir)
     model.to(device).eval()
@@ -64,7 +75,7 @@ def main():
     if args.tune_thresholds_on:
         tune_instances = list(load_split(args.tune_thresholds_on))
         tune_loader = DataLoader(
-            ClassificationDataset(tune_instances, tokenizer, args.context, args.max_length),
+            ClassificationDataset(tune_instances, tokenizer, args.context, args.max_length, df_text),
             batch_size=args.batch_size, shuffle=False, collate_fn=Collator(tokenizer),
         )
         _, _, st2_probs, st3_probs = run_inference(model, tune_loader, device)
@@ -82,7 +93,7 @@ def main():
     if args.sample_size:
         instances = random.Random(args.seed).sample(instances, min(args.sample_size, len(instances)))
     loader = DataLoader(
-        ClassificationDataset(instances, tokenizer, args.context, args.max_length),
+        ClassificationDataset(instances, tokenizer, args.context, args.max_length, df_text),
         batch_size=args.batch_size, shuffle=False, collate_fn=Collator(tokenizer),
     )
     ids, st1_idx, st2_probs, st3_probs = run_inference(model, loader, device)

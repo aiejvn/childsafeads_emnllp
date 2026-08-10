@@ -11,6 +11,7 @@ Saves the best-dev-macro-F1 adapter+heads to <output-dir>/best and the final epo
 to <output-dir>/last (both loadable with lora_predict.py).
 """
 import argparse
+import json
 import os
 import random
 import sys
@@ -37,6 +38,11 @@ def main():
     ap.add_argument("dev", help="dev split for per-epoch evaluation, e.g. public_data_dev/dev.jsonl")
     ap.add_argument("--model", default="FacebookAI/roberta-base")
     ap.add_argument("--context", choices=["transcript", "full"], default="full")
+    ap.add_argument(
+        "--df-path", default=None,
+        help="path to an autoDF-generated dialog-flow JSON (e.g. emnllp-dialog-flow-dialog-flow.json) to "
+        "prepend before each instance's text, so its tokens come first; omit to train without it",
+    )
     ap.add_argument("--max-length", type=int, default=512) # 512?! seems a bit short, if this is sequence length
     ap.add_argument("--epochs", type=int, default=5)
     ap.add_argument("--batch-size", type=int, default=16)
@@ -83,9 +89,15 @@ def main():
         dev_instances = rng.sample(dev_instances, min(args.sample_size, len(dev_instances)))
     log.info(f"train={len(train_instances)} dev={len(dev_instances)}")
 
+    df_text = None
+    if args.df_path:
+        with open(args.df_path, encoding="utf-8") as f:
+            df_text = json.dumps(json.load(f), separators=(",", ":"))
+        log.info(f"prepending autoDF JSON from {args.df_path} ({len(df_text)} chars) before each instance's text")
+
     tokenizer = AutoTokenizer.from_pretrained(args.model)
-    train_ds = ClassificationDataset(train_instances, tokenizer, args.context, args.max_length)
-    dev_ds = ClassificationDataset(dev_instances, tokenizer, args.context, args.max_length)
+    train_ds = ClassificationDataset(train_instances, tokenizer, args.context, args.max_length, df_text)
+    dev_ds = ClassificationDataset(dev_instances, tokenizer, args.context, args.max_length, df_text)
     collate = Collator(tokenizer)
     train_loader = DataLoader(train_ds, batch_size=args.batch_size, shuffle=True, collate_fn=collate)
     dev_loader = DataLoader(dev_ds, batch_size=args.batch_size, shuffle=False, collate_fn=collate)
