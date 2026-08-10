@@ -1,0 +1,13 @@
+Running on rg31901
+Started: Mon 10 Aug 2026 02:37:10 AM EDT
+Account: rrg-zhu2048_gpu
+Partition: gpubase_bynode_b2
+---
+Python: /lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/bin/python  Torch: 2.13.0
+---
+Command: python src/lora/lora_train.py public_data_dev/train.jsonl public_data_dev/dev.jsonl --epochs 200 --output-dir runs/lora_legalbert --local --lora-r 128 --local --df-path emnllp-dialog-flow-dialog-flow.json
+2026-08-10 02:37:32,562 | INFO | MainThread | logging to runs/run_20260810_023732_lora_train_FacebookAI_roberta-base.log
+2026-08-10 02:37:32,563 | INFO | MainThread | config: {'train': 'public_data_dev/train.jsonl', 'dev': 'public_data_dev/dev.jsonl', 'model': 'FacebookAI/roberta-base', 'local': True, 'context': 'full', 'df_path': 'emnllp-dialog-flow-dialog-flow.json', 'max_length': 512, 'epochs': 200, 'batch_size': 16, 'grad_accum_steps': 1, 'lr': 0.0002, 'warmup_ratio': 0.06, 'lora_r': 128, 'lora_alpha': 16, 'lora_dropout': 0.1, 'target_modules': 'query,value', 'st2_loss_weight': 1.0, 'st3_loss_weight': 1.0, 'pos_weight': False, 'threshold': 0.5, 'sample_size': None, 'seed': 42, 'device': None, 'output_dir': 'runs/lora_legalbert', 'no_wandb': False} device=cuda
+wandb: [wandb.login()] Loaded credentials for https://api.wandb.ai from /home/kwang103/.netrc.
+wandb: W&B API key is configured. Use `wandb login --relogin` to force relogin
+[2026-08-10T06:50:46.388] error: *** JOB 18753796 ON rg31901 CANCELLED AT 2026-08-10T06:50:46 DUE to SIGNAL Terminated ***

@@ -1,0 +1,30 @@
+#!/bin/bash
+#SBATCH --account=rrg-zhu2048
+#SBATCH --nodes=1
+#SBATCH --gres=gpu:4
+#SBATCH --job-name=lora_train_generative
+#SBATCH --output=slurm_lora_train_generative_torchrun_20260810_022315.log
+#SBATCH --ntasks=1
+#SBATCH --time=4:00:00
+#SBATCH --mem=40gb
+#SBATCH --cpus-per-task=10
+
+echo "Running on $(hostname)"
+echo "Started: $(date)"
+echo "Account: $SLURM_JOB_ACCOUNT"
+echo "Partition: $SLURM_JOB_PARTITION"
+echo "---"
+
+
+cd "/project/rrg-zhu2048/kwang103/childsafeads_emnllp"
+
+# --- Setup workspace  ---source .venv/bin/activate
+
+echo "Python: $(which python)  Torch: $(python -c 'import torch; print(torch.__version__)')"
+echo "---"
+
+echo "Command: torchrun --standalone --nproc-per-node=4 src/lora/lora_train_generative.py public_data_dev/train.jsonl public_data_dev/dev.jsonl --epochs 200 --output-dir runs/lora_qwen --parallelism tensor"
+torchrun --standalone --nproc-per-node=4 src/lora/lora_train_generative.py public_data_dev/train.jsonl public_data_dev/dev.jsonl --epochs 200 --output-dir runs/lora_qwen --parallelism tensor
+
+echo "---"
+echo "Finished: $(date)"

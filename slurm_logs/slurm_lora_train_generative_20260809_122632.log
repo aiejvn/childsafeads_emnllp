@@ -1,0 +1,6 @@
+Running on rg32001
+Started: Sun 09 Aug 2026 12:26:33 PM EDT
+Account: rrg-zhu2048_gpu
+Partition: gpubase_bynode_b2
+---
+[2026-08-09T16:26:49.627] error: *** JOB 18720517 ON rg32001 CANCELLED AT 2026-08-09T16:26:49 DUE to SIGNAL Terminated ***

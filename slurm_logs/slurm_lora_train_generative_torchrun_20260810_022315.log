@@ -1,0 +1,235 @@
+Running on rg31901
+Started: Mon 10 Aug 2026 02:33:39 AM EDT
+Account: rrg-zhu2048_gpu
+Partition: gpubase_bynode_b2
+---
+Python: /lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/bin/python  Torch: 2.13.0
+---
+Command: torchrun --standalone --nproc-per-node=4 src/lora/lora_train_generative.py public_data_dev/train.jsonl public_data_dev/dev.jsonl --epochs 200 --output-dir runs/lora_qwen --parallelism tensor
+W0810 02:34:06.815000 276873 torch/distributed/run.py:874] 
+W0810 02:34:06.815000 276873 torch/distributed/run.py:874] *****************************************
+W0810 02:34:06.815000 276873 torch/distributed/run.py:874] Setting OMP_NUM_THREADS environment variable for each process to be 1 in default, to avoid your system being overloaded, please further tune the variable for optimal performance in your application as needed. 
+W0810 02:34:06.815000 276873 torch/distributed/run.py:874] *****************************************
+2026-08-10 02:36:35,146 | INFO | MainThread | logging to runs/run_20260810_023635_lora_train_generative_Qwen_Qwen3.5-4B.log
+2026-08-10 02:36:35,147 | INFO | MainThread | config: {'train': 'public_data_dev/train.jsonl', 'dev': 'public_data_dev/dev.jsonl', 'model': 'Qwen/Qwen3.5-4B', 'context': 'full', 'max_length': 4096, 'epochs': 200, 'batch_size': 4, 'grad_accum_steps': 4, 'lr': 0.0002, 'warmup_ratio': 0.06, 'lora_r': 8, 'lora_alpha': 16, 'lora_dropout': 0.1, 'target_modules': 'q_proj,v_proj', 'load_in_4bit': False, 'parallelism': 'tensor', 'max_new_tokens': 128, 'sample_size': None, 'seed': 42, 'device': None, 'output_dir': 'runs/lora_qwen'} device=cuda
+2026-08-10 02:36:35,346 | INFO | MainThread | train=2353 dev=504
+2026-08-10 02:36:35,347 | INFO | MainThread | loading model/tokenizer from local path models/Qwen/Qwen3.5-4B (no remote download)
+[transformers] `torch_dtype` is deprecated! Use `dtype` instead!
+[transformers] `torch_dtype` is deprecated! Use `dtype` instead!
+[transformers] `torch_dtype` is deprecated! Use `dtype` instead!
+[transformers] `torch_dtype` is deprecated! Use `dtype` instead!
+[transformers] The fast path is not available because one of the required library is not installed. Falling back to torch implementation. To install follow https://github.com/fla-org/flash-linear-attention#installation and https://github.com/Dao-AILab/causal-conv1d
+[transformers] The fast path is not available because one of the required library is not installed. Falling back to torch implementation. To install follow https://github.com/fla-org/flash-linear-attention#installation and https://github.com/Dao-AILab/causal-conv1d
+[transformers] The fast path is not available because one of the required library is not installed. Falling back to torch implementation. To install follow https://github.com/fla-org/flash-linear-attention#installation and https://github.com/Dao-AILab/causal-conv1d
+[transformers] The fast path is not available because one of the required library is not installed. Falling back to torch implementation. To install follow https://github.com/fla-org/flash-linear-attention#installation and https://github.com/Dao-AILab/causal-conv1d
+Loading weights:   0%|          | 0/426 [00:00<?, ?it/s]Loading weights:   0%|          | 0/426 [00:00<?, ?it/s]Loading weights:   0%|          | 0/426 [00:00<?, ?it/s]Loading weights:   0%|          | 0/426 [00:00<?, ?it/s]Loading weights:   0%|          | 1/426 [00:05<35:55,  5.07s/it]Loading weights:   0%|          | 1/426 [00:05<35:56,  5.07s/it]Loading weights:   0%|          | 1/426 [00:05<35:55,  5.07s/it]Loading weights:   0%|          | 1/426 [00:05<35:56,  5.07s/it]Loading weights:   1%|▏         | 6/426 [00:05<04:39,  1.51it/s]Loading weights:   2%|▏         | 7/426 [00:05<03:56,  1.77it/s]Loading weights:   3%|▎         | 11/426 [00:05<02:12,  3.12it/s]Loading weights:   2%|▏         | 8/426 [00:05<03:33,  1.96it/s]Loading weights:   2%|▏         | 7/426 [00:05<04:05,  1.71it/s]Loading weights:   3%|▎         | 11/426 [00:06<03:17,  2.10it/s]Loading weights:   3%|▎         | 11/426 [00:06<03:11,  2.16it/s]Loading weights:   3%|▎         | 12/426 [00:06<02:56,  2.34it/s]Loading weights:   5%|▍         | 20/426 [00:07<01:09,  5.84it/s]Loading weights:   3%|▎         | 12/426 [00:07<03:08,  2.19it/s]Loading weights:   3%|▎         | 12/426 [00:07<03:01,  2.28it/s]Loading weights:   3%|▎         | 14/426 [00:07<02:40,  2.57it/s]Loading weights:   6%|▌         | 26/426 [00:08<01:31,  4.39it/s]Loading weights:   6%|▌         | 26/426 [00:08<01:26,  4.61it/s]Loading weights:   6%|▌         | 26/426 [00:08<01:23,  4.80it/s]Loading weights:   6%|▌         | 26/426 [00:08<01:31,  4.37it/s]Loading weights:   8%|▊         | 36/426 [00:08<00:52,  7.47it/s]Loading weights:   8%|▊         | 36/426 [00:08<00:46,  8.41it/s]Loading weights:   8%|▊         | 36/426 [00:08<00:55,  6.97it/s]Loading weights:   8%|▊         | 36/426 [00:08<00:49,  7.87it/s]Loading weights:   9%|▉         | 40/426 [00:09<00:44,  8.63it/s]Loading weights:   9%|▉         | 40/426 [00:09<00:46,  8.22it/s]Loading weights:   9%|▉         | 40/426 [00:09<00:39,  9.74it/s]Loading weights:  10%|▉         | 42/426 [00:09<00:37, 10.18it/s]Loading weights:  10%|█         | 44/426 [00:09<00:52,  7.29it/s]Loading weights:  11%|█         | 45/426 [00:09<00:46,  8.25it/s]Loading weights:  11%|█         | 45/426 [00:09<00:51,  7.42it/s]Loading weights:  11%|█         | 46/426 [00:09<00:47,  8.03it/s]Loading weights:  12%|█▏        | 51/426 [00:10<00:46,  7.98it/s]Loading weights:  12%|█▏        | 51/426 [00:10<00:43,  8.57it/s]Loading weights:  12%|█▏        | 51/426 [00:10<00:46,  8.11it/s]Loading weights:  12%|█▏        | 51/426 [00:10<00:46,  8.01it/s]Loading weights:  18%|█▊        | 75/426 [00:10<00:17, 20.37it/s]Loading weights:  18%|█▊        | 76/426 [00:10<00:14, 23.52it/s]Loading weights:  18%|█▊        | 78/426 [00:10<00:15, 22.62it/s]Loading weights:  19%|█▊        | 79/426 [00:10<00:15, 22.99it/s]Loading weights:  20%|█▉        | 85/426 [00:10<00:11, 28.90it/s]Loading weights:  19%|█▉        | 83/426 [00:10<00:14, 24.27it/s]Loading weights:  21%|██        | 89/426 [00:10<00:11, 28.38it/s]Loading weights:  21%|██▏       | 91/426 [00:10<00:11, 29.22it/s]Loading weights:  22%|██▏       | 93/426 [00:10<00:11, 30.14it/s]Loading weights:  22%|██▏       | 94/426 [00:11<00:10, 30.82it/s]Loading weights:  24%|██▍       | 102/426 [00:11<00:09, 33.46it/s]Loading weights:  23%|██▎       | 98/426 [00:11<00:12, 27.29it/s]Loading weights:  23%|██▎       | 99/426 [00:11<00:12, 26.71it/s]Loading weights:  24%|██▎       | 101/426 [00:11<00:11, 28.23it/s]Loading weights:  26%|██▌       | 109/426 [00:11<00:08, 37.17it/s]Loading weights:  25%|██▍       | 105/426 [00:11<00:10, 30.30it/s]Loading weights:  28%|██▊       | 118/426 [00:11<00:08, 38.13it/s]Loading weights:  28%|██▊       | 118/426 [00:11<00:08, 37.70it/s]Loading weights:  28%|██▊       | 118/426 [00:11<00:08, 37.51it/s]Loading weights:  28%|██▊       | 118/426 [00:11<00:08, 36.20it/s]Loading weights:  31%|███       | 132/426 [00:11<00:06, 42.30it/s]Loading weights:  31%|███       | 132/426 [00:11<00:06, 43.80it/s]Loading weights:  31%|███       | 132/426 [00:11<00:07, 41.08it/s]Loading weights:  31%|███       | 132/426 [00:11<00:07, 41.58it/s]Loading weights:  34%|███▍      | 146/426 [00:12<00:06, 40.29it/s]Loading weights:  34%|███▍      | 146/426 [00:12<00:07, 39.11it/s]Loading weights:  34%|███▍      | 146/426 [00:12<00:07, 39.10it/s]Loading weights:  34%|███▍      | 146/426 [00:12<00:07, 38.41it/s]Loading weights:  36%|███▌      | 152/426 [00:12<00:06, 39.29it/s]Loading weights:  36%|███▌      | 152/426 [00:12<00:07, 39.02it/s]Loading weights:  37%|███▋      | 157/426 [00:12<00:07, 37.83it/s]Loading weights:  37%|███▋      | 157/426 [00:12<00:07, 37.95it/s]Loading weights:  40%|████      | 171/426 [00:12<00:04, 52.92it/s]Loading weights:  40%|████      | 171/426 [00:12<00:04, 54.18it/s]Loading weights:  43%|████▎     | 184/426 [00:12<00:04, 56.25it/s]Loading weights:  43%|████▎     | 185/426 [00:12<00:04, 56.43it/s]Loading weights:  43%|████▎     | 185/426 [00:12<00:04, 57.81it/s]Loading weights:  43%|████▎     | 185/426 [00:12<00:04, 52.88it/s]Loading weights:  47%|████▋     | 199/426 [00:12<00:03, 61.98it/s]Loading weights:  47%|████▋     | 199/426 [00:12<00:03, 60.76it/s]Loading weights:  47%|████▋     | 199/426 [00:12<00:03, 61.33it/s]Loading weights:  47%|████▋     | 199/426 [00:12<00:03, 57.30it/s]Loading weights:  48%|████▊     | 206/426 [00:13<00:04, 51.85it/s]Loading weights:  48%|████▊     | 206/426 [00:13<00:04, 51.58it/s]Loading weights:  48%|████▊     | 206/426 [00:13<00:04, 48.59it/s]Loading weights:  49%|████▊     | 207/426 [00:13<00:04, 48.24it/s]Loading weights:  50%|████▉     | 212/426 [00:13<00:04, 43.36it/s]Loading weights:  50%|████▉     | 212/426 [00:13<00:05, 41.10it/s]Loading weights:  53%|█████▎    | 224/426 [00:13<00:03, 57.54it/s]Loading weights:  53%|█████▎    | 224/426 [00:13<00:03, 56.76it/s]Loading weights:  56%|█████▌    | 238/426 [00:13<00:02, 63.40it/s]Loading weights:  56%|█████▌    | 238/426 [00:13<00:03, 56.58it/s]Loading weights:  56%|█████▌    | 238/426 [00:13<00:03, 58.29it/s]Loading weights:  56%|█████▌    | 238/426 [00:13<00:03, 55.62it/s]Loading weights:  58%|█████▊    | 246/426 [00:13<00:02, 63.13it/s]Loading weights:  58%|█████▊    | 249/426 [00:13<00:02, 61.81it/s]Loading weights:  59%|█████▉    | 251/426 [00:13<00:02, 67.17it/s]Loading weights:  59%|█████▉    | 251/426 [00:13<00:02, 64.29it/s]Loading weights:  59%|█████▉    | 253/426 [00:13<00:02, 63.82it/s]Loading weights:  60%|██████    | 257/426 [00:14<00:04, 41.85it/s]Loading weights:  61%|██████    | 259/426 [00:14<00:03, 44.50it/s]Loading weights:  61%|██████    | 260/426 [00:14<00:04, 40.52it/s]Loading weights:  61%|██████    | 259/426 [00:14<00:04, 41.13it/s]Loading weights:  64%|██████▎   | 271/426 [00:14<00:02, 52.21it/s]Loading weights:  64%|██████▍   | 274/426 [00:14<00:02, 54.68it/s]Loading weights:  65%|██████▍   | 276/426 [00:14<00:02, 57.23it/s]Loading weights:  64%|██████▍   | 274/426 [00:14<00:02, 52.65it/s]Loading weights:  67%|██████▋   | 284/426 [00:14<00:02, 61.08it/s]Loading weights:  67%|██████▋   | 284/426 [00:14<00:02, 61.76it/s]Loading weights:  67%|██████▋   | 287/426 [00:14<00:02, 63.21it/s]Loading weights:  67%|██████▋   | 284/426 [00:14<00:02, 53.69it/s]Loading weights:  69%|██████▊   | 292/426 [00:14<00:02, 56.30it/s]Loading weights:  69%|██████▊   | 292/426 [00:14<00:02, 55.39it/s]Loading weights:  68%|██████▊   | 291/426 [00:14<00:02, 54.57it/s]Loading weights:  70%|██████▉   | 297/426 [00:14<00:02, 60.00it/s]Loading weights:  72%|███████▏  | 305/426 [00:14<00:01, 63.40it/s]Loading weights:  72%|███████▏  | 305/426 [00:14<00:01, 62.95it/s]Loading weights:  72%|███████▏  | 305/426 [00:14<00:02, 59.04it/s]Loading weights:  72%|███████▏  | 305/426 [00:14<00:01, 63.90it/s]Loading weights:  73%|███████▎  | 313/426 [00:15<00:02, 53.78it/s]Loading weights:  73%|███████▎  | 313/426 [00:15<00:02, 50.05it/s]Loading weights:  73%|███████▎  | 313/426 [00:15<00:02, 44.31it/s]Loading weights:  73%|███████▎  | 313/426 [00:15<00:02, 40.96it/s]Loading weights:  78%|███████▊  | 331/426 [00:15<00:01, 59.50it/s]Loading weights:  75%|███████▍  | 319/426 [00:15<00:02, 40.91it/s]Loading weights:  77%|███████▋  | 330/426 [00:15<00:01, 56.74it/s]Loading weights:  75%|███████▌  | 320/426 [00:15<00:02, 39.86it/s]Loading weights:  79%|███████▉  | 337/426 [00:16<00:03, 29.65it/s]Loading weights:  79%|███████▉  | 338/426 [00:16<00:03, 28.58it/s]Loading weights:  79%|███████▉  | 337/426 [00:16<00:03, 29.30it/s]Loading weights:  80%|███████▉  | 340/426 [00:16<00:02, 29.16it/s]Loading weights:  81%|████████  | 344/426 [00:16<00:02, 30.09it/s]Loading weights:  81%|████████  | 344/426 [00:16<00:02, 28.69it/s]Loading weights:  81%|████████  | 344/426 [00:16<00:03, 27.27it/s]Loading weights:  81%|████████▏ | 347/426 [00:16<00:02, 28.53it/s]Loading weights:  84%|████████▍ | 358/426 [00:16<00:01, 35.30it/s]Loading weights:  84%|████████▍ | 358/426 [00:16<00:01, 36.33it/s]Loading weights:  84%|████████▍ | 358/426 [00:16<00:01, 36.18it/s]Loading weights:  84%|████████▍ | 358/426 [00:16<00:02, 33.26it/s]Loading weights:  85%|████████▌ | 363/426 [00:17<00:02, 21.57it/s]Loading weights:  85%|████████▌ | 363/426 [00:17<00:02, 21.20it/s]Loading weights:  85%|████████▌ | 363/426 [00:17<00:03, 20.49it/s]Loading weights:  85%|████████▌ | 364/426 [00:17<00:03, 19.94it/s]Loading weights:  87%|████████▋ | 369/426 [00:17<00:02, 23.55it/s]Loading weights:  87%|████████▋ | 369/426 [00:17<00:02, 23.44it/s]Loading weights:  90%|████████▉ | 383/426 [00:17<00:01, 31.11it/s]Loading weights:  90%|████████▉ | 383/426 [00:17<00:01, 30.31it/s]Loading weights:  90%|████████▉ | 383/426 [00:17<00:01, 33.98it/s]Loading weights:  90%|████████▉ | 383/426 [00:17<00:01, 34.08it/s]Loading weights:  93%|█████████▎| 397/426 [00:18<00:00, 38.59it/s]Loading weights:  93%|█████████▎| 397/426 [00:18<00:00, 34.46it/s]Loading weights:  93%|█████████▎| 397/426 [00:18<00:00, 34.93it/s]Loading weights:  93%|█████████▎| 397/426 [00:18<00:00, 38.08it/s]Loading weights:  96%|█████████▋| 411/426 [00:18<00:00, 40.72it/s]Loading weights:  96%|█████████▋| 411/426 [00:18<00:00, 43.79it/s]Loading weights:  96%|█████████▋| 411/426 [00:18<00:00, 43.21it/s]Loading weights:  96%|█████████▋| 411/426 [00:18<00:00, 39.56it/s]Loading weights:  98%|█████████▊| 417/426 [00:18<00:00, 42.24it/s]Loading weights:  99%|█████████▉| 422/426 [00:18<00:00, 47.08it/s]Loading weights:  99%|█████████▉| 422/426 [00:18<00:00, 50.84it/s]Loading weights:  99%|█████████▉| 422/426 [00:18<00:00, 51.13it/s]Loading weights: 100%|██████████| 426/426 [00:18<00:00, 23.16it/s]
+Loading weights: 100%|██████████| 426/426 [00:18<00:00, 23.16it/s]
+Loading weights: 100%|██████████| 426/426 [00:18<00:00, 23.16it/s]Loading weights: 100%|██████████| 426/426 [00:18<00:00, 23.16it/s]
+
+trainable params: 475,136 || all params: 1,529,408,512 || trainable%: 0.0311
+trainable params: 475,136 || all params: 1,529,408,512 || trainable%: 0.0311
+trainable params: 475,136 || all params: 1,529,408,512 || trainable%: 0.0311
+trainable params: 475,136 || all params: 1,529,408,512 || trainable%: 0.0311
+epoch 1/200:   0%|          | 0/589 [00:00<?, ?it/s][rank3]:[W810 02:37:06.571914447 CUDACachingAllocator.cpp:3933] memory allocation failed with OOM on device 3 while trying to allocate 64174948352 bytes (free: 917372928, total: 85017493504).
+[rank1]:[W810 02:37:06.584963545 CUDACachingAllocator.cpp:3933] memory allocation failed with OOM on device 1 while trying to allocate 64174948352 bytes (free: 917372928, total: 85017493504).
+[rank0]:[W810 02:37:06.584974022 CUDACachingAllocator.cpp:3933] memory allocation failed with OOM on device 0 while trying to allocate 64174948352 bytes (free: 917372928, total: 85017493504).
+[rank2]:[W810 02:37:06.585791000 CUDACachingAllocator.cpp:3933] memory allocation failed with OOM on device 2 while trying to allocate 64174948352 bytes (free: 917372928, total: 85017493504).
+[rank0]:[W810 02:37:06.853112217 CUDACachingAllocator.cpp:3933] memory allocation failed with OOM on device 0 while trying to allocate 64174948352 bytes (free: 44275990528, total: 85017493504).
+[rank3]:[W810 02:37:06.869681650 CUDACachingAllocator.cpp:3933] memory allocation failed with OOM on device 3 while trying to allocate 64174948352 bytes (free: 44275990528, total: 85017493504).
+[rank2]:[W810 02:37:06.869681606 CUDACachingAllocator.cpp:3933] memory allocation failed with OOM on device 2 while trying to allocate 64174948352 bytes (free: 44275990528, total: 85017493504).
+[rank1]:[W810 02:37:06.889879977 CUDACachingAllocator.cpp:3933] memory allocation failed with OOM on device 1 while trying to allocate 64174948352 bytes (free: 44275990528, total: 85017493504).
+epoch 1/200:   0%|          | 0/589 [00:07<?, ?it/s]
+[rank1]: Traceback (most recent call last):
+[rank1]:   File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/src/lora/lora_train_generative.py", line 176, in <module>
+[rank1]:     main()
+[rank1]:   File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/src/lora/lora_train_generative.py", line 147, in main
+[rank1]:     out = model(input_ids=batch["input_ids"], attention_mask=batch["attention_mask"], labels=batch["labels"])
+[rank1]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank1]:   File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+[rank1]:     return self._call_impl(*args, **kwargs)
+[rank1]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank1]:   File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+[rank1]:     return forward_call(*args, **kwargs)
+[rank1]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank1]:   File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/peft/peft_model.py", line 2101, in forward
+[rank1]:     return self.base_model(
+[rank1]:            ^^^^^^^^^^^^^^^^
+[rank1]:   File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+[rank1]:     return self._call_impl(*args, **kwargs)
+[rank1]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank1]:   File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+[rank1]:     return forward_call(*args, **kwargs)
+[rank1]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank1]:   File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/peft/tuners/tuners_utils.py", line 333, in forward
+[rank1]:     return self.model.forward(*args, **kwargs)
+[rank1]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank1]:   File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/transformers/utils/generic.py", line 911, in wrapper
+[rank1]:     output = func(self, *args, **kwargs)
+[rank1]:              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank1]:   File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/transformers/models/qwen3_5/modeling_qwen3_5.py", line 1671, in forward
+[rank1]:     loss = self.loss_function(logits=logits, labels=labels, vocab_size=self.config.vocab_size, **kwargs)
+[rank1]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank1]:   File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/transformers/loss/loss_utils.py", line 59, in ForCausalLMLoss
+[rank1]:     logits = logits.float()
+[rank1]:              ^^^^^^^^^^^^^^
+[rank1]: torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 59.77 GiB. GPU 1 has a total capacity of 79.18 GiB of which 41.24 GiB is free. Including non-PyTorch memory, this process has 37.93 GiB memory in use. Of the allocated memory 35.53 GiB is allocated by PyTorch, and 930.02 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+[rank0]: Traceback (most recent call last):
+[rank0]:   File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/src/lora/lora_train_generative.py", line 176, in <module>
+[rank0]:     main()
+[rank0]:   File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/src/lora/lora_train_generative.py", line 147, in main
+[rank0]:     out = model(input_ids=batch["input_ids"], attention_mask=batch["attention_mask"], labels=batch["labels"])
+[rank0]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+[rank0]:     return self._call_impl(*args, **kwargs)
+[rank0]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+[rank0]:     return forward_call(*args, **kwargs)
+[rank0]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/peft/peft_model.py", line 2101, in forward
+[rank0]:     return self.base_model(
+[rank0]:            ^^^^^^^^^^^^^^^^
+[rank0]:   File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+[rank0]:     return self._call_impl(*args, **kwargs)
+[rank0]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+[rank0]:     return forward_call(*args, **kwargs)
+[rank0]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/peft/tuners/tuners_utils.py", line 333, in forward
+[rank0]:     return self.model.forward(*args, **kwargs)
+[rank0]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/transformers/utils/generic.py", line 911, in wrapper
+[rank0]:     output = func(self, *args, **kwargs)
+[rank0]:              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/transformers/models/qwen3_5/modeling_qwen3_5.py", line 1671, in forward
+[rank0]:     loss = self.loss_function(logits=logits, labels=labels, vocab_size=self.config.vocab_size, **kwargs)
+[rank0]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/transformers/loss/loss_utils.py", line 59, in ForCausalLMLoss
+[rank0]:     logits = logits.float()
+[rank0]:              ^^^^^^^^^^^^^^
+[rank0]: torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 59.77 GiB. GPU 0 has a total capacity of 79.18 GiB of which 41.24 GiB is free. Including non-PyTorch memory, this process has 37.93 GiB memory in use. Of the allocated memory 35.53 GiB is allocated by PyTorch, and 930.02 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+[rank2]: Traceback (most recent call last):
+[rank2]:   File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/src/lora/lora_train_generative.py", line 176, in <module>
+[rank2]:     main()
+[rank2]:   File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/src/lora/lora_train_generative.py", line 147, in main
+[rank2]:     out = model(input_ids=batch["input_ids"], attention_mask=batch["attention_mask"], labels=batch["labels"])
+[rank2]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank2]:   File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+[rank2]:     return self._call_impl(*args, **kwargs)
+[rank2]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank2]:   File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+[rank2]:     return forward_call(*args, **kwargs)
+[rank2]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank2]:   File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/peft/peft_model.py", line 2101, in forward
+[rank2]:     return self.base_model(
+[rank2]:            ^^^^^^^^^^^^^^^^
+[rank2]:   File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+[rank2]:     return self._call_impl(*args, **kwargs)
+[rank2]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank2]:   File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+[rank2]:     return forward_call(*args, **kwargs)
+[rank2]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank2]:   File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/peft/tuners/tuners_utils.py", line 333, in forward
+[rank2]:     return self.model.forward(*args, **kwargs)
+[rank2]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank2]:   File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/transformers/utils/generic.py", line 911, in wrapper
+[rank2]:     output = func(self, *args, **kwargs)
+[rank2]:              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank2]:   File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/transformers/models/qwen3_5/modeling_qwen3_5.py", line 1671, in forward
+[rank2]:     loss = self.loss_function(logits=logits, labels=labels, vocab_size=self.config.vocab_size, **kwargs)
+[rank2]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank2]:   File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/transformers/loss/loss_utils.py", line 59, in ForCausalLMLoss
+[rank2]:     logits = logits.float()
+[rank2]:              ^^^^^^^^^^^^^^
+[rank2]: torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 59.77 GiB. GPU 2 has a total capacity of 79.18 GiB of which 41.24 GiB is free. Including non-PyTorch memory, this process has 37.93 GiB memory in use. Of the allocated memory 35.53 GiB is allocated by PyTorch, and 930.02 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+[rank3]: Traceback (most recent call last):
+[rank3]:   File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/src/lora/lora_train_generative.py", line 176, in <module>
+[rank3]:     main()
+[rank3]:   File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/src/lora/lora_train_generative.py", line 147, in main
+[rank3]:     out = model(input_ids=batch["input_ids"], attention_mask=batch["attention_mask"], labels=batch["labels"])
+[rank3]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank3]:   File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+[rank3]:     return self._call_impl(*args, **kwargs)
+[rank3]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank3]:   File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+[rank3]:     return forward_call(*args, **kwargs)
+[rank3]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank3]:   File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/peft/peft_model.py", line 2101, in forward
+[rank3]:     return self.base_model(
+[rank3]:            ^^^^^^^^^^^^^^^^
+[rank3]:   File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+[rank3]:     return self._call_impl(*args, **kwargs)
+[rank3]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank3]:   File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+[rank3]:     return forward_call(*args, **kwargs)
+[rank3]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank3]:   File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/peft/tuners/tuners_utils.py", line 333, in forward
+[rank3]:     return self.model.forward(*args, **kwargs)
+[rank3]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank3]:   File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/transformers/utils/generic.py", line 911, in wrapper
+[rank3]:     output = func(self, *args, **kwargs)
+[rank3]:              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank3]:   File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/transformers/models/qwen3_5/modeling_qwen3_5.py", line 1671, in forward
+[rank3]:     loss = self.loss_function(logits=logits, labels=labels, vocab_size=self.config.vocab_size, **kwargs)
+[rank3]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank3]:   File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/transformers/loss/loss_utils.py", line 59, in ForCausalLMLoss
+[rank3]:     logits = logits.float()
+[rank3]:              ^^^^^^^^^^^^^^
+[rank3]: torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 59.77 GiB. GPU 3 has a total capacity of 79.18 GiB of which 41.24 GiB is free. Including non-PyTorch memory, this process has 37.93 GiB memory in use. Of the allocated memory 35.53 GiB is allocated by PyTorch, and 930.02 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
+W0810 02:37:08.622000 276873 torch/distributed/elastic/multiprocessing/api.py:1028] Sending process 276944 closing signal SIGTERM
+W0810 02:37:08.623000 276873 torch/distributed/elastic/multiprocessing/api.py:1028] Sending process 276946 closing signal SIGTERM
+W0810 02:37:08.623000 276873 torch/distributed/elastic/multiprocessing/api.py:1028] Sending process 276947 closing signal SIGTERM
+E0810 02:37:08.840000 276873 torch/distributed/elastic/multiprocessing/api.py:1002] failed (exitcode: 1) local_rank: 1 (pid: 276945) of binary: /lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/bin/python3.12
+Traceback (most recent call last):
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/bin/torchrun", line 8, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/torch/distributed/elastic/multiprocessing/errors/__init__.py", line 367, in wrapper
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/torch/distributed/run.py", line 1028, in main
+    run(args)
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/torch/distributed/run.py", line 1019, in run
+    elastic_launch(
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 194, in __call__
+    return launch_agent(
+           ^^^^^^^^^^^^^
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/torch/distributed/launcher/api.py", line 383, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+src/lora/lora_train_generative.py FAILED
+------------------------------------------------------------
+Failures:
+[1]:
+  time      : 2026-08-10_02:37:08
+  host      : rg31901.rorqual.calcul.quebec
+  rank      : 0 (local_rank: 0)
+  exitcode  : 1 (pid: 276944) 
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[2]:
+  time      : 2026-08-10_02:37:08
+  host      : rg31901.rorqual.calcul.quebec
+  rank      : 2 (local_rank: 2)
+  exitcode  : 1 (pid: 276946) 
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+[3]:
+  time      : 2026-08-10_02:37:08
+  host      : rg31901.rorqual.calcul.quebec
+  rank      : 3 (local_rank: 3)
+  exitcode  : 1 (pid: 276947) 
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2026-08-10_02:37:08
+  host      : rg31901.rorqual.calcul.quebec
+  rank      : 1 (local_rank: 1)
+  exitcode  : 1 (pid: 276945) 
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
+---
+Finished: Mon 10 Aug 2026 02:37:09 AM EDT

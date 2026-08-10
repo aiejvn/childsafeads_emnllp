@@ -1,0 +1,24 @@
+Running on rg32301
+Started: Mon 10 Aug 2026 01:58:15 AM EDT
+Account: rrg-zhu2048_gpu
+Partition: gpubase_bynode_b2
+---
+Python: /lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/bin/python  Torch: 2.13.0
+---
+Command: python src/lora/lora_train.py public_data_dev/train.jsonl public_data_dev/dev.jsonl --epochs 200 --output-dir runs/lora_legalbert --no-wandb --df-path emnllp-dialog-flow-dialog-flow.json --local
+usage: lora_train.py [-h] [--model MODEL] [--context {transcript,full}]
+                     [--df-path DF_PATH] [--max-length MAX_LENGTH]
+                     [--epochs EPOCHS] [--batch-size BATCH_SIZE]
+                     [--grad-accum-steps GRAD_ACCUM_STEPS] [--lr LR]
+                     [--warmup-ratio WARMUP_RATIO] [--lora-r LORA_R]
+                     [--lora-alpha LORA_ALPHA] [--lora-dropout LORA_DROPOUT]
+                     [--target-modules TARGET_MODULES]
+                     [--st2-loss-weight ST2_LOSS_WEIGHT]
+                     [--st3-loss-weight ST3_LOSS_WEIGHT] [--pos-weight]
+                     [--threshold THRESHOLD] [--sample-size SAMPLE_SIZE]
+                     [--seed SEED] [--device DEVICE] --output-dir OUTPUT_DIR
+                     [--no-wandb]
+                     train dev
+lora_train.py: error: unrecognized arguments: --local
+---
+Finished: Mon 10 Aug 2026 02:02:42 AM EDT

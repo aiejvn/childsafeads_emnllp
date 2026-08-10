@@ -1,0 +1,30 @@
+Running on rg32102
+Started: Sun 09 Aug 2026 07:59:18 PM EDT
+Account: rrg-zhu2048_gpu
+Partition: gpubase_bynode_b2
+---
+Python: /lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/bin/python  Torch: 2.13.0
+---
+Command: python src/lora/lora_train_generative.py public_data_dev/train.jsonl public_data_dev/dev.jsonl --epochs 200 --output-dir runs/lora_legalbert --parallelism tensor
+2026-08-09 20:03:36,617 | INFO | MainThread | logging to runs/run_20260809_200336_lora_train_generative_Qwen_Qwen3.5-4B.log
+2026-08-09 20:03:36,617 | INFO | MainThread | config: {'train': 'public_data_dev/train.jsonl', 'dev': 'public_data_dev/dev.jsonl', 'model': 'Qwen/Qwen3.5-4B', 'context': 'full', 'max_length': 4096, 'epochs': 200, 'batch_size': 4, 'grad_accum_steps': 4, 'lr': 0.0002, 'warmup_ratio': 0.06, 'lora_r': 8, 'lora_alpha': 16, 'lora_dropout': 0.1, 'target_modules': 'q_proj,v_proj', 'load_in_4bit': False, 'parallelism': 'tensor', 'max_new_tokens': 128, 'sample_size': None, 'seed': 42, 'device': None, 'output_dir': 'runs/lora_legalbert'} device=cuda
+2026-08-09 20:03:37,163 | INFO | MainThread | train=2353 dev=504
+2026-08-09 20:03:37,164 | INFO | MainThread | loading model/tokenizer from local path models/Qwen/Qwen3.5-4B (no remote download)
+Traceback (most recent call last):
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/src/lora/lora_train_generative.py", line 176, in <module>
+    main()
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/src/lora/lora_train_generative.py", line 116, in main
+    model = build_peft_model_causal(
+            ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/src/lora/../lora/lora_model.py", line 137, in build_peft_model_causal
+    model = _load_causal_base(
+            ^^^^^^^^^^^^^^^^^^
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/src/lora/../lora/lora_model.py", line 87, in _load_causal_base
+    _require_multi_gpu(parallelism)
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/src/lora/../lora/lora_model.py", line 63, in _require_multi_gpu
+    raise RuntimeError(
+RuntimeError: --parallelism tensor requires launching under torchrun, e.g.:
+  torchrun --nproc-per-node=4 <script>.py ... --parallelism tensor
+plain `python ...` only starts one process, so there's no process group to shard across.
+---
+Finished: Sun 09 Aug 2026 08:03:39 PM EDT

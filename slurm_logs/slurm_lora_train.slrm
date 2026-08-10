@@ -1,0 +1,30 @@
+#!/bin/bash
+#SBATCH --account=rrg-zhu2048
+#SBATCH --nodes=1
+#SBATCH --gres=gpu:4
+#SBATCH --job-name=lora_train
+#SBATCH --output=slurm_lora_train_20260810_024157.log
+#SBATCH --ntasks=1
+#SBATCH --time=4:00:00
+#SBATCH --mem=40gb
+#SBATCH --cpus-per-task=10
+
+echo "Running on $(hostname)"
+echo "Started: $(date)"
+echo "Account: $SLURM_JOB_ACCOUNT"
+echo "Partition: $SLURM_JOB_PARTITION"
+echo "---"
+
+
+cd "/project/rrg-zhu2048/kwang103/childsafeads_emnllp"
+
+# --- Setup workspace  ---source .venv/bin/activate
+
+echo "Python: $(which python)  Torch: $(python -c 'import torch; print(torch.__version__)')"
+echo "---"
+
+echo "Command: python src/lora/lora_train.py public_data_dev/train.jsonl public_data_dev/dev.jsonl --epochs 200 --output-dir runs/lora_legalbert --local --lora-r 128 --local --df-path emnllp-dialog-flow-dialog-flow.json --no-wandb"
+python src/lora/lora_train.py public_data_dev/train.jsonl public_data_dev/dev.jsonl --epochs 200 --output-dir runs/lora_legalbert --local --lora-r 128 --local --df-path emnllp-dialog-flow-dialog-flow.json --no-wandb
+
+echo "---"
+echo "Finished: $(date)"

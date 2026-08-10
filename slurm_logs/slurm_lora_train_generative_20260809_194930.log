@@ -1,0 +1,17 @@
+Running on rg32002
+Started: Sun 09 Aug 2026 07:49:32 PM EDT
+Account: rrg-zhu2048_gpu
+Partition: gpubase_bynode_b2
+---
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+ModuleNotFoundError: No module named 'torch'
+Python: /cvmfs/soft.computecanada.ca/gentoo/2023/x86-64-v3/usr/bin/python  Torch: 
+---
+Command: python src/lora/lora_train_generative.py public_data_dev/train.jsonl public_data_dev/dev.jsonl --epochs 200 --output-dir runs/lora_legalbert --parallelism pipeline
+Traceback (most recent call last):
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/src/lora/lora_train_generative.py", line 37, in <module>
+    import torch
+ModuleNotFoundError: No module named 'torch'
+---
+Finished: Sun 09 Aug 2026 07:49:32 PM EDT
