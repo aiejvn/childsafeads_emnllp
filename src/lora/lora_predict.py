@@ -39,7 +39,9 @@ def main():
     ap.add_argument("--model", default="FacebookAI/roberta-base", help="must match the base model used in training")
     ap.add_argument("--adapter-dir", required=True, help="e.g. runs/lora_roberta/best")
     ap.add_argument("--context", choices=CONTEXT_CHOICES, default="full",
-                    help="which rungs of the instance the model sees; no_product_page keeps the transcript and video metadata but drops the linked page (a median 38%% of full_context's tokens)")
+                    help="which rungs of the instance the model sees. no_product_page drops the linked page "
+                         "entirely (a median 38%% of full_context's tokens); st2_page keeps only its "
+                         "ST2-bearing lines, see common/page_filter.py")
     ap.add_argument(
         "--df-path", default=None,
         help="path to the autoDF-generated dialog-flow JSON used at train time (must match, if the "

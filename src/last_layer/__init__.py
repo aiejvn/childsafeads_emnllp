@@ -14,12 +14,12 @@ from common import (  # noqa: E402
     ST1_LABELS, ST2_LABELS, ST3_LABELS, Prediction, SYSTEM_PROMPT,
     evaluate, prediction_errors, sanitize_st3, setup_logging,
     full_context, load_split, transcript_only,
-    CONTEXT_CHOICES, no_product_page, render_context,
+    CONTEXT_CHOICES, no_product_page, st2_page_context, render_context,
 )
 
 __all__ = [
     "ST1_LABELS", "ST2_LABELS", "ST3_LABELS", "Prediction", "SYSTEM_PROMPT",
     "evaluate", "prediction_errors", "sanitize_st3", "setup_logging",
     "full_context", "load_split", "transcript_only",
-    "CONTEXT_CHOICES", "no_product_page", "render_context",
+    "CONTEXT_CHOICES", "no_product_page", "st2_page_context", "render_context",
 ]

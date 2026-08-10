@@ -57,7 +57,9 @@ def main():
     ap.add_argument("dev", help="dev split for per-epoch evaluation, e.g. public_data_dev/dev.jsonl")
     ap.add_argument("--model", default="Qwen/Qwen3.5-4B")
     ap.add_argument("--context", choices=CONTEXT_CHOICES, default="full",
-                    help="which rungs of the instance the model sees; no_product_page keeps the transcript and video metadata but drops the linked page (a median 38%% of full_context's tokens)")
+                    help="which rungs of the instance the model sees. no_product_page drops the linked page "
+                         "entirely (a median 38%% of full_context's tokens); st2_page keeps only its "
+                         "ST2-bearing lines, see common/page_filter.py")
     ap.add_argument("--lean-prompt", action="store_true", help="swap the GPT baseline's zero-shot "
                      "SYSTEM_PROMPT (3,533 tokens of instructions + full taxonomy, which leaves 467 "
                      "of 4,096 for the segment and truncates 98%% of instances) for common.SFT_TAXONOMY "

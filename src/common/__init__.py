@@ -39,10 +39,12 @@ _unnamed = [label for label in ST1_LABELS + ST2_LABELS + ST3_LABELS if f"`{label
 if _unnamed:
     raise ValueError(f"{SFT_TAXONOMY_PATH} no longer names these labels: {_unnamed}")
 
-# The rungs of an instance a model is allowed to see. starting_kit/load_data.py ships
-# the two ends -- transcript_only (rung 1) and full_context (everything) -- and
-# no_product_page is the step between them.
-CONTEXT_CHOICES = ["transcript", "no_product_page", "full"]
+from .page_filter import st2_relevant_page  # noqa: E402 (no import back into common, so no cycle)
+
+# The rungs of an instance a model is allowed to see, in increasing order of content.
+# starting_kit/load_data.py ships the two ends -- transcript_only (rung 1) and
+# full_context (everything); no_product_page and st2_page are the steps between.
+CONTEXT_CHOICES = ["transcript", "no_product_page", "st2_page", "full"]
 
 
 def no_product_page(instance: dict) -> str:
@@ -63,12 +65,32 @@ def no_product_page(instance: dict) -> str:
             f"OFFICIAL_DISCLOSURE: {v['official_disclosure']}")
 
 
+def st2_page_context(instance: dict) -> str:
+    """no_product_page plus the page reduced to its ST2-bearing lines (see
+    common/page_filter.py). Keeps full_context's `PAGE (title):` framing so the two
+    differ only in the page body, and falls back to no_product_page for the 344 train
+    pages where nothing survives the filter -- an empty PAGE block would be a header
+    promising content that isn't there.
+
+    Costs a median 81 page tokens against full_context's 384, and retains 100% of the
+    490 (instance, gold ST2 label) pairs whose vocabulary appears on the page and
+    nowhere else -- i.e. it drops none of the evidence that --context no_product_page
+    would lose.
+    """
+    filtered = st2_relevant_page(instance["product_page"].get("text") or "")
+    if not filtered.strip():
+        return no_product_page(instance)
+    return f"{no_product_page(instance)}\n\nPAGE ({instance['product_page']['page_title']}):\n{filtered}"
+
+
 def render_context(instance: dict, context: str = "full") -> str:
     """Single resolver for --context, so a new rung cannot be silently mishandled: the
     `full_context(x) if context == "full" else transcript_only(x)` idiom this replaces
     quietly degrades every unrecognised value to transcript-only."""
     if context == "full":
         return full_context(instance)
+    if context == "st2_page":
+        return st2_page_context(instance)
     if context == "no_product_page":
         return no_product_page(instance)
     if context == "transcript":
@@ -81,5 +103,5 @@ __all__ = [
     "SFT_TAXONOMY", "SFT_TAXONOMY_PATH",
     "evaluate", "prediction_errors", "sanitize_st3", "setup_logging",
     "full_context", "load_split", "transcript_only",
-    "CONTEXT_CHOICES", "no_product_page", "render_context",
+    "CONTEXT_CHOICES", "no_product_page", "st2_page_context", "render_context",
 ]

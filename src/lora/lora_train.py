@@ -42,7 +42,9 @@ def main():
         help="load --model from ./models/{model} instead of the HF hub (must already be downloaded there)",
     )
     ap.add_argument("--context", choices=CONTEXT_CHOICES, default="full",
-                    help="which rungs of the instance the model sees; no_product_page keeps the transcript and video metadata but drops the linked page (a median 38%% of full_context's tokens)")
+                    help="which rungs of the instance the model sees. no_product_page drops the linked page "
+                         "entirely (a median 38%% of full_context's tokens); st2_page keeps only its "
+                         "ST2-bearing lines, see common/page_filter.py")
     ap.add_argument(
         "--df-path", default=None,
         help="path to an autoDF-generated dialog-flow JSON (e.g. emnllp-dialog-flow-dialog-flow.json) to "
