@@ -37,6 +37,10 @@ def main():
     ap.add_argument("train", help="training split, e.g. public_data_dev/train.jsonl")
     ap.add_argument("dev", help="dev split for per-epoch evaluation, e.g. public_data_dev/dev.jsonl")
     ap.add_argument("--model", default="FacebookAI/roberta-base")
+    ap.add_argument(
+        "--local", action="store_true",
+        help="load --model from ./models/{model} instead of the HF hub (must already be downloaded there)",
+    )
     ap.add_argument("--context", choices=["transcript", "full"], default="full")
     ap.add_argument(
         "--df-path", default=None,
@@ -70,6 +74,13 @@ def main():
     torch.manual_seed(args.seed)
     device = args.device or ("cuda" if torch.cuda.is_available() else "cpu")
 
+    model_path = args.model
+    if args.local:
+        local_path = os.path.join("models", args.model)
+        if not os.path.isdir(local_path):
+            raise FileNotFoundError(f"--local set but {local_path} does not exist")
+        model_path = local_path
+
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     log = setup_logging("runs", "lora_train", args.model.replace("/", "_"), timestamp)
     log.info(f"config: {vars(args)} device={device}")
@@ -95,7 +106,7 @@ def main():
             df_text = json.dumps(json.load(f), separators=(",", ":"))
         log.info(f"prepending autoDF JSON from {args.df_path} ({len(df_text)} chars) before each instance's text")
 
-    tokenizer = AutoTokenizer.from_pretrained(args.model)
+    tokenizer = AutoTokenizer.from_pretrained(model_path)
     train_ds = ClassificationDataset(train_instances, tokenizer, args.context, args.max_length, df_text)
     dev_ds = ClassificationDataset(dev_instances, tokenizer, args.context, args.max_length, df_text)
     collate = Collator(tokenizer)
@@ -103,7 +114,7 @@ def main():
     dev_loader = DataLoader(dev_ds, batch_size=args.batch_size, shuffle=False, collate_fn=collate)
 
     model = build_peft_model(
-        args.model, len(ST1_LABELS), len(ST2_LABELS), len(ST3_LABELS),
+        model_path, len(ST1_LABELS), len(ST2_LABELS), len(ST3_LABELS),
         lora_r=args.lora_r, lora_alpha=args.lora_alpha, lora_dropout=args.lora_dropout,
         target_modules=args.target_modules.split(","),
     ).to(device)
