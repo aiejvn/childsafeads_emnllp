@@ -26,6 +26,7 @@ from torch.utils.data import DataLoader
 from transformers import AutoTokenizer
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))  # so `import lora` resolves src/lora as a package
+from common.dialog_flow import df_pre_context  # noqa: E402
 from common.predict_utils import decode, load_thresholds, multi_hot_matrix, run_inference, tune_per_label_thresholds  # noqa: E402
 from lora import ST1_LABELS, ST2_LABELS, ST3_LABELS, evaluate, prediction_errors, setup_logging  # noqa: E402
 from lora.lora_data import Collator, ClassificationDataset, load_split  # noqa: E402
@@ -43,6 +44,8 @@ def main():
         help="path to the autoDF-generated dialog-flow JSON used at train time (must match, if the "
         "adapter was trained with --df-path) -- prepended before each instance's text",
     )
+    ap.add_argument("--lean-prompt", action="store_true",
+                    help="must match the flag used in training -- it changes how --df-path is rendered")
     ap.add_argument("--max-length", type=int, default=512)
     ap.add_argument("--batch-size", type=int, default=16)
     ap.add_argument(
@@ -62,9 +65,9 @@ def main():
 
     df_text = None
     if args.df_path:
-        with open(args.df_path, encoding="utf-8") as f:
-            df_text = json.dumps(json.load(f), separators=(",", ":"))
-        log.info(f"prepending autoDF JSON from {args.df_path} ({len(df_text)} chars) before each instance's text")
+        df_text = df_pre_context(args.df_path, lean=args.lean_prompt)
+        form = "stripped dialog flow" if args.lean_prompt else "raw autoDF JSON"
+        log.info(f"prepending {form} from {args.df_path} ({len(df_text)} chars) before each instance's text")
 
     tokenizer = AutoTokenizer.from_pretrained(args.model)
     model = load_peft_model(args.model, len(ST1_LABELS), len(ST2_LABELS), len(ST3_LABELS), args.adapter_dir)

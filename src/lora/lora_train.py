@@ -11,7 +11,6 @@ Saves the best-dev-macro-F1 adapter+heads to <output-dir>/best and the final epo
 to <output-dir>/last (both loadable with lora_predict.py).
 """
 import argparse
-import json
 import os
 import random
 import sys
@@ -24,6 +23,7 @@ from tqdm import tqdm
 from transformers import AutoTokenizer, get_linear_schedule_with_warmup
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))  # so `import lora` resolves src/lora as a package
+from common.dialog_flow import df_pre_context  # noqa: E402
 from common.predict_utils import save_thresholds, tune_and_decode  # noqa: E402
 from common.train_utils import compute_pos_weight, to_device  # noqa: E402
 from lora import ST1_LABELS, ST2_LABELS, ST3_LABELS, evaluate, setup_logging  # noqa: E402
@@ -47,6 +47,10 @@ def main():
         help="path to an autoDF-generated dialog-flow JSON (e.g. emnllp-dialog-flow-dialog-flow.json) to "
         "prepend before each instance's text, so its tokens come first; omit to train without it",
     )
+    ap.add_argument("--lean-prompt", action="store_true", help="render --df-path as stripped text "
+                     "(943 tokens) instead of the raw editor export (4,003, of which 81%% is UUIDs, "
+                     "canvas positions and CSS classes). No effect without --df-path: this path has "
+                     "no system prompt to trim")
     ap.add_argument("--max-length", type=int, default=512) # 512?! seems a bit short, if this is sequence length
     ap.add_argument("--epochs", type=int, default=5)
     ap.add_argument("--batch-size", type=int, default=16)
@@ -102,9 +106,9 @@ def main():
 
     df_text = None
     if args.df_path:
-        with open(args.df_path, encoding="utf-8") as f:
-            df_text = json.dumps(json.load(f), separators=(",", ":"))
-        log.info(f"prepending autoDF JSON from {args.df_path} ({len(df_text)} chars) before each instance's text")
+        df_text = df_pre_context(args.df_path, lean=args.lean_prompt)
+        form = "stripped dialog flow" if args.lean_prompt else "raw autoDF JSON"
+        log.info(f"prepending {form} from {args.df_path} ({len(df_text)} chars) before each instance's text")
 
     tokenizer = AutoTokenizer.from_pretrained(model_path)
     train_ds = ClassificationDataset(train_instances, tokenizer, args.context, args.max_length, df_text)

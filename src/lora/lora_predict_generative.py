@@ -27,7 +27,8 @@ from torch.utils.data import DataLoader
 from transformers import AutoTokenizer
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))  # so `import lora` resolves src/lora as a package
-from lora import evaluate, load_split, prediction_errors, setup_logging  # noqa: E402
+from common.dialog_flow import df_pre_context  # noqa: E402
+from lora import SFT_TAXONOMY, SYSTEM_PROMPT, evaluate, load_split, prediction_errors, setup_logging  # noqa: E402
 from lora.lora_data import GenerativeCollator, GenerativeDataset  # noqa: E402
 from lora.lora_generative import generate_predictions  # noqa: E402
 from lora.lora_model import PARALLELISM_CHOICES, load_peft_model_causal  # noqa: E402
@@ -39,6 +40,10 @@ def main():
     ap.add_argument("--model", default="Qwen/Qwen3.5-4B", help="must match the base model used in training")
     ap.add_argument("--adapter-dir", required=True, help="e.g. runs/lora_qwen/best")
     ap.add_argument("--context", choices=["transcript", "full"], default="full")
+    ap.add_argument("--lean-prompt", action="store_true",
+                    help="must match the flag used in training -- the adapter was fit against "
+                         "whichever system prompt was in front of it")
+    ap.add_argument("--df-path", default=None, help="must match the path used in training")
     ap.add_argument("--max-length", type=int, default=4096)
     ap.add_argument("--batch-size", type=int, default=4)
     ap.add_argument("--max-new-tokens", type=int, default=128)
@@ -87,8 +92,12 @@ def main():
     instances = list(load_split(args.target))
     if args.sample_size:
         instances = random.Random(args.seed).sample(instances, min(args.sample_size, len(instances)))
+    system_prompt = SFT_TAXONOMY if args.lean_prompt else SYSTEM_PROMPT
+    df_text = df_pre_context(args.df_path, lean=args.lean_prompt) if args.df_path else None
+    log.info(f"system prompt: {'lean' if args.lean_prompt else 'full'} ({len(system_prompt)} chars)"
+             + (f" + dialog flow from {args.df_path} ({len(df_text)} chars)" if df_text else ""))
     loader = DataLoader(
-        GenerativeDataset(instances, tokenizer, args.context, args.max_length),
+        GenerativeDataset(instances, tokenizer, args.context, args.max_length, system_prompt, df_text),
         batch_size=args.batch_size, shuffle=False, collate_fn=GenerativeCollator(tokenizer),
     )
     ids, predictions = generate_predictions(model, loader, tokenizer, args.max_new_tokens)

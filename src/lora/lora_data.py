@@ -9,6 +9,7 @@ below) is LoRA-specific and stays defined here.
 import json
 import os
 import sys
+import warnings
 
 import torch
 from torch.utils.data import Dataset
@@ -32,11 +33,16 @@ def format_completion(labels: dict) -> str:
 
 
 class GenerativeDataset(Dataset):
-    """Formats each instance as the same zero-shot chat prompt used for the GPT baseline
-    (SYSTEM_PROMPT + "SEGMENT DATA:\\n\\n{text}"), with the gold label rendered as a JSON
-    completion. `labels` is -100 over the prompt tokens so cross-entropy only applies to the
-    completion, i.e. standard causal-LM SFT. Instances without gold labels (predict-only
-    splits) yield prompt-only input_ids/attention_mask for `model.generate()`.
+    """Formats each instance as a chat prompt (`system_prompt` + "SEGMENT DATA:\\n\\n{text}"),
+    with the gold label rendered as a JSON completion. `labels` is -100 over the prompt tokens
+    so cross-entropy only applies to the completion, i.e. standard causal-LM SFT. Instances
+    without gold labels (predict-only splits) yield prompt-only input_ids/attention_mask for
+    `model.generate()`.
+
+    `system_prompt` defaults to the zero-shot prompt the GPT baseline uses, which keeps the
+    input framing identical across baselines; pass `common.SFT_TAXONOMY` instead (the scripts'
+    --lean-prompt) to drop the instruction prose and label definitions that 2,353 labelled
+    examples supersede, and that otherwise leave only ~470 of 4,096 tokens for the segment.
 
     The segment text is the only part of the prompt long enough to need truncating, and its
     length varies per-instance while the surrounding chat-template scaffolding (system
@@ -46,23 +52,46 @@ class GenerativeDataset(Dataset):
     (long, mostly-fixed) prompt on every __getitem__ call.
     """
 
-    def __init__(self, instances: list, tokenizer, context: str = "full", max_length: int = 4096):
+    def __init__(self, instances: list, tokenizer, context: str = "full", max_length: int = 4096,
+                 system_prompt: str = SYSTEM_PROMPT, df_text: str = None):
         self.instances = instances
         self.tokenizer = tokenizer
         self.context = context
         self.max_length = max_length
+        # df_text joins the system message rather than going in front of the per-instance
+        # text the way ClassificationDataset prepends it. It is identical for every
+        # instance, so it belongs with the rest of the fixed scaffolding: tokenized once
+        # here instead of on every __getitem__, and outside the per-item truncation --
+        # which cuts from the front, and would otherwise spend the whole text budget on
+        # the flow and leave nothing of the segment.
+        self.system_prompt = f"{system_prompt}\n\n{df_text}" if df_text else system_prompt
 
         rendered = self._render_prompt(_SEGMENT_PLACEHOLDER)
         prefix_str, suffix_str = rendered.split(_SEGMENT_PLACEHOLDER)
         self.prefix_ids = tokenizer(prefix_str, add_special_tokens=False)["input_ids"]
         self.suffix_ids = tokenizer(suffix_str, add_special_tokens=False)["input_ids"]
 
+        # Only the segment text is truncatable, so once the fixed scaffolding fills
+        # max_length the text budget hits its max(1, ...) floor and sequences run *past*
+        # max_length rather than being clipped to it -- silently, and straight into the
+        # fp32 logits tensor that dominates training memory. Warn rather than raise: it's
+        # a legitimate if wasteful config, and the predict path has to be free to mirror
+        # whatever training used.
+        fixed = len(self.prefix_ids) + len(self.suffix_ids) + COMPLETION_TOKEN_BUDGET
+        if fixed >= max_length:
+            warnings.warn(
+                f"fixed prompt scaffolding is {fixed:,} tokens against max_length {max_length:,}: "
+                f"the segment text is truncated to 1 token and sequences will still exceed "
+                f"max_length. Use --lean-prompt, or raise --max-length.",
+                stacklevel=2,
+            )
+
     def __len__(self) -> int:
         return len(self.instances)
 
     def _render_prompt(self, text: str) -> str:
         messages = [
-            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "system", "content": self.system_prompt},
             {"role": "user", "content": f"SEGMENT DATA:\n\n{text}"},
         ]
         return self.tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
