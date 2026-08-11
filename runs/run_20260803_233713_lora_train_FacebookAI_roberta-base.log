@@ -1,3 +1,0 @@
-2026-08-03 23:37:13,315 | INFO | MainThread | logging to runs/run_20260803_233713_lora_train_FacebookAI_roberta-base.log
-2026-08-03 23:37:13,316 | INFO | MainThread | config: {'train': 'public_data_dev/train.jsonl', 'dev': 'public_data_dev/dev.jsonl', 'model': 'FacebookAI/roberta-base', 'context': 'full', 'max_length': 512, 'epochs': 5, 'batch_size': 16, 'grad_accum_steps': 1, 'lr': 0.0002, 'warmup_ratio': 0.06, 'lora_r': 8, 'lora_alpha': 16, 'lora_dropout': 0.1, 'target_modules': 'query,value', 'st2_loss_weight': 1.0, 'st3_loss_weight': 1.0, 'pos_weight': False, 'threshold': 0.5, 'sample_size': None, 'seed': 42, 'device': None, 'output_dir': 'runs/lora_roberta'} device=cuda
-2026-08-03 23:37:13,436 | INFO | MainThread | train=2353 dev=504
