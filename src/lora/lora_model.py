@@ -103,7 +103,7 @@ def _load_causal_base(
     if parallelism == "tensor":
         load_kwargs["tp_plan"] = "auto"
     elif parallelism == "pipeline":
-        load_kwargs["balanced_low_0"] = "auto"
+        load_kwargs["device_map"] = "balanced_low_0"
     elif load_in_4bit:
         load_kwargs["device_map"] = {"": device}
     return AutoModelForCausalLM.from_pretrained(base_model_name, **load_kwargs)
