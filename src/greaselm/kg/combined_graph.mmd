@@ -1,0 +1,170 @@
+flowchart LR
+    n0["Start"]:::start
+    n1["Segment Text"]:::fact
+    n2["Assessability"]:::reasoning
+    n3["Assessability Check"]:::switch
+    n4["Insufficient Context"]:::outcome
+    n5["Commercial Type"]:::reasoning
+    n6["Product Categories"]:::reasoning
+    n7["Disclosure and Claims"]:::reasoning
+    n8["Product Risk"]:::reasoning
+    n9["Classification Report"]:::outcome
+    n10["content"]:::family
+    n11["destination"]:::family
+    n12["disclosure"]:::family
+    n13["housekeeping"]:::family
+    n14["product"]:::family
+    n15["conditional"]:::severity
+    n16["per_se"]:::severity
+    n17["soft_law"]:::severity
+    n18["AI Act"]:::instrument
+    n19["AVMSD"]:::instrument
+    n20["CRD"]:::instrument
+    n21["DSA"]:::instrument
+    n22["GDPR"]:::instrument
+    n23["GPSR"]:::instrument
+    n24["UCPD"]:::instrument
+    n25["UCTD"]:::instrument
+    n26["national"]:::instrument
+    n27["sectoral"]:::instrument
+    n28["soft_law"]:::instrument
+    n29["undisclosed_advertising"]:::st3_flag
+    n30["inadequate_disclosure"]:::st3_flag
+    n31["direct_exhortation"]:::st3_flag
+    n32["misleading_claim"]:::st3_flag
+    n33["age_restricted_or_prohibited_product"]:::st3_flag
+    n34["hfss_food_marketing"]:::st3_flag
+    n35["undisclosed_synthetic_content"]:::st3_flag
+    n36["no_flag"]:::st3_flag
+    n37["insufficient_context"]:::st3_flag
+    n38["defective_precontractual_information"]:::st3_flag
+    n39["unfair_contract_terms"]:::st3_flag
+    n40["gambling_like_mechanics_at_destination"]:::st3_flag
+    n41["unlawful_data_practices_toward_minors"]:::st3_flag
+    n42["age_assurance_failure_at_destination"]:::st3_flag
+    n43["harmful_or_addictive_design_at_destination"]:::st3_flag
+    n44["unsafe_or_non_compliant_product"]:::st3_flag
+    n45["physical_goods"]:::st1_label
+    n46["digital_content_or_services"]:::st1_label
+    n47["physical_services"]:::st1_label
+    n48["none"]:::st1_label
+    n49["other"]:::st1_label
+    n50["apps"]:::st2_label
+    n51["creator_community"]:::st2_label
+    n52["education"]:::st2_label
+    n53["fashion"]:::st2_label
+    n54["financial"]:::st2_label
+    n55["food"]:::st2_label
+    n56["gambling"]:::st2_label
+    n57["gambling_adjacent"]:::st2_label
+    n58["hardware_electronics"]:::st2_label
+    n59["health"]:::st2_label
+    n60["other"]:::st2_label
+    n61["toys"]:::st2_label
+    n0 -->|next| n1
+    n1 -->|next| n2
+    n2 -->|next| n3
+    n3 -->|branch:insufficient_context| n4
+    n3 -->|branch:default| n5
+    n5 -->|next| n6
+    n6 -->|next| n7
+    n7 -->|next| n8
+    n8 -->|next| n9
+    n29 -->|in_family| n12
+    n29 -->|has_severity| n16
+    n29 -->|grounded_in| n24
+    n29 -->|grounded_in| n19
+    n29 -->|grounded_in| n21
+    n30 -->|in_family| n12
+    n30 -->|has_severity| n15
+    n30 -->|grounded_in| n24
+    n30 -->|grounded_in| n21
+    n31 -->|in_family| n10
+    n31 -->|has_severity| n16
+    n31 -->|grounded_in| n24
+    n32 -->|in_family| n10
+    n32 -->|has_severity| n15
+    n32 -->|grounded_in| n24
+    n32 -->|grounded_in| n19
+    n32 -->|grounded_in| n27
+    n33 -->|in_family| n14
+    n33 -->|has_severity| n15
+    n33 -->|grounded_in| n19
+    n33 -->|grounded_in| n21
+    n33 -->|grounded_in| n26
+    n34 -->|in_family| n14
+    n34 -->|has_severity| n17
+    n34 -->|grounded_in| n19
+    n34 -->|grounded_in| n24
+    n35 -->|in_family| n10
+    n35 -->|has_severity| n15
+    n35 -->|grounded_in| n18
+    n35 -->|grounded_in| n24
+    n36 -->|in_family| n13
+    n37 -->|in_family| n13
+    n38 -->|in_family| n11
+    n38 -->|has_severity| n15
+    n38 -->|grounded_in| n20
+    n38 -->|grounded_in| n24
+    n39 -->|in_family| n11
+    n39 -->|has_severity| n15
+    n39 -->|grounded_in| n25
+    n40 -->|in_family| n11
+    n40 -->|has_severity| n15
+    n40 -->|grounded_in| n21
+    n40 -->|grounded_in| n24
+    n40 -->|grounded_in| n18
+    n40 -->|grounded_in| n26
+    n41 -->|in_family| n11
+    n41 -->|has_severity| n15
+    n41 -->|grounded_in| n22
+    n42 -->|in_family| n11
+    n42 -->|has_severity| n15
+    n42 -->|grounded_in| n21
+    n42 -->|grounded_in| n19
+    n42 -->|grounded_in| n28
+    n43 -->|in_family| n11
+    n43 -->|has_severity| n15
+    n43 -->|grounded_in| n21
+    n43 -->|grounded_in| n18
+    n43 -->|grounded_in| n23
+    n44 -->|in_family| n11
+    n44 -->|has_severity| n15
+    n44 -->|grounded_in| n23
+    n44 -->|grounded_in| n21
+    n5 -->|assesses| n45
+    n5 -->|assesses| n46
+    n5 -->|assesses| n47
+    n5 -->|assesses| n48
+    n5 -->|assesses| n49
+    n6 -->|assesses| n50
+    n6 -->|assesses| n51
+    n6 -->|assesses| n52
+    n6 -->|assesses| n53
+    n6 -->|assesses| n54
+    n6 -->|assesses| n55
+    n6 -->|assesses| n56
+    n6 -->|assesses| n57
+    n6 -->|assesses| n58
+    n6 -->|assesses| n59
+    n6 -->|assesses| n60
+    n6 -->|assesses| n61
+    n7 -->|assesses| n29
+    n7 -->|assesses| n30
+    n7 -->|assesses| n31
+    n7 -->|assesses| n32
+    n7 -->|assesses| n36
+    n8 -->|assesses| n33
+    n8 -->|assesses| n34
+    n8 -->|assesses| n36
+    classDef fact stroke-width:1px
+    classDef family stroke-width:1px
+    classDef instrument stroke-width:1px
+    classDef outcome stroke-width:1px
+    classDef reasoning stroke-width:1px
+    classDef severity stroke-width:1px
+    classDef st1_label stroke-width:1px
+    classDef st2_label stroke-width:1px
+    classDef st3_flag stroke-width:1px
+    classDef start stroke-width:1px
+    classDef switch stroke-width:1px

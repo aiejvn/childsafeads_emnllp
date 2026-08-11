@@ -11,7 +11,10 @@ def to_device(batch: dict, device: str) -> dict:
 
 
 def compute_pos_weight(instances: list, labels_key: str, label_list: list) -> torch.Tensor:
-    """Inverse-frequency BCE pos_weight per label, from training-set label counts."""
+    """
+        Inverse-frequency BCE pos_weight per label, from training-set label counts.
+        Classes that appear less frequently receive more weight during loss calculation.
+    """
     pos = torch.zeros(len(label_list))
     for inst in instances:
         for flag in inst["labels"][labels_key]:

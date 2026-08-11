@@ -1,0 +1,25 @@
+flowchart LR
+    n0["Start"]:::start
+    n1["Segment Text"]:::fact
+    n2["Assessability"]:::reasoning
+    n3["Assessability Check"]:::switch
+    n4["Insufficient Context"]:::outcome
+    n5["Commercial Type"]:::reasoning
+    n6["Product Categories"]:::reasoning
+    n7["Disclosure and Claims"]:::reasoning
+    n8["Product Risk"]:::reasoning
+    n9["Classification Report"]:::outcome
+    n0 -->|next| n1
+    n1 -->|next| n2
+    n2 -->|next| n3
+    n3 -->|branch:insufficient_context| n4
+    n3 -->|branch:default| n5
+    n5 -->|next| n6
+    n6 -->|next| n7
+    n7 -->|next| n8
+    n8 -->|next| n9
+    classDef fact stroke-width:1px
+    classDef outcome stroke-width:1px
+    classDef reasoning stroke-width:1px
+    classDef start stroke-width:1px
+    classDef switch stroke-width:1px

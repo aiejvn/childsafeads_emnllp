@@ -110,6 +110,31 @@ class KnowledgeGraph:
         with open(path, "w", encoding="utf-8") as f:
             json.dump(self.to_json(), f, indent=2)
 
+    def to_mermaid(self, direction: str = "LR") -> str:
+        """Renders the same nodes/edges as a Mermaid flowchart instead of JSON, for
+        visual inspection (e.g. in an Artifact, which renders ```mermaid fences
+        natively) rather than training consumption -- greaselm_model.py still reads
+        to_json()/save(), this is a parallel view onto the same graph.
+        Node ids are remapped to n0, n1, ... since ids like "st3_flag:no_flag" contain
+        characters Mermaid's node-id grammar doesn't accept; the original id/label is
+        kept as the node's display text.
+        """
+        safe_id = {n.id: f"n{i}" for i, n in enumerate(self.nodes)}
+        lines = [f"flowchart {direction}"]
+        for n in self.nodes:
+            label = n.label.replace('"', "'")
+            lines.append(f'    {safe_id[n.id]}["{label}"]:::{n.type}')
+        for e in self.edges:
+            relation = e.relation.replace('"', "'")
+            lines.append(f"    {safe_id[e.source]} -->|{relation}| {safe_id[e.target]}")
+        for t in self.node_types():
+            lines.append(f"    classDef {t} stroke-width:1px")
+        return "\n".join(lines)
+
+    def save_mermaid(self, path: str, direction: str = "LR") -> None:
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(self.to_mermaid(direction))
+
     @staticmethod
     def load(path: str) -> "KnowledgeGraph":
         with open(path, encoding="utf-8") as f:

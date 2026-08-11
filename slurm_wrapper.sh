@@ -55,7 +55,8 @@ echo "---"
 
 cd "$SLURM_SUBMIT_DIR"
 
-# --- Setup workspace  ---source .venv/bin/activate
+# --- Setup workspace  ---
+source .venv/bin/activate
 
 echo "Python: \$(which python)  Torch: \$(python -c 'import torch; print(torch.__version__)')"
 echo "---"
