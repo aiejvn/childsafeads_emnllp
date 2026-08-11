@@ -59,6 +59,12 @@ def main():
     ap.add_argument("--batch-size", type=int, default=16)
     ap.add_argument("--grad-accum-steps", type=int, default=1)
     ap.add_argument("--lr", type=float, default=2e-4)
+    ap.add_argument(
+        "--head-lr", type=float, default=None,
+        help="separate LR for the randomly-initialized st1/st2/st3 heads (modules_to_save), which start from "
+        "scratch unlike the LoRA adapters that nudge an already-pretrained encoder; defaults to --lr (i.e. "
+        "one param group, previous behavior) when omitted",
+    )
     ap.add_argument("--warmup-ratio", type=float, default=0.06)
     ap.add_argument("--lora-r", type=int, default=256)
     ap.add_argument("--lora-alpha", type=int, default=16)
@@ -131,7 +137,22 @@ def main():
     st3_pos_weight = compute_pos_weight(train_instances, "st3", ST3_LABELS).to(device) if args.pos_weight else None
 
     trainable = [p for p in model.parameters() if p.requires_grad]
-    optimizer = torch.optim.AdamW(trainable, lr=args.lr)
+    head_lr = args.head_lr if args.head_lr is not None else args.lr
+    if head_lr == args.lr:
+        optimizer = torch.optim.AdamW(trainable, lr=args.lr)
+    else:
+        # st1_head/st2_head/st3_head (PEFT's modules_to_save) start from random init, unlike the LoRA
+        # adapters which nudge an already-pretrained encoder -- named-parameter split lets them use a
+        # different (usually higher) LR. "head" only appears in these three modules' qualified names
+        # (verified against a built model: encoder LoRA params are named *.lora_A/lora_B.default.weight,
+        # heads are *.st{1,2,3}_head.modules_to_save.default.{weight,bias}), never in encoder LoRA names.
+        head_params = [p for n, p in model.named_parameters() if p.requires_grad and "head" in n]
+        lora_params = [p for n, p in model.named_parameters() if p.requires_grad and "head" not in n]
+        optimizer = torch.optim.AdamW([
+            {"params": lora_params, "lr": args.lr},
+            {"params": head_params, "lr": head_lr},
+        ])
+        log.info(f"using separate LRs: lora={args.lr} head={head_lr} ({len(lora_params)} lora tensors, {len(head_params)} head tensors)")
     steps_per_epoch = -(-len(train_loader) // args.grad_accum_steps)  # ceil div
     total_steps = steps_per_epoch * args.epochs
     scheduler = get_linear_schedule_with_warmup(
