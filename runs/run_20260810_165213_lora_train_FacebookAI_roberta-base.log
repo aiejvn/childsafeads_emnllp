@@ -1,0 +1,33 @@
+2026-08-10 16:52:13,265 | INFO | MainThread | logging to runs/run_20260810_165213_lora_train_FacebookAI_roberta-base.log
+2026-08-10 16:52:13,265 | INFO | MainThread | config: {'train': 'public_data_dev/train.jsonl', 'dev': 'public_data_dev/dev.jsonl', 'model': 'FacebookAI/roberta-base', 'local': False, 'context': 'full', 'df_path': None, 'max_length': 512, 'epochs': 10, 'batch_size': 16, 'grad_accum_steps': 1, 'lr': 0.0002, 'warmup_ratio': 0.06, 'lora_r': 64, 'lora_alpha': 16, 'lora_dropout': 0.1, 'target_modules': 'query,key,value,dense', 'st2_loss_weight': 1.0, 'st3_loss_weight': 2.0, 'pos_weight': True, 'threshold': 0.5, 'sample_size': None, 'seed': 42, 'device': None, 'output_dir': 'runs/lora_exp05_st3w2', 'no_wandb': True} device=cuda
+2026-08-10 16:52:13,364 | INFO | MainThread | train=2353 dev=504
+2026-08-10 16:57:32,270 | INFO | MainThread | epoch 1: mean train loss = 4.2916
+2026-08-10 16:58:24,378 | INFO | MainThread | epoch 1 dev metrics (tuned thresholds): st1_macro_f1=0.392, st2_macro_f1=0.437, st3_macro_f1=0.308, st3_family_macro_f1=0.351, mean_macro_f1=0.379
+2026-08-10 16:58:24,477 | INFO | MainThread | epoch 1: new best mean_macro_f1=0.379, saved to runs/lora_exp05_st3w2/best
+2026-08-10 17:03:47,935 | INFO | MainThread | epoch 2: mean train loss = 2.9695
+2026-08-10 17:04:42,167 | INFO | MainThread | epoch 2 dev metrics (tuned thresholds): st1_macro_f1=0.600, st2_macro_f1=0.628, st3_macro_f1=0.483, st3_family_macro_f1=0.574, mean_macro_f1=0.570
+2026-08-10 17:04:42,264 | INFO | MainThread | epoch 2: new best mean_macro_f1=0.570, saved to runs/lora_exp05_st3w2/best
+2026-08-10 17:10:10,419 | INFO | MainThread | epoch 3: mean train loss = 2.3985
+2026-08-10 17:11:04,607 | INFO | MainThread | epoch 3 dev metrics (tuned thresholds): st1_macro_f1=0.616, st2_macro_f1=0.638, st3_macro_f1=0.471, st3_family_macro_f1=0.564, mean_macro_f1=0.575
+2026-08-10 17:11:04,705 | INFO | MainThread | epoch 3: new best mean_macro_f1=0.575, saved to runs/lora_exp05_st3w2/best
+2026-08-10 17:16:33,132 | INFO | MainThread | epoch 4: mean train loss = 2.1128
+2026-08-10 17:17:27,035 | INFO | MainThread | epoch 4 dev metrics (tuned thresholds): st1_macro_f1=0.627, st2_macro_f1=0.636, st3_macro_f1=0.509, st3_family_macro_f1=0.576, mean_macro_f1=0.591
+2026-08-10 17:17:27,137 | INFO | MainThread | epoch 4: new best mean_macro_f1=0.591, saved to runs/lora_exp05_st3w2/best
+2026-08-10 17:23:18,617 | INFO | MainThread | epoch 5: mean train loss = 1.8876
+2026-08-10 17:24:15,538 | INFO | MainThread | epoch 5 dev metrics (tuned thresholds): st1_macro_f1=0.647, st2_macro_f1=0.662, st3_macro_f1=0.494, st3_family_macro_f1=0.577, mean_macro_f1=0.601
+2026-08-10 17:24:15,645 | INFO | MainThread | epoch 5: new best mean_macro_f1=0.601, saved to runs/lora_exp05_st3w2/best
+2026-08-10 17:30:07,720 | INFO | MainThread | epoch 6: mean train loss = 1.7645
+2026-08-10 17:31:04,542 | INFO | MainThread | epoch 6 dev metrics (tuned thresholds): st1_macro_f1=0.619, st2_macro_f1=0.655, st3_macro_f1=0.535, st3_family_macro_f1=0.569, mean_macro_f1=0.603
+2026-08-10 17:31:04,618 | INFO | MainThread | epoch 6: new best mean_macro_f1=0.603, saved to runs/lora_exp05_st3w2/best
+2026-08-10 17:37:31,494 | INFO | MainThread | epoch 7: mean train loss = 1.6042
+2026-08-10 17:38:39,225 | INFO | MainThread | epoch 7 dev metrics (tuned thresholds): st1_macro_f1=0.617, st2_macro_f1=0.663, st3_macro_f1=0.580, st3_family_macro_f1=0.618, mean_macro_f1=0.620
+2026-08-10 17:38:39,384 | INFO | MainThread | epoch 7: new best mean_macro_f1=0.620, saved to runs/lora_exp05_st3w2/best
+2026-08-10 17:45:24,004 | INFO | MainThread | epoch 8: mean train loss = 1.5320
+2026-08-10 17:46:31,391 | INFO | MainThread | epoch 8 dev metrics (tuned thresholds): st1_macro_f1=0.655, st2_macro_f1=0.660, st3_macro_f1=0.564, st3_family_macro_f1=0.612, mean_macro_f1=0.626
+2026-08-10 17:46:31,551 | INFO | MainThread | epoch 8: new best mean_macro_f1=0.626, saved to runs/lora_exp05_st3w2/best
+2026-08-10 17:53:32,452 | INFO | MainThread | epoch 9: mean train loss = 1.4291
+2026-08-10 17:54:39,476 | INFO | MainThread | epoch 9 dev metrics (tuned thresholds): st1_macro_f1=0.614, st2_macro_f1=0.650, st3_macro_f1=0.575, st3_family_macro_f1=0.633, mean_macro_f1=0.613
+2026-08-10 18:01:33,647 | INFO | MainThread | epoch 10: mean train loss = 1.4021
+2026-08-10 18:02:49,923 | INFO | MainThread | epoch 10 dev metrics (tuned thresholds): st1_macro_f1=0.644, st2_macro_f1=0.648, st3_macro_f1=0.602, st3_family_macro_f1=0.654, mean_macro_f1=0.631
+2026-08-10 18:02:49,998 | INFO | MainThread | epoch 10: new best mean_macro_f1=0.631, saved to runs/lora_exp05_st3w2/best
+2026-08-10 18:02:50,086 | INFO | MainThread | saved final epoch adapter to runs/lora_exp05_st3w2/last (best dev mean_macro_f1=0.631)

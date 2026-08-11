@@ -1,0 +1,4 @@
+2026-08-10 14:37:17,152 | INFO | MainThread | logging to runs/run_20260810_143717_lora_train_generative_Qwen_Qwen3-4B-Thinking-2507-FP8.log
+2026-08-10 14:37:17,152 | INFO | MainThread | config: {'train': 'public_data_dev/train.jsonl', 'dev': 'public_data_dev/dev.jsonl', 'model': 'Qwen/Qwen3-4B-Thinking-2507-FP8', 'context': 'full', 'max_length': 4096, 'epochs': 2, 'batch_size': 2, 'grad_accum_steps': 4, 'lr': 0.0002, 'warmup_ratio': 0.06, 'lora_r': 8, 'lora_alpha': 16, 'lora_dropout': 0.1, 'target_modules': 'q_proj,v_proj', 'load_in_4bit': False, 'parallelism': 'none', 'max_new_tokens': 128, 'sample_size': None, 'seed': 42, 'device': None, 'output_dir': 'runs/lora_smoke_qwen'} device=cuda
+2026-08-10 14:37:17,303 | INFO | MainThread | train=2353 dev=504
+2026-08-10 14:37:17,304 | INFO | MainThread | loading model/tokenizer from local path models/Qwen/Qwen3-4B-Thinking-2507-FP8 (no remote download)
