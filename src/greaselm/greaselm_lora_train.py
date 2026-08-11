@@ -39,7 +39,7 @@ from greaselm import (  # noqa: E402
     evaluate, full_context, load_split, setup_logging,
 )
 from greaselm.greaselm_lora_model import (  # noqa: E402
-    GreaseLMLoRAClassifier, count_trainable_parameters, unfreeze_non_lora,
+    GreaseLMLoRAClassifier, count_trainable_parameters, unfreeze_non_lora, unfreeze_trailing_lm_layers,
 )
 
 ST1_INDEX = {label: i for i, label in enumerate(ST1_LABELS)}
@@ -134,6 +134,10 @@ def main():
     ap.add_argument("--p-fc", type=float, default=0.2)
     ap.add_argument("--ie-dim", type=int, default=200)
     ap.add_argument("--no-info-exchange", action="store_true", help="disable MInt fusion between LM and GNN (ablation)")
+    ap.add_argument("--num-unfrozen-lm-layers", type=int, default=0, help="fully fine-tune the trailing N transformer "
+                     "blocks of the wrapped LM (all their weights, not just LoRA A/B), on top of LoRA adapting every "
+                     "block. Technique borrowed from src/last_layer/last_layer_model.py's build_frozen_model, layered "
+                     "on top of LoRA rather than used instead of it. 0 (default) = LoRA-only, matching every prior run")
     ap.add_argument("--epochs", type=int, default=10)
     ap.add_argument("--batch-size", type=int, default=8)
     ap.add_argument("--grad-accum-steps", type=int, default=1)
@@ -202,6 +206,7 @@ def main():
     )
     model = get_peft_model(base, lora_config)
     unfreeze_non_lora(model)
+    unfreeze_trailing_lm_layers(base, args.num_unfrozen_lm_layers)
     model = model.to(device)
     trainable_n, total_n = count_trainable_parameters(model)
     log.info(f"model built in {time.time() - t0:.1f}s; trainable params: {trainable_n}/{total_n} ({trainable_n / total_n:.2%})")

@@ -266,6 +266,32 @@ def unfreeze_non_lora(peft_model) -> None:
         p.requires_grad = True
 
 
+def unfreeze_trailing_lm_layers(base_model: "GreaseLMLoRAClassifier", num_unfrozen_layers: int) -> None:
+    """Optional extra unfreeze pass, call AFTER get_peft_model()+unfreeze_non_lora(): fully
+    fine-tunes the trailing `num_unfrozen_layers` transformer blocks of the wrapped LM (all
+    their weights, not just LoRA A/B), on top of LoRA adapting every block. Borrows the
+    technique from src/last_layer/last_layer_model.py's build_frozen_model (freeze
+    everything, re-unfreeze the last N blocks) but layers it on top of LoRA rather than
+    instead of it -- unlike that script, this doesn't freeze the earlier blocks completely,
+    since they're still LoRA-adapted.
+
+    `base_model` must be the original (pre get_peft_model) GreaseLMLoRAClassifier -- its
+    `.mp.lm.encoder.layer` ModuleList is the SAME object PEFT's wrapped model holds (PEFT
+    swaps target-module Linears in place, it doesn't replace the containing ModuleList), so
+    setting requires_grad=True on that list's trailing layers' parameters here is visible
+    through the wrapped model too. This affects every parameter in those blocks: LoRA A/B
+    (already trainable), the LoRA-wrapped Linears' `base_layer.weight` (previously frozen,
+    now trainable), and any non-LoRA-targeted sublayers in those blocks (LayerNorm,
+    intermediate/output dense not covered by --target-modules, etc.)."""
+    layers = base_model.mp.lm.encoder.layer
+    if num_unfrozen_layers <= 0:
+        return
+    trailing = layers[-num_unfrozen_layers:] if num_unfrozen_layers <= len(layers) else layers[:]
+    for layer in trailing:
+        for p in layer.parameters():
+            p.requires_grad = True
+
+
 def count_trainable_parameters(model) -> tuple:
     trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
     total = sum(p.numel() for p in model.parameters())
