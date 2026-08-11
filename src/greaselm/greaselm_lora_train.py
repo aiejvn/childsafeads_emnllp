@@ -146,6 +146,12 @@ def main():
     ap.add_argument("--st2-loss-weight", type=float, default=1.0)
     ap.add_argument("--st3-loss-weight", type=float, default=2.0)
     ap.add_argument("--pos-weight", action="store_true", help="reweight st2/st3 BCE by inverse train-set frequency")
+    ap.add_argument("--clip-norm", type=float, default=1.0, help="global grad-clip norm across ALL trainable params "
+                     "(LoRA + GNN + trunk + heads together). Was hardcoded at 1.0; exposed as a flag after k=1 and "
+                     "wider-GNN (concept_dim/n_attention_head/fc_dim) runs both collapsed to a near-constant output "
+                     "with this hardcoded at 1.0 -- suspected the shared clip was starving effective gradient budget "
+                     "once the mix of trainable-param gradient magnitudes shifted away from the k=2/default-width "
+                     "combo that happened to train stably")
     ap.add_argument("--threshold", type=float, default=0.5)
     ap.add_argument("--sample-size", type=int, default=None, help="sample N train and N dev instances (seeded smoke test)")
     ap.add_argument("--seed", type=int, default=42)
@@ -235,7 +241,7 @@ def main():
             loss.backward()
             running_loss += out["loss"].item()
             if (step + 1) % args.grad_accum_steps == 0 or step + 1 == len(train_loader):
-                torch.nn.utils.clip_grad_norm_(trainable, 1.0)
+                torch.nn.utils.clip_grad_norm_(trainable, args.clip_norm)
                 optimizer.step()
                 scheduler.step()
                 optimizer.zero_grad()
