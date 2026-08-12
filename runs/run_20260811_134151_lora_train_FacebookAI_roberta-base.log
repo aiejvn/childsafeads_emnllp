@@ -1,0 +1,415 @@
+2026-08-11 13:41:51,964 | INFO | MainThread | logging to runs/run_20260811_134151_lora_train_FacebookAI_roberta-base.log
+2026-08-11 13:41:51,964 | INFO | MainThread | config: {'train': 'public_data_dev/train.jsonl', 'dev': 'public_data_dev/dev.jsonl', 'model': 'FacebookAI/roberta-base', 'local': False, 'context': 'full', 'df_path': None, 'lean_prompt': False, 'max_length': 512, 'epochs': 200, 'batch_size': 16, 'grad_accum_steps': 1, 'lr': 0.0002, 'head_lr': None, 'warmup_ratio': 0.06, 'lora_r': 64, 'lora_alpha': 128, 'lora_dropout': 0.1, 'target_modules': 'query,key,value,dense', 'st2_loss_weight': 1.0, 'st3_loss_weight': 2.0, 'pos_weight': True, 'threshold': 0.5, 'sample_size': None, 'seed': 42, 'device': None, 'output_dir': 'runs/lora_roberta_good', 'no_wandb': True} device=cuda
+2026-08-11 13:41:52,104 | INFO | MainThread | train=2353 dev=504
+2026-08-11 13:43:01,708 | INFO | MainThread | epoch 1: mean train loss = 4.5345
+2026-08-11 13:43:08,409 | INFO | MainThread | epoch 1 dev metrics (tuned thresholds): st1_macro_f1=0.346, st2_macro_f1=0.198, st3_macro_f1=0.165, st3_family_macro_f1=0.257, mean_macro_f1=0.237
+2026-08-11 13:43:08,487 | INFO | MainThread | epoch 1: new best mean_macro_f1=0.237, saved to runs/lora_roberta_good/best
+2026-08-11 13:44:53,068 | INFO | MainThread | epoch 2: mean train loss = 3.8190
+2026-08-11 13:45:04,286 | INFO | MainThread | epoch 2 dev metrics (tuned thresholds): st1_macro_f1=0.578, st2_macro_f1=0.445, st3_macro_f1=0.403, st3_family_macro_f1=0.424, mean_macro_f1=0.475
+2026-08-11 13:45:04,411 | INFO | MainThread | epoch 2: new best mean_macro_f1=0.475, saved to runs/lora_roberta_good/best
+2026-08-11 13:47:08,832 | INFO | MainThread | epoch 3: mean train loss = 2.9490
+2026-08-11 13:47:20,300 | INFO | MainThread | epoch 3 dev metrics (tuned thresholds): st1_macro_f1=0.583, st2_macro_f1=0.585, st3_macro_f1=0.430, st3_family_macro_f1=0.503, mean_macro_f1=0.532
+2026-08-11 13:47:20,434 | INFO | MainThread | epoch 3: new best mean_macro_f1=0.532, saved to runs/lora_roberta_good/best
+2026-08-11 13:49:24,034 | INFO | MainThread | epoch 4: mean train loss = 2.5366
+2026-08-11 13:49:35,539 | INFO | MainThread | epoch 4 dev metrics (tuned thresholds): st1_macro_f1=0.606, st2_macro_f1=0.617, st3_macro_f1=0.462, st3_family_macro_f1=0.543, mean_macro_f1=0.562
+2026-08-11 13:49:35,671 | INFO | MainThread | epoch 4: new best mean_macro_f1=0.562, saved to runs/lora_roberta_good/best
+2026-08-11 13:51:39,685 | INFO | MainThread | epoch 5: mean train loss = 2.2638
+2026-08-11 13:51:50,883 | INFO | MainThread | epoch 5 dev metrics (tuned thresholds): st1_macro_f1=0.606, st2_macro_f1=0.629, st3_macro_f1=0.474, st3_family_macro_f1=0.567, mean_macro_f1=0.570
+2026-08-11 13:51:51,016 | INFO | MainThread | epoch 5: new best mean_macro_f1=0.570, saved to runs/lora_roberta_good/best
+2026-08-11 13:53:55,644 | INFO | MainThread | epoch 6: mean train loss = 2.0034
+2026-08-11 13:54:07,212 | INFO | MainThread | epoch 6 dev metrics (tuned thresholds): st1_macro_f1=0.599, st2_macro_f1=0.647, st3_macro_f1=0.529, st3_family_macro_f1=0.607, mean_macro_f1=0.592
+2026-08-11 13:54:07,344 | INFO | MainThread | epoch 6: new best mean_macro_f1=0.592, saved to runs/lora_roberta_good/best
+2026-08-11 13:56:11,135 | INFO | MainThread | epoch 7: mean train loss = 1.7570
+2026-08-11 13:56:22,708 | INFO | MainThread | epoch 7 dev metrics (tuned thresholds): st1_macro_f1=0.618, st2_macro_f1=0.626, st3_macro_f1=0.568, st3_family_macro_f1=0.631, mean_macro_f1=0.604
+2026-08-11 13:56:22,839 | INFO | MainThread | epoch 7: new best mean_macro_f1=0.604, saved to runs/lora_roberta_good/best
+2026-08-11 13:57:55,126 | INFO | MainThread | epoch 8: mean train loss = 1.6670
+2026-08-11 13:58:06,685 | INFO | MainThread | epoch 8 dev metrics (tuned thresholds): st1_macro_f1=0.624, st2_macro_f1=0.656, st3_macro_f1=0.579, st3_family_macro_f1=0.659, mean_macro_f1=0.620
+2026-08-11 13:58:06,812 | INFO | MainThread | epoch 8: new best mean_macro_f1=0.620, saved to runs/lora_roberta_good/best
+2026-08-11 14:00:12,057 | INFO | MainThread | epoch 9: mean train loss = 1.4202
+2026-08-11 14:00:23,442 | INFO | MainThread | epoch 9 dev metrics (tuned thresholds): st1_macro_f1=0.593, st2_macro_f1=0.638, st3_macro_f1=0.531, st3_family_macro_f1=0.614, mean_macro_f1=0.588
+2026-08-11 14:02:28,088 | INFO | MainThread | epoch 10: mean train loss = 1.3414
+2026-08-11 14:02:39,854 | INFO | MainThread | epoch 10 dev metrics (tuned thresholds): st1_macro_f1=0.639, st2_macro_f1=0.645, st3_macro_f1=0.528, st3_family_macro_f1=0.605, mean_macro_f1=0.604
+2026-08-11 14:04:44,067 | INFO | MainThread | epoch 11: mean train loss = 1.1901
+2026-08-11 14:04:55,545 | INFO | MainThread | epoch 11 dev metrics (tuned thresholds): st1_macro_f1=0.591, st2_macro_f1=0.658, st3_macro_f1=0.523, st3_family_macro_f1=0.597, mean_macro_f1=0.591
+2026-08-11 14:07:00,758 | INFO | MainThread | epoch 12: mean train loss = 1.0816
+2026-08-11 14:07:12,047 | INFO | MainThread | epoch 12 dev metrics (tuned thresholds): st1_macro_f1=0.709, st2_macro_f1=0.637, st3_macro_f1=0.608, st3_family_macro_f1=0.660, mean_macro_f1=0.652
+2026-08-11 14:07:12,198 | INFO | MainThread | epoch 12: new best mean_macro_f1=0.652, saved to runs/lora_roberta_good/best
+2026-08-11 14:09:16,667 | INFO | MainThread | epoch 13: mean train loss = 0.9849
+2026-08-11 14:09:28,206 | INFO | MainThread | epoch 13 dev metrics (tuned thresholds): st1_macro_f1=0.713, st2_macro_f1=0.631, st3_macro_f1=0.510, st3_family_macro_f1=0.590, mean_macro_f1=0.618
+2026-08-11 14:11:26,319 | INFO | MainThread | epoch 14: mean train loss = 0.8419
+2026-08-11 14:11:33,074 | INFO | MainThread | epoch 14 dev metrics (tuned thresholds): st1_macro_f1=0.663, st2_macro_f1=0.651, st3_macro_f1=0.572, st3_family_macro_f1=0.613, mean_macro_f1=0.628
+2026-08-11 14:13:21,800 | INFO | MainThread | epoch 15: mean train loss = 0.7394
+2026-08-11 14:13:33,412 | INFO | MainThread | epoch 15 dev metrics (tuned thresholds): st1_macro_f1=0.684, st2_macro_f1=0.636, st3_macro_f1=0.574, st3_family_macro_f1=0.642, mean_macro_f1=0.631
+2026-08-11 14:15:38,549 | INFO | MainThread | epoch 16: mean train loss = 0.6088
+2026-08-11 14:15:49,920 | INFO | MainThread | epoch 16 dev metrics (tuned thresholds): st1_macro_f1=0.689, st2_macro_f1=0.661, st3_macro_f1=0.607, st3_family_macro_f1=0.636, mean_macro_f1=0.653
+2026-08-11 14:15:50,053 | INFO | MainThread | epoch 16: new best mean_macro_f1=0.653, saved to runs/lora_roberta_good/best
+2026-08-11 14:17:54,359 | INFO | MainThread | epoch 17: mean train loss = 0.5244
+2026-08-11 14:18:06,075 | INFO | MainThread | epoch 17 dev metrics (tuned thresholds): st1_macro_f1=0.577, st2_macro_f1=0.637, st3_macro_f1=0.585, st3_family_macro_f1=0.627, mean_macro_f1=0.600
+2026-08-11 14:20:10,225 | INFO | MainThread | epoch 18: mean train loss = 0.4894
+2026-08-11 14:20:21,897 | INFO | MainThread | epoch 18 dev metrics (tuned thresholds): st1_macro_f1=0.721, st2_macro_f1=0.638, st3_macro_f1=0.566, st3_family_macro_f1=0.648, mean_macro_f1=0.642
+2026-08-11 14:22:27,155 | INFO | MainThread | epoch 19: mean train loss = 0.4360
+2026-08-11 14:22:38,340 | INFO | MainThread | epoch 19 dev metrics (tuned thresholds): st1_macro_f1=0.700, st2_macro_f1=0.667, st3_macro_f1=0.543, st3_family_macro_f1=0.627, mean_macro_f1=0.637
+2026-08-11 14:24:43,188 | INFO | MainThread | epoch 20: mean train loss = 0.3725
+2026-08-11 14:24:54,848 | INFO | MainThread | epoch 20 dev metrics (tuned thresholds): st1_macro_f1=0.639, st2_macro_f1=0.646, st3_macro_f1=0.539, st3_family_macro_f1=0.631, mean_macro_f1=0.608
+2026-08-11 14:26:29,161 | INFO | MainThread | epoch 21: mean train loss = 0.3199
+2026-08-11 14:26:40,902 | INFO | MainThread | epoch 21 dev metrics (tuned thresholds): st1_macro_f1=0.707, st2_macro_f1=0.661, st3_macro_f1=0.602, st3_family_macro_f1=0.687, mean_macro_f1=0.657
+2026-08-11 14:26:41,042 | INFO | MainThread | epoch 21: new best mean_macro_f1=0.657, saved to runs/lora_roberta_good/best
+2026-08-11 14:28:45,116 | INFO | MainThread | epoch 22: mean train loss = 0.2977
+2026-08-11 14:28:56,725 | INFO | MainThread | epoch 22 dev metrics (tuned thresholds): st1_macro_f1=0.650, st2_macro_f1=0.657, st3_macro_f1=0.568, st3_family_macro_f1=0.646, mean_macro_f1=0.625
+2026-08-11 14:31:02,016 | INFO | MainThread | epoch 23: mean train loss = 0.3213
+2026-08-11 14:31:13,449 | INFO | MainThread | epoch 23 dev metrics (tuned thresholds): st1_macro_f1=0.687, st2_macro_f1=0.630, st3_macro_f1=0.577, st3_family_macro_f1=0.650, mean_macro_f1=0.631
+2026-08-11 14:33:17,909 | INFO | MainThread | epoch 24: mean train loss = 0.2373
+2026-08-11 14:33:29,579 | INFO | MainThread | epoch 24 dev metrics (tuned thresholds): st1_macro_f1=0.629, st2_macro_f1=0.655, st3_macro_f1=0.588, st3_family_macro_f1=0.646, mean_macro_f1=0.624
+2026-08-11 14:35:33,899 | INFO | MainThread | epoch 25: mean train loss = 0.2137
+2026-08-11 14:35:45,515 | INFO | MainThread | epoch 25 dev metrics (tuned thresholds): st1_macro_f1=0.635, st2_macro_f1=0.660, st3_macro_f1=0.596, st3_family_macro_f1=0.637, mean_macro_f1=0.630
+2026-08-11 14:37:50,712 | INFO | MainThread | epoch 26: mean train loss = 0.2113
+2026-08-11 14:38:01,614 | INFO | MainThread | epoch 26 dev metrics (tuned thresholds): st1_macro_f1=0.660, st2_macro_f1=0.651, st3_macro_f1=0.543, st3_family_macro_f1=0.628, mean_macro_f1=0.618
+2026-08-11 14:39:46,367 | INFO | MainThread | epoch 27: mean train loss = 0.1797
+2026-08-11 14:39:53,122 | INFO | MainThread | epoch 27 dev metrics (tuned thresholds): st1_macro_f1=0.644, st2_macro_f1=0.653, st3_macro_f1=0.615, st3_family_macro_f1=0.664, mean_macro_f1=0.637
+2026-08-11 14:41:52,964 | INFO | MainThread | epoch 28: mean train loss = 0.1605
+2026-08-11 14:42:04,408 | INFO | MainThread | epoch 28 dev metrics (tuned thresholds): st1_macro_f1=0.636, st2_macro_f1=0.661, st3_macro_f1=0.608, st3_family_macro_f1=0.674, mean_macro_f1=0.635
+2026-08-11 14:44:08,009 | INFO | MainThread | epoch 29: mean train loss = 0.1796
+2026-08-11 14:44:19,518 | INFO | MainThread | epoch 29 dev metrics (tuned thresholds): st1_macro_f1=0.660, st2_macro_f1=0.653, st3_macro_f1=0.547, st3_family_macro_f1=0.634, mean_macro_f1=0.620
+2026-08-11 14:46:23,871 | INFO | MainThread | epoch 30: mean train loss = 0.1593
+2026-08-11 14:46:35,338 | INFO | MainThread | epoch 30 dev metrics (tuned thresholds): st1_macro_f1=0.638, st2_macro_f1=0.643, st3_macro_f1=0.562, st3_family_macro_f1=0.635, mean_macro_f1=0.614
+2026-08-11 14:48:39,067 | INFO | MainThread | epoch 31: mean train loss = 0.1274
+2026-08-11 14:48:50,652 | INFO | MainThread | epoch 31 dev metrics (tuned thresholds): st1_macro_f1=0.623, st2_macro_f1=0.641, st3_macro_f1=0.584, st3_family_macro_f1=0.642, mean_macro_f1=0.616
+2026-08-11 14:50:54,075 | INFO | MainThread | epoch 32: mean train loss = 0.1196
+2026-08-11 14:51:05,663 | INFO | MainThread | epoch 32 dev metrics (tuned thresholds): st1_macro_f1=0.693, st2_macro_f1=0.650, st3_macro_f1=0.606, st3_family_macro_f1=0.679, mean_macro_f1=0.650
+2026-08-11 14:53:10,154 | INFO | MainThread | epoch 33: mean train loss = 0.1194
+2026-08-11 14:53:21,396 | INFO | MainThread | epoch 33 dev metrics (tuned thresholds): st1_macro_f1=0.606, st2_macro_f1=0.661, st3_macro_f1=0.599, st3_family_macro_f1=0.690, mean_macro_f1=0.622
+2026-08-11 14:54:30,616 | INFO | MainThread | epoch 34: mean train loss = 0.1066
+2026-08-11 14:54:37,354 | INFO | MainThread | epoch 34 dev metrics (tuned thresholds): st1_macro_f1=0.626, st2_macro_f1=0.653, st3_macro_f1=0.605, st3_family_macro_f1=0.690, mean_macro_f1=0.628
+2026-08-11 14:56:05,092 | INFO | MainThread | epoch 35: mean train loss = 0.1203
+2026-08-11 14:56:16,669 | INFO | MainThread | epoch 35 dev metrics (tuned thresholds): st1_macro_f1=0.645, st2_macro_f1=0.664, st3_macro_f1=0.526, st3_family_macro_f1=0.616, mean_macro_f1=0.612
+2026-08-11 14:58:20,256 | INFO | MainThread | epoch 36: mean train loss = 0.1158
+2026-08-11 14:58:31,904 | INFO | MainThread | epoch 36 dev metrics (tuned thresholds): st1_macro_f1=0.601, st2_macro_f1=0.661, st3_macro_f1=0.598, st3_family_macro_f1=0.667, mean_macro_f1=0.620
+2026-08-11 15:00:36,476 | INFO | MainThread | epoch 37: mean train loss = 0.0996
+2026-08-11 15:00:47,352 | INFO | MainThread | epoch 37 dev metrics (tuned thresholds): st1_macro_f1=0.610, st2_macro_f1=0.646, st3_macro_f1=0.528, st3_family_macro_f1=0.620, mean_macro_f1=0.595
+2026-08-11 15:02:51,893 | INFO | MainThread | epoch 38: mean train loss = 0.1139
+2026-08-11 15:03:03,393 | INFO | MainThread | epoch 38 dev metrics (tuned thresholds): st1_macro_f1=0.645, st2_macro_f1=0.654, st3_macro_f1=0.557, st3_family_macro_f1=0.627, mean_macro_f1=0.619
+2026-08-11 15:05:07,163 | INFO | MainThread | epoch 39: mean train loss = 0.1161
+2026-08-11 15:05:18,682 | INFO | MainThread | epoch 39 dev metrics (tuned thresholds): st1_macro_f1=0.575, st2_macro_f1=0.668, st3_macro_f1=0.551, st3_family_macro_f1=0.603, mean_macro_f1=0.598
+2026-08-11 15:07:23,020 | INFO | MainThread | epoch 40: mean train loss = 0.0995
+2026-08-11 15:07:33,938 | INFO | MainThread | epoch 40 dev metrics (tuned thresholds): st1_macro_f1=0.614, st2_macro_f1=0.658, st3_macro_f1=0.607, st3_family_macro_f1=0.663, mean_macro_f1=0.626
+2026-08-11 15:09:16,286 | INFO | MainThread | epoch 41: mean train loss = 0.0626
+2026-08-11 15:09:23,011 | INFO | MainThread | epoch 41 dev metrics (tuned thresholds): st1_macro_f1=0.616, st2_macro_f1=0.665, st3_macro_f1=0.604, st3_family_macro_f1=0.678, mean_macro_f1=0.629
+2026-08-11 15:11:03,448 | INFO | MainThread | epoch 42: mean train loss = 0.0547
+2026-08-11 15:11:14,421 | INFO | MainThread | epoch 42 dev metrics (tuned thresholds): st1_macro_f1=0.595, st2_macro_f1=0.664, st3_macro_f1=0.591, st3_family_macro_f1=0.673, mean_macro_f1=0.617
+2026-08-11 15:13:18,846 | INFO | MainThread | epoch 43: mean train loss = 0.0694
+2026-08-11 15:13:30,443 | INFO | MainThread | epoch 43 dev metrics (tuned thresholds): st1_macro_f1=0.689, st2_macro_f1=0.666, st3_macro_f1=0.568, st3_family_macro_f1=0.645, mean_macro_f1=0.641
+2026-08-11 15:15:33,951 | INFO | MainThread | epoch 44: mean train loss = 0.0595
+2026-08-11 15:15:45,562 | INFO | MainThread | epoch 44 dev metrics (tuned thresholds): st1_macro_f1=0.650, st2_macro_f1=0.680, st3_macro_f1=0.600, st3_family_macro_f1=0.668, mean_macro_f1=0.643
+2026-08-11 15:17:49,991 | INFO | MainThread | epoch 45: mean train loss = 0.0661
+2026-08-11 15:18:01,194 | INFO | MainThread | epoch 45 dev metrics (tuned thresholds): st1_macro_f1=0.606, st2_macro_f1=0.651, st3_macro_f1=0.532, st3_family_macro_f1=0.622, mean_macro_f1=0.596
+2026-08-11 15:20:05,305 | INFO | MainThread | epoch 46: mean train loss = 0.0425
+2026-08-11 15:20:16,932 | INFO | MainThread | epoch 46 dev metrics (tuned thresholds): st1_macro_f1=0.618, st2_macro_f1=0.673, st3_macro_f1=0.508, st3_family_macro_f1=0.651, mean_macro_f1=0.600
+2026-08-11 15:22:20,566 | INFO | MainThread | epoch 47: mean train loss = 0.0424
+2026-08-11 15:22:32,130 | INFO | MainThread | epoch 47 dev metrics (tuned thresholds): st1_macro_f1=0.584, st2_macro_f1=0.670, st3_macro_f1=0.565, st3_family_macro_f1=0.651, mean_macro_f1=0.606
+2026-08-11 15:24:06,381 | INFO | MainThread | epoch 48: mean train loss = 0.0442
+2026-08-11 15:24:13,195 | INFO | MainThread | epoch 48 dev metrics (tuned thresholds): st1_macro_f1=0.498, st2_macro_f1=0.663, st3_macro_f1=0.518, st3_family_macro_f1=0.642, mean_macro_f1=0.560
+2026-08-11 15:26:17,001 | INFO | MainThread | epoch 49: mean train loss = 0.0393
+2026-08-11 15:26:28,567 | INFO | MainThread | epoch 49 dev metrics (tuned thresholds): st1_macro_f1=0.593, st2_macro_f1=0.668, st3_macro_f1=0.567, st3_family_macro_f1=0.673, mean_macro_f1=0.609
+2026-08-11 15:28:31,957 | INFO | MainThread | epoch 50: mean train loss = 0.0434
+2026-08-11 15:28:43,482 | INFO | MainThread | epoch 50 dev metrics (tuned thresholds): st1_macro_f1=0.661, st2_macro_f1=0.653, st3_macro_f1=0.577, st3_family_macro_f1=0.692, mean_macro_f1=0.630
+2026-08-11 15:30:47,719 | INFO | MainThread | epoch 51: mean train loss = 0.0340
+2026-08-11 15:30:58,976 | INFO | MainThread | epoch 51 dev metrics (tuned thresholds): st1_macro_f1=0.610, st2_macro_f1=0.647, st3_macro_f1=0.566, st3_family_macro_f1=0.657, mean_macro_f1=0.607
+2026-08-11 15:33:02,796 | INFO | MainThread | epoch 52: mean train loss = 0.0348
+2026-08-11 15:33:14,363 | INFO | MainThread | epoch 52 dev metrics (tuned thresholds): st1_macro_f1=0.584, st2_macro_f1=0.674, st3_macro_f1=0.565, st3_family_macro_f1=0.651, mean_macro_f1=0.608
+2026-08-11 15:35:17,756 | INFO | MainThread | epoch 53: mean train loss = 0.0398
+2026-08-11 15:35:29,153 | INFO | MainThread | epoch 53 dev metrics (tuned thresholds): st1_macro_f1=0.595, st2_macro_f1=0.656, st3_macro_f1=0.599, st3_family_macro_f1=0.671, mean_macro_f1=0.617
+2026-08-11 15:37:33,506 | INFO | MainThread | epoch 54: mean train loss = 0.0421
+2026-08-11 15:37:44,870 | INFO | MainThread | epoch 54 dev metrics (tuned thresholds): st1_macro_f1=0.597, st2_macro_f1=0.650, st3_macro_f1=0.521, st3_family_macro_f1=0.639, mean_macro_f1=0.589
+2026-08-11 15:39:16,100 | INFO | MainThread | epoch 55: mean train loss = 0.0429
+2026-08-11 15:39:27,580 | INFO | MainThread | epoch 55 dev metrics (tuned thresholds): st1_macro_f1=0.613, st2_macro_f1=0.664, st3_macro_f1=0.567, st3_family_macro_f1=0.682, mean_macro_f1=0.615
+2026-08-11 15:41:30,998 | INFO | MainThread | epoch 56: mean train loss = 0.0401
+2026-08-11 15:41:42,538 | INFO | MainThread | epoch 56 dev metrics (tuned thresholds): st1_macro_f1=0.638, st2_macro_f1=0.651, st3_macro_f1=0.565, st3_family_macro_f1=0.671, mean_macro_f1=0.618
+2026-08-11 15:43:46,803 | INFO | MainThread | epoch 57: mean train loss = 0.0389
+2026-08-11 15:43:57,592 | INFO | MainThread | epoch 57 dev metrics (tuned thresholds): st1_macro_f1=0.596, st2_macro_f1=0.645, st3_macro_f1=0.574, st3_family_macro_f1=0.653, mean_macro_f1=0.605
+2026-08-11 15:46:01,993 | INFO | MainThread | epoch 58: mean train loss = 0.0559
+2026-08-11 15:46:13,481 | INFO | MainThread | epoch 58 dev metrics (tuned thresholds): st1_macro_f1=0.610, st2_macro_f1=0.640, st3_macro_f1=0.589, st3_family_macro_f1=0.641, mean_macro_f1=0.613
+2026-08-11 15:48:17,036 | INFO | MainThread | epoch 59: mean train loss = 0.0350
+2026-08-11 15:48:28,630 | INFO | MainThread | epoch 59 dev metrics (tuned thresholds): st1_macro_f1=0.597, st2_macro_f1=0.638, st3_macro_f1=0.557, st3_family_macro_f1=0.651, mean_macro_f1=0.598
+2026-08-11 15:50:33,091 | INFO | MainThread | epoch 60: mean train loss = 0.0222
+2026-08-11 15:50:44,029 | INFO | MainThread | epoch 60 dev metrics (tuned thresholds): st1_macro_f1=0.596, st2_macro_f1=0.601, st3_macro_f1=0.568, st3_family_macro_f1=0.644, mean_macro_f1=0.588
+2026-08-11 15:52:29,732 | INFO | MainThread | epoch 61: mean train loss = 0.0372
+2026-08-11 15:52:36,460 | INFO | MainThread | epoch 61 dev metrics (tuned thresholds): st1_macro_f1=0.594, st2_macro_f1=0.652, st3_macro_f1=0.542, st3_family_macro_f1=0.622, mean_macro_f1=0.596
+2026-08-11 15:54:29,129 | INFO | MainThread | epoch 62: mean train loss = 0.0277
+2026-08-11 15:54:40,633 | INFO | MainThread | epoch 62 dev metrics (tuned thresholds): st1_macro_f1=0.675, st2_macro_f1=0.638, st3_macro_f1=0.547, st3_family_macro_f1=0.631, mean_macro_f1=0.620
+2026-08-11 15:56:45,007 | INFO | MainThread | epoch 63: mean train loss = 0.0321
+2026-08-11 15:56:55,910 | INFO | MainThread | epoch 63 dev metrics (tuned thresholds): st1_macro_f1=0.649, st2_macro_f1=0.661, st3_macro_f1=0.571, st3_family_macro_f1=0.673, mean_macro_f1=0.627
+2026-08-11 15:59:00,259 | INFO | MainThread | epoch 64: mean train loss = 0.0397
+2026-08-11 15:59:11,856 | INFO | MainThread | epoch 64 dev metrics (tuned thresholds): st1_macro_f1=0.660, st2_macro_f1=0.645, st3_macro_f1=0.524, st3_family_macro_f1=0.633, mean_macro_f1=0.609
+2026-08-11 16:01:15,115 | INFO | MainThread | epoch 65: mean train loss = 0.0407
+2026-08-11 16:01:26,575 | INFO | MainThread | epoch 65 dev metrics (tuned thresholds): st1_macro_f1=0.656, st2_macro_f1=0.653, st3_macro_f1=0.542, st3_family_macro_f1=0.661, mean_macro_f1=0.617
+2026-08-11 16:03:30,770 | INFO | MainThread | epoch 66: mean train loss = 0.0213
+2026-08-11 16:03:42,017 | INFO | MainThread | epoch 66 dev metrics (tuned thresholds): st1_macro_f1=0.606, st2_macro_f1=0.633, st3_macro_f1=0.575, st3_family_macro_f1=0.649, mean_macro_f1=0.605
+2026-08-11 16:05:46,098 | INFO | MainThread | epoch 67: mean train loss = 0.0270
+2026-08-11 16:05:57,662 | INFO | MainThread | epoch 67 dev metrics (tuned thresholds): st1_macro_f1=0.646, st2_macro_f1=0.646, st3_macro_f1=0.625, st3_family_macro_f1=0.694, mean_macro_f1=0.639
+2026-08-11 16:07:27,065 | INFO | MainThread | epoch 68: mean train loss = 0.0234
+2026-08-11 16:07:38,188 | INFO | MainThread | epoch 68 dev metrics (tuned thresholds): st1_macro_f1=0.634, st2_macro_f1=0.657, st3_macro_f1=0.596, st3_family_macro_f1=0.645, mean_macro_f1=0.629
+2026-08-11 16:09:35,592 | INFO | MainThread | epoch 69: mean train loss = 0.0453
+2026-08-11 16:09:46,686 | INFO | MainThread | epoch 69 dev metrics (tuned thresholds): st1_macro_f1=0.651, st2_macro_f1=0.633, st3_macro_f1=0.532, st3_family_macro_f1=0.655, mean_macro_f1=0.605
+2026-08-11 16:11:44,119 | INFO | MainThread | epoch 70: mean train loss = 0.0279
+2026-08-11 16:11:54,540 | INFO | MainThread | epoch 70 dev metrics (tuned thresholds): st1_macro_f1=0.620, st2_macro_f1=0.647, st3_macro_f1=0.585, st3_family_macro_f1=0.664, mean_macro_f1=0.617
+2026-08-11 16:13:52,085 | INFO | MainThread | epoch 71: mean train loss = 0.0396
+2026-08-11 16:14:03,157 | INFO | MainThread | epoch 71 dev metrics (tuned thresholds): st1_macro_f1=0.612, st2_macro_f1=0.641, st3_macro_f1=0.594, st3_family_macro_f1=0.661, mean_macro_f1=0.615
+2026-08-11 16:16:00,395 | INFO | MainThread | epoch 72: mean train loss = 0.0397
+2026-08-11 16:16:11,495 | INFO | MainThread | epoch 72 dev metrics (tuned thresholds): st1_macro_f1=0.681, st2_macro_f1=0.651, st3_macro_f1=0.577, st3_family_macro_f1=0.645, mean_macro_f1=0.636
+2026-08-11 16:18:07,711 | INFO | MainThread | epoch 73: mean train loss = 0.0290
+2026-08-11 16:18:18,858 | INFO | MainThread | epoch 73 dev metrics (tuned thresholds): st1_macro_f1=0.652, st2_macro_f1=0.636, st3_macro_f1=0.517, st3_family_macro_f1=0.647, mean_macro_f1=0.602
+2026-08-11 16:20:16,261 | INFO | MainThread | epoch 74: mean train loss = 0.0231
+2026-08-11 16:20:27,419 | INFO | MainThread | epoch 74 dev metrics (tuned thresholds): st1_macro_f1=0.644, st2_macro_f1=0.657, st3_macro_f1=0.585, st3_family_macro_f1=0.674, mean_macro_f1=0.629
+2026-08-11 16:22:24,998 | INFO | MainThread | epoch 75: mean train loss = 0.0190
+2026-08-11 16:22:36,166 | INFO | MainThread | epoch 75 dev metrics (tuned thresholds): st1_macro_f1=0.683, st2_macro_f1=0.649, st3_macro_f1=0.563, st3_family_macro_f1=0.636, mean_macro_f1=0.632
+2026-08-11 16:23:49,684 | INFO | MainThread | epoch 76: mean train loss = 0.0202
+2026-08-11 16:23:56,411 | INFO | MainThread | epoch 76 dev metrics (tuned thresholds): st1_macro_f1=0.594, st2_macro_f1=0.631, st3_macro_f1=0.553, st3_family_macro_f1=0.661, mean_macro_f1=0.593
+2026-08-11 16:25:04,942 | INFO | MainThread | epoch 77: mean train loss = 0.0191
+2026-08-11 16:25:11,703 | INFO | MainThread | epoch 77 dev metrics (tuned thresholds): st1_macro_f1=0.657, st2_macro_f1=0.633, st3_macro_f1=0.562, st3_family_macro_f1=0.662, mean_macro_f1=0.617
+2026-08-11 16:27:10,186 | INFO | MainThread | epoch 78: mean train loss = 0.0308
+2026-08-11 16:27:22,072 | INFO | MainThread | epoch 78 dev metrics (tuned thresholds): st1_macro_f1=0.677, st2_macro_f1=0.635, st3_macro_f1=0.534, st3_family_macro_f1=0.647, mean_macro_f1=0.615
+2026-08-11 16:29:26,584 | INFO | MainThread | epoch 79: mean train loss = 0.0440
+2026-08-11 16:29:37,201 | INFO | MainThread | epoch 79 dev metrics (tuned thresholds): st1_macro_f1=0.675, st2_macro_f1=0.645, st3_macro_f1=0.638, st3_family_macro_f1=0.690, mean_macro_f1=0.652
+2026-08-11 16:31:41,690 | INFO | MainThread | epoch 80: mean train loss = 0.0274
+2026-08-11 16:31:53,535 | INFO | MainThread | epoch 80 dev metrics (tuned thresholds): st1_macro_f1=0.680, st2_macro_f1=0.661, st3_macro_f1=0.537, st3_family_macro_f1=0.673, mean_macro_f1=0.626
+2026-08-11 16:33:57,047 | INFO | MainThread | epoch 81: mean train loss = 0.0474
+2026-08-11 16:34:08,889 | INFO | MainThread | epoch 81 dev metrics (tuned thresholds): st1_macro_f1=0.652, st2_macro_f1=0.659, st3_macro_f1=0.590, st3_family_macro_f1=0.682, mean_macro_f1=0.634
+2026-08-11 16:36:13,359 | INFO | MainThread | epoch 82: mean train loss = 0.0196
+2026-08-11 16:36:25,180 | INFO | MainThread | epoch 82 dev metrics (tuned thresholds): st1_macro_f1=0.687, st2_macro_f1=0.641, st3_macro_f1=0.595, st3_family_macro_f1=0.674, mean_macro_f1=0.641
+2026-08-11 16:38:28,733 | INFO | MainThread | epoch 83: mean train loss = 0.0162
+2026-08-11 16:38:40,587 | INFO | MainThread | epoch 83 dev metrics (tuned thresholds): st1_macro_f1=0.655, st2_macro_f1=0.648, st3_macro_f1=0.563, st3_family_macro_f1=0.657, mean_macro_f1=0.622
+2026-08-11 16:40:14,175 | INFO | MainThread | epoch 84: mean train loss = 0.0163
+2026-08-11 16:40:25,749 | INFO | MainThread | epoch 84 dev metrics (tuned thresholds): st1_macro_f1=0.639, st2_macro_f1=0.675, st3_macro_f1=0.539, st3_family_macro_f1=0.663, mean_macro_f1=0.618
+2026-08-11 16:42:30,105 | INFO | MainThread | epoch 85: mean train loss = 0.0589
+2026-08-11 16:42:41,708 | INFO | MainThread | epoch 85 dev metrics (tuned thresholds): st1_macro_f1=0.640, st2_macro_f1=0.625, st3_macro_f1=0.544, st3_family_macro_f1=0.680, mean_macro_f1=0.603
+2026-08-11 16:44:45,164 | INFO | MainThread | epoch 86: mean train loss = 0.0106
+2026-08-11 16:44:56,794 | INFO | MainThread | epoch 86 dev metrics (tuned thresholds): st1_macro_f1=0.638, st2_macro_f1=0.674, st3_macro_f1=0.566, st3_family_macro_f1=0.657, mean_macro_f1=0.626
+2026-08-11 16:47:01,333 | INFO | MainThread | epoch 87: mean train loss = 0.0091
+2026-08-11 16:47:12,076 | INFO | MainThread | epoch 87 dev metrics (tuned thresholds): st1_macro_f1=0.622, st2_macro_f1=0.652, st3_macro_f1=0.574, st3_family_macro_f1=0.669, mean_macro_f1=0.616
+2026-08-11 16:49:16,877 | INFO | MainThread | epoch 88: mean train loss = 0.0130
+2026-08-11 16:49:28,563 | INFO | MainThread | epoch 88 dev metrics (tuned thresholds): st1_macro_f1=0.660, st2_macro_f1=0.660, st3_macro_f1=0.513, st3_family_macro_f1=0.605, mean_macro_f1=0.611
+2026-08-11 16:51:32,259 | INFO | MainThread | epoch 89: mean train loss = 0.0213
+2026-08-11 16:51:43,867 | INFO | MainThread | epoch 89 dev metrics (tuned thresholds): st1_macro_f1=0.637, st2_macro_f1=0.662, st3_macro_f1=0.592, st3_family_macro_f1=0.649, mean_macro_f1=0.631
+2026-08-11 16:53:48,467 | INFO | MainThread | epoch 90: mean train loss = 0.0315
+2026-08-11 16:54:00,311 | INFO | MainThread | epoch 90 dev metrics (tuned thresholds): st1_macro_f1=0.613, st2_macro_f1=0.634, st3_macro_f1=0.586, st3_family_macro_f1=0.651, mean_macro_f1=0.611
+2026-08-11 16:55:24,564 | INFO | MainThread | epoch 91: mean train loss = 0.0218
+2026-08-11 16:55:36,532 | INFO | MainThread | epoch 91 dev metrics (tuned thresholds): st1_macro_f1=0.595, st2_macro_f1=0.666, st3_macro_f1=0.597, st3_family_macro_f1=0.648, mean_macro_f1=0.619
+2026-08-11 16:57:42,065 | INFO | MainThread | epoch 92: mean train loss = 0.0135
+2026-08-11 16:57:53,144 | INFO | MainThread | epoch 92 dev metrics (tuned thresholds): st1_macro_f1=0.692, st2_macro_f1=0.650, st3_macro_f1=0.529, st3_family_macro_f1=0.623, mean_macro_f1=0.623
+2026-08-11 16:59:58,640 | INFO | MainThread | epoch 93: mean train loss = 0.0125
+2026-08-11 17:00:10,635 | INFO | MainThread | epoch 93 dev metrics (tuned thresholds): st1_macro_f1=0.650, st2_macro_f1=0.649, st3_macro_f1=0.607, st3_family_macro_f1=0.670, mean_macro_f1=0.636
+2026-08-11 17:02:15,198 | INFO | MainThread | epoch 94: mean train loss = 0.0173
+2026-08-11 17:02:27,163 | INFO | MainThread | epoch 94 dev metrics (tuned thresholds): st1_macro_f1=0.621, st2_macro_f1=0.651, st3_macro_f1=0.576, st3_family_macro_f1=0.646, mean_macro_f1=0.616
+2026-08-11 17:04:32,919 | INFO | MainThread | epoch 95: mean train loss = 0.0092
+2026-08-11 17:04:44,868 | INFO | MainThread | epoch 95 dev metrics (tuned thresholds): st1_macro_f1=0.664, st2_macro_f1=0.663, st3_macro_f1=0.560, st3_family_macro_f1=0.631, mean_macro_f1=0.629
+2026-08-11 17:06:49,876 | INFO | MainThread | epoch 96: mean train loss = 0.0075
+2026-08-11 17:07:01,863 | INFO | MainThread | epoch 96 dev metrics (tuned thresholds): st1_macro_f1=0.639, st2_macro_f1=0.631, st3_macro_f1=0.562, st3_family_macro_f1=0.655, mean_macro_f1=0.610
+2026-08-11 17:09:07,524 | INFO | MainThread | epoch 97: mean train loss = 0.0141
+2026-08-11 17:09:18,849 | INFO | MainThread | epoch 97 dev metrics (tuned thresholds): st1_macro_f1=0.650, st2_macro_f1=0.673, st3_macro_f1=0.527, st3_family_macro_f1=0.593, mean_macro_f1=0.617
+2026-08-11 17:10:27,770 | INFO | MainThread | epoch 98: mean train loss = 0.0228
+2026-08-11 17:10:34,486 | INFO | MainThread | epoch 98 dev metrics (tuned thresholds): st1_macro_f1=0.653, st2_macro_f1=0.647, st3_macro_f1=0.552, st3_family_macro_f1=0.658, mean_macro_f1=0.617
+2026-08-11 17:11:42,752 | INFO | MainThread | epoch 99: mean train loss = 0.0150
+2026-08-11 17:11:49,458 | INFO | MainThread | epoch 99 dev metrics (tuned thresholds): st1_macro_f1=0.636, st2_macro_f1=0.654, st3_macro_f1=0.561, st3_family_macro_f1=0.653, mean_macro_f1=0.617
+2026-08-11 17:12:57,765 | INFO | MainThread | epoch 100: mean train loss = 0.0258
+2026-08-11 17:13:04,483 | INFO | MainThread | epoch 100 dev metrics (tuned thresholds): st1_macro_f1=0.643, st2_macro_f1=0.667, st3_macro_f1=0.559, st3_family_macro_f1=0.643, mean_macro_f1=0.623
+2026-08-11 17:14:12,823 | INFO | MainThread | epoch 101: mean train loss = 0.0098
+2026-08-11 17:14:19,536 | INFO | MainThread | epoch 101 dev metrics (tuned thresholds): st1_macro_f1=0.644, st2_macro_f1=0.664, st3_macro_f1=0.577, st3_family_macro_f1=0.656, mean_macro_f1=0.628
+2026-08-11 17:15:27,793 | INFO | MainThread | epoch 102: mean train loss = 0.0090
+2026-08-11 17:15:34,501 | INFO | MainThread | epoch 102 dev metrics (tuned thresholds): st1_macro_f1=0.625, st2_macro_f1=0.665, st3_macro_f1=0.526, st3_family_macro_f1=0.628, mean_macro_f1=0.606
+2026-08-11 17:16:42,736 | INFO | MainThread | epoch 103: mean train loss = 0.0122
+2026-08-11 17:16:49,445 | INFO | MainThread | epoch 103 dev metrics (tuned thresholds): st1_macro_f1=0.602, st2_macro_f1=0.676, st3_macro_f1=0.535, st3_family_macro_f1=0.598, mean_macro_f1=0.605
+2026-08-11 17:17:57,701 | INFO | MainThread | epoch 104: mean train loss = 0.0110
+2026-08-11 17:18:04,411 | INFO | MainThread | epoch 104 dev metrics (tuned thresholds): st1_macro_f1=0.597, st2_macro_f1=0.670, st3_macro_f1=0.570, st3_family_macro_f1=0.667, mean_macro_f1=0.612
+2026-08-11 17:19:12,718 | INFO | MainThread | epoch 105: mean train loss = 0.0093
+2026-08-11 17:19:19,431 | INFO | MainThread | epoch 105 dev metrics (tuned thresholds): st1_macro_f1=0.638, st2_macro_f1=0.660, st3_macro_f1=0.563, st3_family_macro_f1=0.635, mean_macro_f1=0.620
+2026-08-11 17:20:27,746 | INFO | MainThread | epoch 106: mean train loss = 0.0061
+2026-08-11 17:20:34,455 | INFO | MainThread | epoch 106 dev metrics (tuned thresholds): st1_macro_f1=0.603, st2_macro_f1=0.656, st3_macro_f1=0.578, st3_family_macro_f1=0.642, mean_macro_f1=0.612
+2026-08-11 17:21:42,788 | INFO | MainThread | epoch 107: mean train loss = 0.0034
+2026-08-11 17:21:49,493 | INFO | MainThread | epoch 107 dev metrics (tuned thresholds): st1_macro_f1=0.626, st2_macro_f1=0.658, st3_macro_f1=0.572, st3_family_macro_f1=0.627, mean_macro_f1=0.619
+2026-08-11 17:22:57,773 | INFO | MainThread | epoch 108: mean train loss = 0.0043
+2026-08-11 17:23:04,484 | INFO | MainThread | epoch 108 dev metrics (tuned thresholds): st1_macro_f1=0.658, st2_macro_f1=0.670, st3_macro_f1=0.601, st3_family_macro_f1=0.658, mean_macro_f1=0.643
+2026-08-11 17:24:12,793 | INFO | MainThread | epoch 109: mean train loss = 0.0077
+2026-08-11 17:24:19,501 | INFO | MainThread | epoch 109 dev metrics (tuned thresholds): st1_macro_f1=0.629, st2_macro_f1=0.669, st3_macro_f1=0.583, st3_family_macro_f1=0.657, mean_macro_f1=0.627
+2026-08-11 17:25:27,815 | INFO | MainThread | epoch 110: mean train loss = 0.0149
+2026-08-11 17:25:34,528 | INFO | MainThread | epoch 110 dev metrics (tuned thresholds): st1_macro_f1=0.594, st2_macro_f1=0.654, st3_macro_f1=0.584, st3_family_macro_f1=0.661, mean_macro_f1=0.610
+2026-08-11 17:26:42,872 | INFO | MainThread | epoch 111: mean train loss = 0.0169
+2026-08-11 17:26:49,593 | INFO | MainThread | epoch 111 dev metrics (tuned thresholds): st1_macro_f1=0.661, st2_macro_f1=0.658, st3_macro_f1=0.606, st3_family_macro_f1=0.672, mean_macro_f1=0.642
+2026-08-11 17:27:57,868 | INFO | MainThread | epoch 112: mean train loss = 0.0088
+2026-08-11 17:28:04,576 | INFO | MainThread | epoch 112 dev metrics (tuned thresholds): st1_macro_f1=0.620, st2_macro_f1=0.633, st3_macro_f1=0.594, st3_family_macro_f1=0.651, mean_macro_f1=0.616
+2026-08-11 17:29:12,903 | INFO | MainThread | epoch 113: mean train loss = 0.0104
+2026-08-11 17:29:19,618 | INFO | MainThread | epoch 113 dev metrics (tuned thresholds): st1_macro_f1=0.630, st2_macro_f1=0.658, st3_macro_f1=0.628, st3_family_macro_f1=0.662, mean_macro_f1=0.639
+2026-08-11 17:30:27,986 | INFO | MainThread | epoch 114: mean train loss = 0.0122
+2026-08-11 17:30:34,693 | INFO | MainThread | epoch 114 dev metrics (tuned thresholds): st1_macro_f1=0.626, st2_macro_f1=0.639, st3_macro_f1=0.556, st3_family_macro_f1=0.653, mean_macro_f1=0.607
+2026-08-11 17:31:43,013 | INFO | MainThread | epoch 115: mean train loss = 0.0143
+2026-08-11 17:31:49,733 | INFO | MainThread | epoch 115 dev metrics (tuned thresholds): st1_macro_f1=0.676, st2_macro_f1=0.655, st3_macro_f1=0.587, st3_family_macro_f1=0.673, mean_macro_f1=0.640
+2026-08-11 17:32:58,017 | INFO | MainThread | epoch 116: mean train loss = 0.0184
+2026-08-11 17:33:04,734 | INFO | MainThread | epoch 116 dev metrics (tuned thresholds): st1_macro_f1=0.596, st2_macro_f1=0.645, st3_macro_f1=0.588, st3_family_macro_f1=0.648, mean_macro_f1=0.610
+2026-08-11 17:34:13,059 | INFO | MainThread | epoch 117: mean train loss = 0.0168
+2026-08-11 17:34:19,770 | INFO | MainThread | epoch 117 dev metrics (tuned thresholds): st1_macro_f1=0.632, st2_macro_f1=0.654, st3_macro_f1=0.545, st3_family_macro_f1=0.651, mean_macro_f1=0.610
+2026-08-11 17:35:28,113 | INFO | MainThread | epoch 118: mean train loss = 0.0108
+2026-08-11 17:35:34,821 | INFO | MainThread | epoch 118 dev metrics (tuned thresholds): st1_macro_f1=0.653, st2_macro_f1=0.645, st3_macro_f1=0.580, st3_family_macro_f1=0.653, mean_macro_f1=0.626
+2026-08-11 17:36:43,239 | INFO | MainThread | epoch 119: mean train loss = 0.0020
+2026-08-11 17:36:49,961 | INFO | MainThread | epoch 119 dev metrics (tuned thresholds): st1_macro_f1=0.617, st2_macro_f1=0.648, st3_macro_f1=0.595, st3_family_macro_f1=0.672, mean_macro_f1=0.620
+2026-08-11 17:37:58,412 | INFO | MainThread | epoch 120: mean train loss = 0.0045
+2026-08-11 17:38:05,139 | INFO | MainThread | epoch 120 dev metrics (tuned thresholds): st1_macro_f1=0.636, st2_macro_f1=0.636, st3_macro_f1=0.547, st3_family_macro_f1=0.633, mean_macro_f1=0.607
+2026-08-11 17:39:13,593 | INFO | MainThread | epoch 121: mean train loss = 0.0079
+2026-08-11 17:39:20,316 | INFO | MainThread | epoch 121 dev metrics (tuned thresholds): st1_macro_f1=0.650, st2_macro_f1=0.646, st3_macro_f1=0.607, st3_family_macro_f1=0.663, mean_macro_f1=0.634
+2026-08-11 17:40:28,742 | INFO | MainThread | epoch 122: mean train loss = 0.0075
+2026-08-11 17:40:35,474 | INFO | MainThread | epoch 122 dev metrics (tuned thresholds): st1_macro_f1=0.649, st2_macro_f1=0.644, st3_macro_f1=0.559, st3_family_macro_f1=0.668, mean_macro_f1=0.617
+2026-08-11 17:41:43,753 | INFO | MainThread | epoch 123: mean train loss = 0.0048
+2026-08-11 17:41:50,466 | INFO | MainThread | epoch 123 dev metrics (tuned thresholds): st1_macro_f1=0.636, st2_macro_f1=0.648, st3_macro_f1=0.606, st3_family_macro_f1=0.666, mean_macro_f1=0.630
+2026-08-11 17:42:58,777 | INFO | MainThread | epoch 124: mean train loss = 0.0017
+2026-08-11 17:43:05,487 | INFO | MainThread | epoch 124 dev metrics (tuned thresholds): st1_macro_f1=0.631, st2_macro_f1=0.652, st3_macro_f1=0.606, st3_family_macro_f1=0.675, mean_macro_f1=0.630
+2026-08-11 17:44:13,822 | INFO | MainThread | epoch 125: mean train loss = 0.0102
+2026-08-11 17:44:20,538 | INFO | MainThread | epoch 125 dev metrics (tuned thresholds): st1_macro_f1=0.601, st2_macro_f1=0.653, st3_macro_f1=0.616, st3_family_macro_f1=0.671, mean_macro_f1=0.623
+2026-08-11 17:45:28,879 | INFO | MainThread | epoch 126: mean train loss = 0.0051
+2026-08-11 17:45:35,593 | INFO | MainThread | epoch 126 dev metrics (tuned thresholds): st1_macro_f1=0.634, st2_macro_f1=0.647, st3_macro_f1=0.601, st3_family_macro_f1=0.672, mean_macro_f1=0.628
+2026-08-11 17:46:43,939 | INFO | MainThread | epoch 127: mean train loss = 0.0014
+2026-08-11 17:46:50,657 | INFO | MainThread | epoch 127 dev metrics (tuned thresholds): st1_macro_f1=0.642, st2_macro_f1=0.650, st3_macro_f1=0.606, st3_family_macro_f1=0.646, mean_macro_f1=0.633
+2026-08-11 17:47:58,978 | INFO | MainThread | epoch 128: mean train loss = 0.0131
+2026-08-11 17:48:05,692 | INFO | MainThread | epoch 128 dev metrics (tuned thresholds): st1_macro_f1=0.645, st2_macro_f1=0.638, st3_macro_f1=0.616, st3_family_macro_f1=0.680, mean_macro_f1=0.633
+2026-08-11 17:49:14,021 | INFO | MainThread | epoch 129: mean train loss = 0.0076
+2026-08-11 17:49:20,738 | INFO | MainThread | epoch 129 dev metrics (tuned thresholds): st1_macro_f1=0.656, st2_macro_f1=0.663, st3_macro_f1=0.621, st3_family_macro_f1=0.688, mean_macro_f1=0.647
+2026-08-11 17:50:29,073 | INFO | MainThread | epoch 130: mean train loss = 0.0095
+2026-08-11 17:50:35,787 | INFO | MainThread | epoch 130 dev metrics (tuned thresholds): st1_macro_f1=0.651, st2_macro_f1=0.649, st3_macro_f1=0.569, st3_family_macro_f1=0.631, mean_macro_f1=0.623
+2026-08-11 17:51:44,111 | INFO | MainThread | epoch 131: mean train loss = 0.0024
+2026-08-11 17:51:50,824 | INFO | MainThread | epoch 131 dev metrics (tuned thresholds): st1_macro_f1=0.655, st2_macro_f1=0.638, st3_macro_f1=0.605, st3_family_macro_f1=0.672, mean_macro_f1=0.633
+2026-08-11 17:52:59,128 | INFO | MainThread | epoch 132: mean train loss = 0.0120
+2026-08-11 17:53:05,834 | INFO | MainThread | epoch 132 dev metrics (tuned thresholds): st1_macro_f1=0.649, st2_macro_f1=0.652, st3_macro_f1=0.590, st3_family_macro_f1=0.667, mean_macro_f1=0.630
+2026-08-11 17:54:14,180 | INFO | MainThread | epoch 133: mean train loss = 0.0115
+2026-08-11 17:54:20,890 | INFO | MainThread | epoch 133 dev metrics (tuned thresholds): st1_macro_f1=0.656, st2_macro_f1=0.638, st3_macro_f1=0.588, st3_family_macro_f1=0.656, mean_macro_f1=0.627
+2026-08-11 17:55:29,189 | INFO | MainThread | epoch 134: mean train loss = 0.0029
+2026-08-11 17:55:35,932 | INFO | MainThread | epoch 134 dev metrics (tuned thresholds): st1_macro_f1=0.641, st2_macro_f1=0.649, st3_macro_f1=0.599, st3_family_macro_f1=0.666, mean_macro_f1=0.629
+2026-08-11 17:56:44,267 | INFO | MainThread | epoch 135: mean train loss = 0.0051
+2026-08-11 17:56:50,986 | INFO | MainThread | epoch 135 dev metrics (tuned thresholds): st1_macro_f1=0.617, st2_macro_f1=0.628, st3_macro_f1=0.587, st3_family_macro_f1=0.663, mean_macro_f1=0.611
+2026-08-11 17:57:59,330 | INFO | MainThread | epoch 136: mean train loss = 0.0094
+2026-08-11 17:58:06,048 | INFO | MainThread | epoch 136 dev metrics (tuned thresholds): st1_macro_f1=0.596, st2_macro_f1=0.641, st3_macro_f1=0.597, st3_family_macro_f1=0.666, mean_macro_f1=0.611
+2026-08-11 17:59:14,403 | INFO | MainThread | epoch 137: mean train loss = 0.0010
+2026-08-11 17:59:21,126 | INFO | MainThread | epoch 137 dev metrics (tuned thresholds): st1_macro_f1=0.600, st2_macro_f1=0.644, st3_macro_f1=0.593, st3_family_macro_f1=0.678, mean_macro_f1=0.612
+2026-08-11 18:00:29,480 | INFO | MainThread | epoch 138: mean train loss = 0.0019
+2026-08-11 18:00:36,194 | INFO | MainThread | epoch 138 dev metrics (tuned thresholds): st1_macro_f1=0.665, st2_macro_f1=0.629, st3_macro_f1=0.596, st3_family_macro_f1=0.657, mean_macro_f1=0.630
+2026-08-11 18:01:44,528 | INFO | MainThread | epoch 139: mean train loss = 0.0014
+2026-08-11 18:01:51,243 | INFO | MainThread | epoch 139 dev metrics (tuned thresholds): st1_macro_f1=0.646, st2_macro_f1=0.642, st3_macro_f1=0.624, st3_family_macro_f1=0.665, mean_macro_f1=0.638
+2026-08-11 18:02:59,543 | INFO | MainThread | epoch 140: mean train loss = 0.0010
+2026-08-11 18:03:06,254 | INFO | MainThread | epoch 140 dev metrics (tuned thresholds): st1_macro_f1=0.630, st2_macro_f1=0.641, st3_macro_f1=0.588, st3_family_macro_f1=0.667, mean_macro_f1=0.619
+2026-08-11 18:04:14,557 | INFO | MainThread | epoch 141: mean train loss = 0.0006
+2026-08-11 18:04:21,276 | INFO | MainThread | epoch 141 dev metrics (tuned thresholds): st1_macro_f1=0.620, st2_macro_f1=0.644, st3_macro_f1=0.594, st3_family_macro_f1=0.676, mean_macro_f1=0.619
+2026-08-11 18:05:29,630 | INFO | MainThread | epoch 142: mean train loss = 0.0011
+2026-08-11 18:05:36,341 | INFO | MainThread | epoch 142 dev metrics (tuned thresholds): st1_macro_f1=0.624, st2_macro_f1=0.629, st3_macro_f1=0.616, st3_family_macro_f1=0.684, mean_macro_f1=0.623
+2026-08-11 18:06:44,682 | INFO | MainThread | epoch 143: mean train loss = 0.0005
+2026-08-11 18:06:51,390 | INFO | MainThread | epoch 143 dev metrics (tuned thresholds): st1_macro_f1=0.604, st2_macro_f1=0.648, st3_macro_f1=0.590, st3_family_macro_f1=0.669, mean_macro_f1=0.614
+2026-08-11 18:07:59,766 | INFO | MainThread | epoch 144: mean train loss = 0.0026
+2026-08-11 18:08:06,485 | INFO | MainThread | epoch 144 dev metrics (tuned thresholds): st1_macro_f1=0.625, st2_macro_f1=0.650, st3_macro_f1=0.596, st3_family_macro_f1=0.680, mean_macro_f1=0.624
+2026-08-11 18:09:14,834 | INFO | MainThread | epoch 145: mean train loss = 0.0016
+2026-08-11 18:09:21,548 | INFO | MainThread | epoch 145 dev metrics (tuned thresholds): st1_macro_f1=0.600, st2_macro_f1=0.646, st3_macro_f1=0.568, st3_family_macro_f1=0.667, mean_macro_f1=0.604
+2026-08-11 18:10:29,874 | INFO | MainThread | epoch 146: mean train loss = 0.0032
+2026-08-11 18:10:36,600 | INFO | MainThread | epoch 146 dev metrics (tuned thresholds): st1_macro_f1=0.621, st2_macro_f1=0.647, st3_macro_f1=0.581, st3_family_macro_f1=0.661, mean_macro_f1=0.616
+2026-08-11 18:11:45,051 | INFO | MainThread | epoch 147: mean train loss = 0.0067
+2026-08-11 18:11:51,776 | INFO | MainThread | epoch 147 dev metrics (tuned thresholds): st1_macro_f1=0.624, st2_macro_f1=0.646, st3_macro_f1=0.590, st3_family_macro_f1=0.644, mean_macro_f1=0.620
+2026-08-11 18:13:00,263 | INFO | MainThread | epoch 148: mean train loss = 0.0044
+2026-08-11 18:13:06,989 | INFO | MainThread | epoch 148 dev metrics (tuned thresholds): st1_macro_f1=0.606, st2_macro_f1=0.652, st3_macro_f1=0.576, st3_family_macro_f1=0.625, mean_macro_f1=0.612
+2026-08-11 18:14:15,481 | INFO | MainThread | epoch 149: mean train loss = 0.0025
+2026-08-11 18:14:22,200 | INFO | MainThread | epoch 149 dev metrics (tuned thresholds): st1_macro_f1=0.623, st2_macro_f1=0.652, st3_macro_f1=0.571, st3_family_macro_f1=0.666, mean_macro_f1=0.615
+2026-08-11 18:15:30,723 | INFO | MainThread | epoch 150: mean train loss = 0.0052
+2026-08-11 18:15:37,460 | INFO | MainThread | epoch 150 dev metrics (tuned thresholds): st1_macro_f1=0.623, st2_macro_f1=0.643, st3_macro_f1=0.572, st3_family_macro_f1=0.659, mean_macro_f1=0.613
+2026-08-11 18:16:45,980 | INFO | MainThread | epoch 151: mean train loss = 0.0015
+2026-08-11 18:16:52,713 | INFO | MainThread | epoch 151 dev metrics (tuned thresholds): st1_macro_f1=0.622, st2_macro_f1=0.641, st3_macro_f1=0.555, st3_family_macro_f1=0.651, mean_macro_f1=0.606
+2026-08-11 18:18:01,260 | INFO | MainThread | epoch 152: mean train loss = 0.0011
+2026-08-11 18:18:07,999 | INFO | MainThread | epoch 152 dev metrics (tuned thresholds): st1_macro_f1=0.619, st2_macro_f1=0.647, st3_macro_f1=0.581, st3_family_macro_f1=0.667, mean_macro_f1=0.616
+2026-08-11 18:19:16,558 | INFO | MainThread | epoch 153: mean train loss = 0.0005
+2026-08-11 18:19:23,293 | INFO | MainThread | epoch 153 dev metrics (tuned thresholds): st1_macro_f1=0.617, st2_macro_f1=0.652, st3_macro_f1=0.606, st3_family_macro_f1=0.680, mean_macro_f1=0.625
+2026-08-11 18:20:31,816 | INFO | MainThread | epoch 154: mean train loss = 0.0026
+2026-08-11 18:20:38,558 | INFO | MainThread | epoch 154 dev metrics (tuned thresholds): st1_macro_f1=0.613, st2_macro_f1=0.646, st3_macro_f1=0.612, st3_family_macro_f1=0.678, mean_macro_f1=0.624
+2026-08-11 18:21:47,086 | INFO | MainThread | epoch 155: mean train loss = 0.0004
+2026-08-11 18:21:53,819 | INFO | MainThread | epoch 155 dev metrics (tuned thresholds): st1_macro_f1=0.622, st2_macro_f1=0.642, st3_macro_f1=0.613, st3_family_macro_f1=0.680, mean_macro_f1=0.625
+2026-08-11 18:23:02,363 | INFO | MainThread | epoch 156: mean train loss = 0.0003
+2026-08-11 18:23:09,092 | INFO | MainThread | epoch 156 dev metrics (tuned thresholds): st1_macro_f1=0.647, st2_macro_f1=0.653, st3_macro_f1=0.576, st3_family_macro_f1=0.637, mean_macro_f1=0.625
+2026-08-11 18:24:17,595 | INFO | MainThread | epoch 157: mean train loss = 0.0006
+2026-08-11 18:24:24,328 | INFO | MainThread | epoch 157 dev metrics (tuned thresholds): st1_macro_f1=0.621, st2_macro_f1=0.658, st3_macro_f1=0.595, st3_family_macro_f1=0.685, mean_macro_f1=0.625
+2026-08-11 18:25:32,767 | INFO | MainThread | epoch 158: mean train loss = 0.0002
+2026-08-11 18:25:39,496 | INFO | MainThread | epoch 158 dev metrics (tuned thresholds): st1_macro_f1=0.631, st2_macro_f1=0.659, st3_macro_f1=0.622, st3_family_macro_f1=0.688, mean_macro_f1=0.637
+2026-08-11 18:26:48,002 | INFO | MainThread | epoch 159: mean train loss = 0.0022
+2026-08-11 18:26:54,726 | INFO | MainThread | epoch 159 dev metrics (tuned thresholds): st1_macro_f1=0.596, st2_macro_f1=0.662, st3_macro_f1=0.603, st3_family_macro_f1=0.684, mean_macro_f1=0.620
+2026-08-11 18:28:03,248 | INFO | MainThread | epoch 160: mean train loss = 0.0024
+2026-08-11 18:28:09,982 | INFO | MainThread | epoch 160 dev metrics (tuned thresholds): st1_macro_f1=0.594, st2_macro_f1=0.648, st3_macro_f1=0.586, st3_family_macro_f1=0.663, mean_macro_f1=0.609
+2026-08-11 18:29:18,525 | INFO | MainThread | epoch 161: mean train loss = 0.0028
+2026-08-11 18:29:25,258 | INFO | MainThread | epoch 161 dev metrics (tuned thresholds): st1_macro_f1=0.595, st2_macro_f1=0.651, st3_macro_f1=0.570, st3_family_macro_f1=0.667, mean_macro_f1=0.605
+2026-08-11 18:30:33,760 | INFO | MainThread | epoch 162: mean train loss = 0.0009
+2026-08-11 18:30:40,489 | INFO | MainThread | epoch 162 dev metrics (tuned thresholds): st1_macro_f1=0.611, st2_macro_f1=0.658, st3_macro_f1=0.578, st3_family_macro_f1=0.671, mean_macro_f1=0.615
+2026-08-11 18:31:48,962 | INFO | MainThread | epoch 163: mean train loss = 0.0073
+2026-08-11 18:31:55,685 | INFO | MainThread | epoch 163 dev metrics (tuned thresholds): st1_macro_f1=0.617, st2_macro_f1=0.653, st3_macro_f1=0.591, st3_family_macro_f1=0.666, mean_macro_f1=0.620
+2026-08-11 18:33:04,105 | INFO | MainThread | epoch 164: mean train loss = 0.0128
+2026-08-11 18:33:10,821 | INFO | MainThread | epoch 164 dev metrics (tuned thresholds): st1_macro_f1=0.587, st2_macro_f1=0.640, st3_macro_f1=0.578, st3_family_macro_f1=0.676, mean_macro_f1=0.602
+2026-08-11 18:34:19,210 | INFO | MainThread | epoch 165: mean train loss = 0.0014
+2026-08-11 18:34:25,935 | INFO | MainThread | epoch 165 dev metrics (tuned thresholds): st1_macro_f1=0.614, st2_macro_f1=0.647, st3_macro_f1=0.597, st3_family_macro_f1=0.680, mean_macro_f1=0.620
+2026-08-11 18:35:34,374 | INFO | MainThread | epoch 166: mean train loss = 0.0003
+2026-08-11 18:35:41,092 | INFO | MainThread | epoch 166 dev metrics (tuned thresholds): st1_macro_f1=0.612, st2_macro_f1=0.651, st3_macro_f1=0.599, st3_family_macro_f1=0.670, mean_macro_f1=0.621
+2026-08-11 18:36:49,544 | INFO | MainThread | epoch 167: mean train loss = 0.0001
+2026-08-11 18:36:56,274 | INFO | MainThread | epoch 167 dev metrics (tuned thresholds): st1_macro_f1=0.616, st2_macro_f1=0.649, st3_macro_f1=0.601, st3_family_macro_f1=0.675, mean_macro_f1=0.622
+2026-08-11 18:38:04,630 | INFO | MainThread | epoch 168: mean train loss = 0.0013
+2026-08-11 18:38:11,353 | INFO | MainThread | epoch 168 dev metrics (tuned thresholds): st1_macro_f1=0.619, st2_macro_f1=0.641, st3_macro_f1=0.615, st3_family_macro_f1=0.676, mean_macro_f1=0.625
+2026-08-11 18:39:19,733 | INFO | MainThread | epoch 169: mean train loss = 0.0006
+2026-08-11 18:39:26,451 | INFO | MainThread | epoch 169 dev metrics (tuned thresholds): st1_macro_f1=0.618, st2_macro_f1=0.645, st3_macro_f1=0.589, st3_family_macro_f1=0.673, mean_macro_f1=0.617
+2026-08-11 18:40:34,820 | INFO | MainThread | epoch 170: mean train loss = 0.0002
+2026-08-11 18:40:41,539 | INFO | MainThread | epoch 170 dev metrics (tuned thresholds): st1_macro_f1=0.620, st2_macro_f1=0.634, st3_macro_f1=0.591, st3_family_macro_f1=0.666, mean_macro_f1=0.615
+2026-08-11 18:41:49,891 | INFO | MainThread | epoch 171: mean train loss = 0.0016
+2026-08-11 18:41:56,611 | INFO | MainThread | epoch 171 dev metrics (tuned thresholds): st1_macro_f1=0.618, st2_macro_f1=0.633, st3_macro_f1=0.586, st3_family_macro_f1=0.670, mean_macro_f1=0.613
+2026-08-11 18:43:04,990 | INFO | MainThread | epoch 172: mean train loss = 0.0001
+2026-08-11 18:43:11,708 | INFO | MainThread | epoch 172 dev metrics (tuned thresholds): st1_macro_f1=0.589, st2_macro_f1=0.635, st3_macro_f1=0.599, st3_family_macro_f1=0.666, mean_macro_f1=0.608
+2026-08-11 18:44:20,072 | INFO | MainThread | epoch 173: mean train loss = 0.0002
+2026-08-11 18:44:26,784 | INFO | MainThread | epoch 173 dev metrics (tuned thresholds): st1_macro_f1=0.623, st2_macro_f1=0.642, st3_macro_f1=0.587, st3_family_macro_f1=0.669, mean_macro_f1=0.617
+2026-08-11 18:45:35,121 | INFO | MainThread | epoch 174: mean train loss = 0.0001
+2026-08-11 18:45:41,830 | INFO | MainThread | epoch 174 dev metrics (tuned thresholds): st1_macro_f1=0.622, st2_macro_f1=0.639, st3_macro_f1=0.591, st3_family_macro_f1=0.676, mean_macro_f1=0.617
+2026-08-11 18:46:50,103 | INFO | MainThread | epoch 175: mean train loss = 0.0003
+2026-08-11 18:46:56,814 | INFO | MainThread | epoch 175 dev metrics (tuned thresholds): st1_macro_f1=0.597, st2_macro_f1=0.650, st3_macro_f1=0.574, st3_family_macro_f1=0.662, mean_macro_f1=0.607
+2026-08-11 18:48:05,105 | INFO | MainThread | epoch 176: mean train loss = 0.0002
+2026-08-11 18:48:11,818 | INFO | MainThread | epoch 176 dev metrics (tuned thresholds): st1_macro_f1=0.613, st2_macro_f1=0.642, st3_macro_f1=0.590, st3_family_macro_f1=0.661, mean_macro_f1=0.615
+2026-08-11 18:49:20,100 | INFO | MainThread | epoch 177: mean train loss = 0.0001
+2026-08-11 18:49:26,816 | INFO | MainThread | epoch 177 dev metrics (tuned thresholds): st1_macro_f1=0.581, st2_macro_f1=0.637, st3_macro_f1=0.606, st3_family_macro_f1=0.666, mean_macro_f1=0.608
+2026-08-11 18:50:35,116 | INFO | MainThread | epoch 178: mean train loss = 0.0001
+2026-08-11 18:50:41,822 | INFO | MainThread | epoch 178 dev metrics (tuned thresholds): st1_macro_f1=0.613, st2_macro_f1=0.641, st3_macro_f1=0.601, st3_family_macro_f1=0.672, mean_macro_f1=0.619
+2026-08-11 18:51:50,154 | INFO | MainThread | epoch 179: mean train loss = 0.0002
+2026-08-11 18:51:56,866 | INFO | MainThread | epoch 179 dev metrics (tuned thresholds): st1_macro_f1=0.610, st2_macro_f1=0.639, st3_macro_f1=0.587, st3_family_macro_f1=0.663, mean_macro_f1=0.612
+2026-08-11 18:53:05,168 | INFO | MainThread | epoch 180: mean train loss = 0.0001
+2026-08-11 18:53:11,887 | INFO | MainThread | epoch 180 dev metrics (tuned thresholds): st1_macro_f1=0.610, st2_macro_f1=0.633, st3_macro_f1=0.593, st3_family_macro_f1=0.676, mean_macro_f1=0.612
+2026-08-11 18:54:20,189 | INFO | MainThread | epoch 181: mean train loss = 0.0011
+2026-08-11 18:54:26,898 | INFO | MainThread | epoch 181 dev metrics (tuned thresholds): st1_macro_f1=0.613, st2_macro_f1=0.637, st3_macro_f1=0.602, st3_family_macro_f1=0.680, mean_macro_f1=0.617
+2026-08-11 18:55:35,252 | INFO | MainThread | epoch 182: mean train loss = 0.0001
+2026-08-11 18:55:41,970 | INFO | MainThread | epoch 182 dev metrics (tuned thresholds): st1_macro_f1=0.613, st2_macro_f1=0.631, st3_macro_f1=0.602, st3_family_macro_f1=0.681, mean_macro_f1=0.615
+2026-08-11 18:56:50,279 | INFO | MainThread | epoch 183: mean train loss = 0.0001
+2026-08-11 18:56:56,988 | INFO | MainThread | epoch 183 dev metrics (tuned thresholds): st1_macro_f1=0.641, st2_macro_f1=0.627, st3_macro_f1=0.597, st3_family_macro_f1=0.674, mean_macro_f1=0.622
+2026-08-11 18:58:05,290 | INFO | MainThread | epoch 184: mean train loss = 0.0001
+2026-08-11 18:58:12,012 | INFO | MainThread | epoch 184 dev metrics (tuned thresholds): st1_macro_f1=0.637, st2_macro_f1=0.627, st3_macro_f1=0.603, st3_family_macro_f1=0.677, mean_macro_f1=0.622
+2026-08-11 18:59:20,270 | INFO | MainThread | epoch 185: mean train loss = 0.0001
+2026-08-11 18:59:26,978 | INFO | MainThread | epoch 185 dev metrics (tuned thresholds): st1_macro_f1=0.608, st2_macro_f1=0.627, st3_macro_f1=0.603, st3_family_macro_f1=0.680, mean_macro_f1=0.613
+2026-08-11 19:00:35,325 | INFO | MainThread | epoch 186: mean train loss = 0.0001
+2026-08-11 19:00:42,040 | INFO | MainThread | epoch 186 dev metrics (tuned thresholds): st1_macro_f1=0.608, st2_macro_f1=0.627, st3_macro_f1=0.599, st3_family_macro_f1=0.679, mean_macro_f1=0.611
+2026-08-11 19:01:50,361 | INFO | MainThread | epoch 187: mean train loss = 0.0001
+2026-08-11 19:01:57,080 | INFO | MainThread | epoch 187 dev metrics (tuned thresholds): st1_macro_f1=0.612, st2_macro_f1=0.628, st3_macro_f1=0.605, st3_family_macro_f1=0.678, mean_macro_f1=0.615
+2026-08-11 19:03:05,395 | INFO | MainThread | epoch 188: mean train loss = 0.0001
+2026-08-11 19:03:12,109 | INFO | MainThread | epoch 188 dev metrics (tuned thresholds): st1_macro_f1=0.608, st2_macro_f1=0.634, st3_macro_f1=0.585, st3_family_macro_f1=0.676, mean_macro_f1=0.609
+2026-08-11 19:04:20,409 | INFO | MainThread | epoch 189: mean train loss = 0.0000
+2026-08-11 19:04:27,122 | INFO | MainThread | epoch 189 dev metrics (tuned thresholds): st1_macro_f1=0.609, st2_macro_f1=0.635, st3_macro_f1=0.597, st3_family_macro_f1=0.675, mean_macro_f1=0.614
+2026-08-11 19:05:35,418 | INFO | MainThread | epoch 190: mean train loss = 0.0000
+2026-08-11 19:05:42,130 | INFO | MainThread | epoch 190 dev metrics (tuned thresholds): st1_macro_f1=0.609, st2_macro_f1=0.634, st3_macro_f1=0.601, st3_family_macro_f1=0.675, mean_macro_f1=0.615
+2026-08-11 19:06:50,398 | INFO | MainThread | epoch 191: mean train loss = 0.0001
+2026-08-11 19:06:57,106 | INFO | MainThread | epoch 191 dev metrics (tuned thresholds): st1_macro_f1=0.610, st2_macro_f1=0.627, st3_macro_f1=0.597, st3_family_macro_f1=0.674, mean_macro_f1=0.611
+2026-08-11 19:08:05,379 | INFO | MainThread | epoch 192: mean train loss = 0.0002
+2026-08-11 19:08:12,093 | INFO | MainThread | epoch 192 dev metrics (tuned thresholds): st1_macro_f1=0.611, st2_macro_f1=0.634, st3_macro_f1=0.603, st3_family_macro_f1=0.677, mean_macro_f1=0.616
+2026-08-11 19:09:20,343 | INFO | MainThread | epoch 193: mean train loss = 0.0001
+2026-08-11 19:09:27,057 | INFO | MainThread | epoch 193 dev metrics (tuned thresholds): st1_macro_f1=0.611, st2_macro_f1=0.630, st3_macro_f1=0.605, st3_family_macro_f1=0.677, mean_macro_f1=0.615
+2026-08-11 19:10:35,327 | INFO | MainThread | epoch 194: mean train loss = 0.0000
+2026-08-11 19:10:42,048 | INFO | MainThread | epoch 194 dev metrics (tuned thresholds): st1_macro_f1=0.611, st2_macro_f1=0.629, st3_macro_f1=0.605, st3_family_macro_f1=0.678, mean_macro_f1=0.615
+2026-08-11 19:11:50,385 | INFO | MainThread | epoch 195: mean train loss = 0.0000
+2026-08-11 19:11:57,109 | INFO | MainThread | epoch 195 dev metrics (tuned thresholds): st1_macro_f1=0.611, st2_macro_f1=0.629, st3_macro_f1=0.605, st3_family_macro_f1=0.678, mean_macro_f1=0.615
+2026-08-11 19:13:05,440 | INFO | MainThread | epoch 196: mean train loss = 0.0000
+2026-08-11 19:13:12,155 | INFO | MainThread | epoch 196 dev metrics (tuned thresholds): st1_macro_f1=0.611, st2_macro_f1=0.629, st3_macro_f1=0.605, st3_family_macro_f1=0.678, mean_macro_f1=0.615
+2026-08-11 19:14:20,441 | INFO | MainThread | epoch 197: mean train loss = 0.0006
+2026-08-11 19:14:27,153 | INFO | MainThread | epoch 197 dev metrics (tuned thresholds): st1_macro_f1=0.610, st2_macro_f1=0.632, st3_macro_f1=0.608, st3_family_macro_f1=0.676, mean_macro_f1=0.617
+2026-08-11 19:15:35,337 | INFO | MainThread | epoch 198: mean train loss = 0.0000
+2026-08-11 19:15:42,223 | INFO | MainThread | epoch 198 dev metrics (tuned thresholds): st1_macro_f1=0.610, st2_macro_f1=0.632, st3_macro_f1=0.608, st3_family_macro_f1=0.678, mean_macro_f1=0.617
+2026-08-11 19:16:50,422 | INFO | MainThread | epoch 199: mean train loss = 0.0000
+2026-08-11 19:16:57,130 | INFO | MainThread | epoch 199 dev metrics (tuned thresholds): st1_macro_f1=0.610, st2_macro_f1=0.634, st3_macro_f1=0.608, st3_family_macro_f1=0.678, mean_macro_f1=0.617
+2026-08-11 19:18:05,423 | INFO | MainThread | epoch 200: mean train loss = 0.0000
+2026-08-11 19:18:12,133 | INFO | MainThread | epoch 200 dev metrics (tuned thresholds): st1_macro_f1=0.610, st2_macro_f1=0.634, st3_macro_f1=0.608, st3_family_macro_f1=0.678, mean_macro_f1=0.617
+2026-08-11 19:18:12,210 | INFO | MainThread | saved final epoch adapter to runs/lora_roberta_good/last (best dev mean_macro_f1=0.657)
