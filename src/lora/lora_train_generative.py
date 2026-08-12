@@ -21,7 +21,9 @@ same schema (see lora_generative.py); a completion that fails to parse is regene
 3 times before falling back to a default prediction.
 
 Saves the best-dev-macro-F1 adapter to <output-dir>/best and the final epoch's to
-<output-dir>/last (both loadable with lora_predict_generative.py).
+<output-dir>/last (both loadable with lora_predict_generative.py). Pass --checkpoint-save-path
+to write the best/last checkpoints elsewhere (e.g. a scratch disk) while --output-dir still
+anchors the run's logs.
 
 To download a model:
 
@@ -93,6 +95,9 @@ def main():
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--device", default=None, help="defaults to cuda if available, else cpu")
     ap.add_argument("--output-dir", required=True)
+    ap.add_argument("--checkpoint-save-path", default=None, help="directory under which to save "
+                     "the best/last adapter checkpoints (<checkpoint-save-path>/best, "
+                     "<checkpoint-save-path>/last); defaults to --output-dir")
     args = ap.parse_args()
 
     torch.manual_seed(args.seed)
@@ -162,8 +167,9 @@ def main():
         optimizer, num_warmup_steps=int(args.warmup_ratio * total_steps), num_training_steps=total_steps
     )
 
+    checkpoint_dir = args.checkpoint_save_path or args.output_dir
     best_f1 = -1.0
-    os.makedirs(args.output_dir, exist_ok=True)
+    os.makedirs(checkpoint_dir, exist_ok=True)
     for epoch in range(args.epochs):
         model.train()
         tokenizer.padding_side = "right"  # loss-masked labels must line up token-for-token
@@ -190,12 +196,12 @@ def main():
         if metrics["mean_macro_f1"] > best_f1:
             best_f1 = metrics["mean_macro_f1"]
             if is_main:  # avoid every rank racing to write the same adapter dir under --parallelism tensor
-                model.save_pretrained(os.path.join(args.output_dir, "best"))
-                log.info(f"epoch {epoch + 1}: new best mean_macro_f1={best_f1:.3f}, saved to {args.output_dir}/best")
+                model.save_pretrained(os.path.join(checkpoint_dir, "best"))
+                log.info(f"epoch {epoch + 1}: new best mean_macro_f1={best_f1:.3f}, saved to {checkpoint_dir}/best")
 
     if is_main:
-        model.save_pretrained(os.path.join(args.output_dir, "last"))
-        log.info(f"saved final epoch adapter to {args.output_dir}/last (best dev mean_macro_f1={best_f1:.3f})")
+        model.save_pretrained(os.path.join(checkpoint_dir, "last"))
+        log.info(f"saved final epoch adapter to {checkpoint_dir}/last (best dev mean_macro_f1={best_f1:.3f})")
 
 
 if __name__ == "__main__":
