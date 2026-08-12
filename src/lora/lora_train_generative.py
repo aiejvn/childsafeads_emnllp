@@ -58,6 +58,9 @@ def main():
     ap.add_argument("train", help="training split, e.g. public_data_dev/train.jsonl")
     ap.add_argument("dev", help="dev split for per-epoch evaluation, e.g. public_data_dev/dev.jsonl")
     ap.add_argument("--model", default="Qwen/Qwen3.5-4B")
+    ap.add_argument("--model-path", default=None, help="load the model/tokenizer from this local "
+                     "directory instead of models/{--model}; --model is still used for logging/checkpoint "
+                     "naming")
     ap.add_argument("--context", choices=CONTEXT_CHOICES, default="full",
                     help="which rungs of the instance the model sees. no_product_page drops the linked page "
                          "entirely (a median 38%% of full_context's tokens); st2_page keeps only its "
@@ -121,11 +124,13 @@ def main():
         dev_instances = rng.sample(dev_instances, min(args.sample_size, len(dev_instances)))
     log.info(f"train={len(train_instances)} dev={len(dev_instances)}")
 
-    model_path = os.path.join("models", args.model)
+    model_path = args.model_path or os.path.join("models", args.model)
     if not os.path.isdir(model_path):
         raise FileNotFoundError(
-            f"expected local model at {model_path!r} (from --model {args.model!r}); "
-            f"download it first with `hf download {args.model} --local-dir {model_path}`"
+            f"expected local model at {model_path!r} "
+            + (f"(from --model-path {args.model_path!r})" if args.model_path else
+               f"(from --model {args.model!r}); download it first with "
+               f"`hf download {args.model} --local-dir {model_path}`")
         )
     log.info(f"loading model/tokenizer from local path {model_path} (no remote download)")
 
