@@ -1,0 +1,34 @@
+Running on rg32403
+Started: Tue 11 Aug 2026 12:33:52 AM EDT
+Account: rrg-zhu2048_gpu
+Partition: gpubase_bynode_b2
+---
+Python: /lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/bin/python  Torch: 2.13.0
+---
+Command: python src/lora/lora_train_generative.py public_data_dev/train.jsonl public_data_dev/dev.jsonl --epochs 200 --output-dir runs/lora_qwen --batch-size 1 --model Qwen/Qwen3-0.6B --parallelism pipeline --df-path emnllp-dialog-flow-dialog-flow.json --lean-prompt
+2026-08-11 00:34:05,690 | INFO | MainThread | logging to runs/run_20260811_003405_lora_train_generative_Qwen_Qwen3-0.6B.log
+2026-08-11 00:34:05,691 | INFO | MainThread | config: {'train': 'public_data_dev/train.jsonl', 'dev': 'public_data_dev/dev.jsonl', 'model': 'Qwen/Qwen3-0.6B', 'context': 'full', 'lean_prompt': True, 'df_path': 'emnllp-dialog-flow-dialog-flow.json', 'max_length': 4096, 'epochs': 200, 'batch_size': 1, 'grad_accum_steps': 4, 'lr': 0.0002, 'warmup_ratio': 0.06, 'lora_r': 8, 'lora_alpha': 16, 'lora_dropout': 0.1, 'target_modules': 'q_proj,v_proj', 'load_in_4bit': False, 'parallelism': 'pipeline', 'max_new_tokens': 128, 'sample_size': None, 'seed': 42, 'device': None, 'output_dir': 'runs/lora_qwen'} device=cuda
+2026-08-11 00:34:05,824 | INFO | MainThread | train=2353 dev=504
+2026-08-11 00:34:05,825 | INFO | MainThread | loading model/tokenizer from local path models/Qwen/Qwen3-0.6B (no remote download)
+[transformers] `torch_dtype` is deprecated! Use `dtype` instead!
+Traceback (most recent call last):
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/src/lora/lora_train_generative.py", line 202, in <module>
+    main()
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/src/lora/lora_train_generative.py", line 131, in main
+    model = build_peft_model_causal(
+            ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/src/lora/../common/../lora/lora_model.py", line 137, in build_peft_model_causal
+    model = _load_causal_base(
+            ^^^^^^^^^^^^^^^^^^
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/src/lora/../common/../lora/lora_model.py", line 109, in _load_causal_base
+    return AutoModelForCausalLM.from_pretrained(base_model_name, **load_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/transformers/models/auto/auto_factory.py", line 402, in from_pretrained
+    return model_class.from_pretrained(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/transformers/modeling_utils.py", line 4412, in from_pretrained
+    model = cls(config, *model_args, **model_kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: Qwen3ForCausalLM.__init__() got an unexpected keyword argument 'balanced_low_0'
+---
+Finished: Tue 11 Aug 2026 12:34:08 AM EDT

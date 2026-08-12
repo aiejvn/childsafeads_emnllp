@@ -1,0 +1,118 @@
+Running on rg32401
+Started: Tue 11 Aug 2026 01:57:59 AM EDT
+Account: rrg-zhu2048_gpu
+Partition: gpubase_bynode_b2
+---
+Python: /lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/bin/python  Torch: 2.13.0
+---
+Command: python src/lora/lora_train_generative.py public_data_dev/train.jsonl public_data_dev/dev.jsonl --epochs 200 --output-dir runs/lora_qwen --batch-size 1 --model Qwen/Qwen3-0.6B --parallelism pipeline --df-path emnllp-dialog-flow-dialog-flow.json --lean-prompt
+2026-08-11 01:59:43,191 | INFO | MainThread | logging to runs/run_20260811_015943_lora_train_generative_Qwen_Qwen3-0.6B.log
+2026-08-11 01:59:43,192 | INFO | MainThread | config: {'train': 'public_data_dev/train.jsonl', 'dev': 'public_data_dev/dev.jsonl', 'model': 'Qwen/Qwen3-0.6B', 'context': 'full', 'lean_prompt': True, 'df_path': 'emnllp-dialog-flow-dialog-flow.json', 'max_length': 4096, 'epochs': 200, 'batch_size': 1, 'grad_accum_steps': 4, 'lr': 0.0002, 'warmup_ratio': 0.06, 'lora_r': 8, 'lora_alpha': 16, 'lora_dropout': 0.1, 'target_modules': 'q_proj,v_proj', 'load_in_4bit': False, 'parallelism': 'pipeline', 'max_new_tokens': 128, 'sample_size': None, 'seed': 42, 'device': None, 'output_dir': 'runs/lora_qwen'} device=cuda
+2026-08-11 01:59:43,619 | INFO | MainThread | train=2353 dev=504
+2026-08-11 01:59:43,619 | INFO | MainThread | loading model/tokenizer from local path models/Qwen/Qwen3-0.6B (no remote download)
+[transformers] `torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/311 [00:00<?, ?it/s]Loading weights:   0%|          | 1/311 [00:01<06:02,  1.17s/it]Loading weights:   1%|          | 2/311 [00:01<04:39,  1.11it/s]Loading weights:   7%|▋         | 21/311 [00:02<00:19, 14.89it/s]Loading weights:   8%|▊         | 25/311 [00:02<00:17, 16.74it/s]Loading weights:  10%|▉         | 31/311 [00:02<00:13, 20.98it/s]Loading weights:  11%|█▏        | 35/311 [00:02<00:12, 22.91it/s]Loading weights:  13%|█▎        | 39/311 [00:02<00:12, 21.19it/s]Loading weights:  15%|█▍        | 46/311 [00:02<00:09, 26.90it/s]Loading weights:  17%|█▋        | 54/311 [00:03<00:07, 36.06it/s]Loading weights:  19%|█▉        | 60/311 [00:03<00:06, 39.90it/s]Loading weights:  23%|██▎       | 71/311 [00:03<00:04, 55.10it/s]Loading weights:  28%|██▊       | 87/311 [00:03<00:02, 78.07it/s]Loading weights:  32%|███▏      | 101/311 [00:03<00:02, 88.86it/s]Loading weights:  51%|█████     | 159/311 [00:03<00:00, 208.62it/s]Loading weights:  59%|█████▉    | 183/311 [00:03<00:00, 193.37it/s]Loading weights:  66%|██████▌   | 205/311 [00:03<00:00, 159.42it/s]Loading weights:  72%|███████▏  | 224/311 [00:04<00:00, 137.98it/s]Loading weights:  77%|███████▋  | 240/311 [00:04<00:00, 94.65it/s] Loading weights:  81%|████████▏ | 253/311 [00:04<00:00, 81.53it/s]Loading weights:  85%|████████▍ | 264/311 [00:04<00:00, 85.25it/s]Loading weights:  88%|████████▊ | 275/311 [00:05<00:00, 60.93it/s]Loading weights:  93%|█████████▎| 288/311 [00:05<00:00, 70.26it/s]Loading weights:  97%|█████████▋| 303/311 [00:05<00:00, 82.65it/s]Loading weights: 100%|██████████| 311/311 [00:05<00:00, 57.36it/s]
+2026-08-11 01:59:51,286 | INFO | MainThread | system prompt: lean (1698 chars) + dialog flow from emnllp-dialog-flow-dialog-flow.json (4507 chars)
+trainable params: 1,146,880 || all params: 597,196,800 || trainable%: 0.1920
+epoch 1/200:   0%|          | 0/2353 [00:00<?, ?it/s]epoch 1/200:   0%|          | 1/2353 [00:05<3:52:53,  5.94s/it]epoch 1/200:   0%|          | 2/2353 [00:06<1:48:46,  2.78s/it]epoch 1/200:   0%|          | 3/2353 [00:07<1:08:43,  1.75s/it]epoch 1/200:   0%|          | 4/2353 [00:08<57:54,  1.48s/it]  epoch 1/200:   0%|          | 5/2353 [00:08<44:45,  1.14s/it]epoch 1/200:   0%|          | 6/2353 [00:09<36:53,  1.06it/s]epoch 1/200:   0%|          | 7/2353 [00:09<31:46,  1.23it/s]epoch 1/200:   0%|          | 8/2353 [00:10<28:32,  1.37it/s]epoch 1/200:   0%|          | 9/2353 [00:10<26:18,  1.49it/s]epoch 1/200:   0%|          | 10/2353 [00:11<24:33,  1.59it/s]epoch 1/200:   0%|          | 11/2353 [00:11<23:35,  1.65it/s]epoch 1/200:   1%|          | 12/2353 [00:12<22:54,  1.70it/s]epoch 1/200:   1%|          | 13/2353 [00:13<22:14,  1.75it/s]epoch 1/200:   1%|          | 14/2353 [00:13<21:58,  1.77it/s]epoch 1/200:   1%|          | 15/2353 [00:14<21:38,  1.80it/s]epoch 1/200:   1%|          | 16/2353 [00:14<21:36,  1.80it/s]epoch 1/200:   1%|          | 17/2353 [00:15<21:19,  1.83it/s]epoch 1/200:   1%|          | 18/2353 [00:15<21:17,  1.83it/s]epoch 1/200:   1%|          | 19/2353 [00:16<21:07,  1.84it/s]epoch 1/200:   1%|          | 20/2353 [00:16<21:13,  1.83it/s]epoch 1/200:   1%|          | 21/2353 [00:17<21:09,  1.84it/s]epoch 1/200:   1%|          | 22/2353 [00:17<21:00,  1.85it/s]epoch 1/200:   1%|          | 23/2353 [00:18<20:55,  1.86it/s]epoch 1/200:   1%|          | 24/2353 [00:18<20:59,  1.85it/s]epoch 1/200:   1%|          | 25/2353 [00:19<21:02,  1.84it/s]epoch 1/200:   1%|          | 26/2353 [00:20<20:53,  1.86it/s]epoch 1/200:   1%|          | 27/2353 [00:20<20:49,  1.86it/s]epoch 1/200:   1%|          | 28/2353 [00:20<16:32,  2.34it/s]epoch 1/200:   1%|          | 29/2353 [00:21<17:46,  2.18it/s]epoch 1/200:   1%|▏         | 30/2353 [00:21<18:45,  2.06it/s]epoch 1/200:   1%|▏         | 31/2353 [00:22<19:17,  2.01it/s]epoch 1/200:   1%|▏         | 32/2353 [00:22<19:52,  1.95it/s]epoch 1/200:   1%|▏         | 33/2353 [00:23<20:04,  1.93it/s]epoch 1/200:   1%|▏         | 34/2353 [00:23<20:13,  1.91it/s]epoch 1/200:   1%|▏         | 35/2353 [00:24<20:23,  1.89it/s]epoch 1/200:   2%|▏         | 36/2353 [00:25<20:38,  1.87it/s]epoch 1/200:   2%|▏         | 37/2353 [00:25<20:35,  1.87it/s]epoch 1/200:   2%|▏         | 38/2353 [00:26<20:34,  1.88it/s]epoch 1/200:   2%|▏         | 39/2353 [00:26<20:32,  1.88it/s]epoch 1/200:   2%|▏         | 40/2353 [00:27<20:43,  1.86it/s]epoch 1/200:   2%|▏         | 41/2353 [00:27<20:37,  1.87it/s]epoch 1/200:   2%|▏         | 42/2353 [00:28<20:39,  1.87it/s]epoch 1/200:   2%|▏         | 43/2353 [00:28<20:37,  1.87it/s]epoch 1/200:   2%|▏         | 44/2353 [00:29<20:40,  1.86it/s]epoch 1/200:   2%|▏         | 45/2353 [00:29<20:44,  1.85it/s]epoch 1/200:   2%|▏         | 46/2353 [00:30<20:41,  1.86it/s]epoch 1/200:   2%|▏         | 47/2353 [00:30<20:36,  1.86it/s]epoch 1/200:   2%|▏         | 48/2353 [00:31<20:37,  1.86it/s]epoch 1/200:   2%|▏         | 49/2353 [00:31<16:22,  2.34it/s]epoch 1/200:   2%|▏         | 50/2353 [00:32<17:40,  2.17it/s]epoch 1/200:   2%|▏         | 51/2353 [00:32<21:03,  1.82it/s]epoch 1/200:   2%|▏         | 52/2353 [00:33<21:01,  1.82it/s]epoch 1/200:   2%|▏         | 53/2353 [00:34<20:50,  1.84it/s]epoch 1/200:   2%|▏         | 54/2353 [00:34<20:41,  1.85it/s]epoch 1/200:   2%|▏         | 55/2353 [00:35<20:34,  1.86it/s]epoch 1/200:   2%|▏         | 56/2353 [00:35<20:33,  1.86it/s]epoch 1/200:   2%|▏         | 57/2353 [00:36<20:31,  1.86it/s]epoch 1/200:   2%|▏         | 58/2353 [00:36<20:28,  1.87it/s]epoch 1/200:   3%|▎         | 59/2353 [00:37<20:27,  1.87it/s]epoch 1/200:   3%|▎         | 60/2353 [00:37<20:28,  1.87it/s]epoch 1/200:   3%|▎         | 61/2353 [00:38<20:24,  1.87it/s]epoch 1/200:   3%|▎         | 62/2353 [00:38<20:34,  1.86it/s]epoch 1/200:   3%|▎         | 63/2353 [00:39<20:28,  1.86it/s]epoch 1/200:   3%|▎         | 64/2353 [00:39<20:38,  1.85it/s]epoch 1/200:   3%|▎         | 65/2353 [00:40<20:30,  1.86it/s]epoch 1/200:   3%|▎         | 66/2353 [00:40<16:13,  2.35it/s]epoch 1/200:   3%|▎         | 67/2353 [00:40<13:15,  2.87it/s]epoch 1/200:   3%|▎         | 68/2353 [00:41<15:25,  2.47it/s]epoch 1/200:   3%|▎         | 69/2353 [00:41<16:56,  2.25it/s]epoch 1/200:   3%|▎         | 70/2353 [00:42<18:05,  2.10it/s]epoch 1/200:   3%|▎         | 71/2353 [00:42<18:43,  2.03it/s]epoch 1/200:   3%|▎         | 72/2353 [00:43<19:12,  1.98it/s]epoch 1/200:   3%|▎         | 73/2353 [00:44<19:31,  1.95it/s]epoch 1/200:   3%|▎         | 74/2353 [00:44<19:43,  1.93it/s]epoch 1/200:   3%|▎         | 75/2353 [00:45<19:55,  1.91it/s]epoch 1/200:   3%|▎         | 76/2353 [00:45<20:06,  1.89it/s]epoch 1/200:   3%|▎         | 77/2353 [00:46<20:10,  1.88it/s]epoch 1/200:   3%|▎         | 78/2353 [00:46<20:10,  1.88it/s]epoch 1/200:   3%|▎         | 79/2353 [00:47<20:11,  1.88it/s]epoch 1/200:   3%|▎         | 80/2353 [00:47<20:14,  1.87it/s]epoch 1/200:   3%|▎         | 81/2353 [00:48<20:12,  1.87it/s]epoch 1/200:   3%|▎         | 82/2353 [00:48<20:13,  1.87it/s]epoch 1/200:   4%|▎         | 83/2353 [00:49<20:12,  1.87it/s]epoch 1/200:   4%|▎         | 83/2353 [00:49<22:33,  1.68it/s]
+OSError: [Errno 122] Disk quota exceeded
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/src/lora/lora_train_generative.py", line 202, in <module>
+    main()
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/src/lora/lora_train_generative.py", line 173, in main
+    out = model(input_ids=batch["input_ids"], attention_mask=batch["attention_mask"], labels=batch["labels"])
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/peft/peft_model.py", line 2101, in forward
+    return self.base_model(
+           ^^^^^^^^^^^^^^^^
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/peft/tuners/tuners_utils.py", line 333, in forward
+    return self.model.forward(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/accelerate/hooks.py", line 192, in new_forward
+    output = module._old_forward(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/transformers/utils/generic.py", line 911, in wrapper
+    output = func(self, *args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/transformers/models/qwen3/modeling_qwen3.py", line 492, in forward
+    outputs: BaseModelOutputWithPast = self.model(
+                                       ^^^^^^^^^^^
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/transformers/utils/generic.py", line 1040, in wrapper
+    output = func(self, *args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/transformers/utils/output_capturing.py", line 262, in wrapper
+    outputs = func(self, *args, **kwargs)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/transformers/models/qwen3/modeling_qwen3.py", line 421, in forward
+    position_embeddings = self.rotary_emb(hidden_states, position_ids)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/accelerate/hooks.py", line 192, in new_forward
+    output = module._old_forward(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/transformers/modeling_rope_utils.py", line 128, in wrapper
+    return rope_forward(self, x, position_ids, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/transformers/models/qwen3/modeling_qwen3.py", line 143, in forward
+    freqs = (inv_freq_expanded.float() @ position_ids_expanded.float()).transpose(1, 2)
+             ~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/torch/_native/registry.py", line 923, in eager_router
+    result = _dispatch(args, kwargs, swallow_cond_exceptions=False)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/torch/_native/registry.py", line 919, in _dispatch
+    return getattr(torch.ops._native, impl_name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/torch/_ops.py", line 1279, in __call__
+    return self._op(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/torch/_native/ops/bmm_outer_product/triton_impl.py", line 31, in _bmm_outer_product_impl
+    return bmm_outer_product(a, b)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/torch/_native/ops/bmm_outer_product/triton_kernels.py", line 76, in bmm_outer_product
+    _bmm_outer_product_kernel[(B * triton.cdiv(M, BLOCK_M) * triton.cdiv(N, BLOCK_N),)](
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/triton/runtime/jit.py", line 370, in <lambda>
+    return lambda *args, **kwargs: self.run(grid=grid, warmup=False, *args, **kwargs)
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/triton/runtime/jit.py", line 720, in run
+    kernel = self._do_compile(key, signature, device, constexprs, options, attrs, warmup)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/triton/runtime/jit.py", line 849, in _do_compile
+    kernel = self.compile(src, target=target, options=options.__dict__)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/triton/compiler/compiler.py", line 314, in compile
+    metadata_group[ir_filename] = fn_cache_manager.put(module, ir_filename)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/triton/runtime/cache.py", line 116, in put
+    with open(temp_path, mode) as f:
+OSError: [Errno 122] Disk quota exceeded
+---
+Finished: Tue 11 Aug 2026 02:00:42 AM EDT

@@ -1,0 +1,19 @@
+Running on rg32302
+Started: Wed 12 Aug 2026 12:11:03 AM EDT
+Account: rrg-zhu2048_gpu
+Partition: gpubase_bynode_b2
+---
+Python: /lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/bin/python  Torch: 2.13.0
+---
+Command: python src/lora/lora_train_generative.py public_data_dev/train.jsonl public_data_dev/dev.jsonl --epochs 200 --output-dir runs/lora_qwen --batch-size 1 --model Qwen/Qwen3-4B --parallelism pipeline --df-path emnllp-dialog-flow-dialog-flow.json --lean-prompt --checkpoint-save-path /scratch/kwang103
+2026-08-12 00:11:17,019 | INFO | MainThread | logging to runs/run_20260812_001117_lora_train_generative_Qwen_Qwen3-4B.log
+2026-08-12 00:11:17,019 | INFO | MainThread | config: {'train': 'public_data_dev/train.jsonl', 'dev': 'public_data_dev/dev.jsonl', 'model': 'Qwen/Qwen3-4B', 'context': 'full', 'lean_prompt': True, 'df_path': 'emnllp-dialog-flow-dialog-flow.json', 'max_length': 4096, 'epochs': 200, 'batch_size': 1, 'grad_accum_steps': 4, 'lr': 0.0002, 'warmup_ratio': 0.06, 'lora_r': 8, 'lora_alpha': 16, 'lora_dropout': 0.1, 'target_modules': 'q_proj,v_proj', 'load_in_4bit': False, 'parallelism': 'pipeline', 'max_new_tokens': 128, 'sample_size': None, 'seed': 42, 'device': None, 'output_dir': 'runs/lora_qwen', 'checkpoint_save_path': '/scratch/kwang103'} device=cuda
+2026-08-12 00:11:17,154 | INFO | MainThread | train=2353 dev=504
+Traceback (most recent call last):
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/src/lora/lora_train_generative.py", line 208, in <module>
+    main()
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/src/lora/lora_train_generative.py", line 126, in main
+    raise FileNotFoundError(
+FileNotFoundError: expected local model at 'models/Qwen/Qwen3-4B' (from --model 'Qwen/Qwen3-4B'); download it first with `hf download Qwen/Qwen3-4B --local-dir models/Qwen/Qwen3-4B`
+---
+Finished: Wed 12 Aug 2026 12:11:18 AM EDT
