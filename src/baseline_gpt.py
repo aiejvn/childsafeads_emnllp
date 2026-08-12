@@ -169,9 +169,9 @@ def build_messages(instance: dict, context: str) -> list:
     return [SystemMessage(SYSTEM_PROMPT), HumanMessage(f"SEGMENT DATA:\n\n{text}")]
 
 
-def macro_f1(y_true: List[list], y_pred: List[list], labels: List[str]) -> float:
-    """Macro-F1 over multi-label sets, averaged across `labels`."""
-    scores = []
+def macro_f1(y_true: List[list], y_pred: List[list], labels: List[str]) -> tuple:
+    """Macro-F1 over multi-label sets, averaged across `labels`. Returns (macro_f1, per_label_f1)."""
+    per_label = {}
     # Iterate over labels to avoid having to O(n^2) loop over every y_true and check if it is in y_pred (or vice-versa)
     for label in labels:
         tp = sum(1 for t, p in zip(y_true, y_pred) if label in t and label in p)
@@ -182,8 +182,9 @@ def macro_f1(y_true: List[list], y_pred: List[list], labels: List[str]) -> float
         precision = tp / (tp + fp) if (tp + fp) else 0.0
         recall = tp / (tp + fn) if (tp + fn) else 0.0
         f1 = 2 * precision * recall / (precision + recall + 10e-6)
-        scores.append(f1)
-    return sum(scores) / len(scores) if scores else 0.0
+        per_label[label] = f1
+    macro = sum(per_label.values()) / len(per_label) if per_label else 0.0
+    return macro, per_label
 
 
 def prediction_errors(gold: dict, pred: dict) -> dict:
@@ -201,17 +202,25 @@ def prediction_errors(gold: dict, pred: dict) -> dict:
 
 
 def evaluate(gold: List[dict], pred: List[dict]) -> dict:
-    st1_f1 = macro_f1([[g["st1"]] for g in gold], [[p["st1"]] for p in pred], ST1_LABELS)
-    st2_f1 = macro_f1([g["st2"] for g in gold], [p["st2"] for p in pred], ST2_LABELS)
-    st3_f1 = macro_f1([g["st3"] for g in gold], [p["st3"] for p in pred], ST3_LABELS)
+    st1_f1, st1_per_label = macro_f1([[g["st1"]] for g in gold], [[p["st1"]] for p in pred], ST1_LABELS)
+    st2_f1, st2_per_label = macro_f1([g["st2"] for g in gold], [p["st2"] for p in pred], ST2_LABELS)
+    st3_f1, st3_per_label = macro_f1([g["st3"] for g in gold], [p["st3"] for p in pred], ST3_LABELS)
     fam = lambda flags: [ST3_FAMILY[f] for f in flags]
-    st3_fam_f1 = macro_f1([fam(g["st3"]) for g in gold], [fam(p["st3"]) for p in pred], FAMILY_LABELS)
+    st3_fam_f1, st3_fam_per_label = macro_f1(
+        [fam(g["st3"]) for g in gold], [fam(p["st3"]) for p in pred], FAMILY_LABELS
+    )
     return {
         "st1_macro_f1": st1_f1,
         "st2_macro_f1": st2_f1,
         "st3_macro_f1": st3_f1,
         "st3_family_macro_f1": st3_fam_f1,
         "mean_macro_f1": (st1_f1 + st2_f1 + st3_f1) / 3,
+        "per_label_f1": {
+            "st1": st1_per_label,
+            "st2": st2_per_label,
+            "st3": st3_per_label,
+            "st3_family": st3_fam_per_label,
+        },
     }
 
 # From repo root:
@@ -287,7 +296,11 @@ def main():
         metrics = evaluate(gold, predictions)
         log.info("Evaluation:")
         for k, v in metrics.items():
+            if k == "per_label_f1":
+                continue
             log.info(f"  {k}: {v:.3f}")
+        for tier, per_label in metrics["per_label_f1"].items():
+            log.info(f"  {tier} per-label F1: " + ", ".join(f"{l}={f:.3f}" for l, f in sorted(per_label.items())))
     else:
         log.info("target has no gold labels (or a partial mismatch) -- skipping evaluation")
 

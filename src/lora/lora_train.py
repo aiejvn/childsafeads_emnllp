@@ -18,7 +18,7 @@ from datetime import datetime
 
 import torch
 import wandb
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, WeightedRandomSampler
 from tqdm import tqdm
 from transformers import AutoTokenizer, get_linear_schedule_with_warmup
 
@@ -29,6 +29,39 @@ from common.train_utils import compute_pos_weight, to_device  # noqa: E402
 from lora import CONTEXT_CHOICES, ST1_LABELS, ST2_LABELS, ST3_LABELS, evaluate, setup_logging  # noqa: E402
 from lora.lora_data import Collator, ClassificationDataset, load_split  # noqa: E402
 from lora.lora_model import build_peft_model  # noqa: E402
+
+
+def flatten_label_f1(per_label_f1: dict) -> dict:
+    """Merges the st1/st2/st3 per-label F1 maps `evaluate()` returns into one lookup
+    keyed by label name (st3_family is derived from st3, not a label an instance
+    carries directly, so it's left out)."""
+    merged = {}
+    for tier in ("st1", "st2", "st3"):
+        merged.update(per_label_f1[tier])
+    return merged
+
+
+def instance_difficulty(instance: dict, label_f1: dict) -> float:
+    """Mean (1 - dev F1) over an instance's gold labels: how poorly the model is
+    currently doing, on last epoch's dev pass, on the labels this instance carries."""
+    gold = instance["labels"]
+    labels = [gold["st1"]] + gold["st2"] + gold["st3"]
+    return sum(1.0 - label_f1[label] for label in labels) / len(labels)
+
+
+def curriculum_sampler(train_instances: list, label_f1: dict, epoch: int, total_epochs: int,
+                        floor: float) -> WeightedRandomSampler:
+    """Self-paced sampler: instances whose gold labels the model is currently weak on
+    (low dev F1 from the previous epoch) are downweighted and progressively
+    reintroduced at full weight as `epoch` advances toward `total_epochs` -- so the
+    curriculum tracks the model's own per-label weak spots each epoch, rather than a
+    fixed a-priori difficulty order."""
+    pace = epoch / max(1, total_epochs - 1)  # 0.0 at epoch 0 -> 1.0 at the final epoch
+    weights = [
+        1.0 if instance_difficulty(inst, label_f1) <= pace else floor
+        for inst in train_instances
+    ]
+    return WeightedRandomSampler(weights, num_samples=len(train_instances), replacement=True)
 
 
 #  python src/lora/lora_train.py public_data_dev/train.jsonl public_data_dev/dev.jsonl --model nlpaueb/legal-bert-base-uncased --epochs 200 --output-dir runs/lora_legalbert --no-wandb
@@ -71,6 +104,13 @@ def main():
         "--threshold", type=float, default=0.5,
         help="fallback st2/st3 threshold for labels tune_per_label_thresholds can't tune (see common/predict_utils.py)",
     )
+    ap.add_argument("--no-curriculum", action="store_true", help="disable self-paced curriculum sampling "
+                     "(by default, from epoch 2 on, training instances whose gold labels scored low dev "
+                     "F1 last epoch are downweighted, then progressively reintroduced at full weight as "
+                     "training approaches --epochs)")
+    ap.add_argument("--curriculum-floor", type=float, default=0.1, help="sampling weight given to "
+                     "still-weak instances early in the curriculum, relative to a weight of 1.0 for "
+                     "already-easy ones; no effect with --no-curriculum")
     ap.add_argument("--sample-size", type=int, default=None, help="sample N train and N dev instances (seeded smoke test)")
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--device", default=None, help="defaults to cuda if available, else cpu")
@@ -139,8 +179,13 @@ def main():
     )
 
     best_f1 = -1.0
+    label_f1 = None  # populated after the first dev pass; drives the curriculum sampler from epoch 2 on
     os.makedirs(args.output_dir, exist_ok=True)
     for epoch in range(args.epochs):
+        if label_f1 is not None and not args.no_curriculum:
+            sampler = curriculum_sampler(train_instances, label_f1, epoch, args.epochs, args.curriculum_floor)
+            train_loader = DataLoader(train_ds, batch_size=args.batch_size, sampler=sampler, collate_fn=collate)
+
         model.train()
         running_loss = 0.0
         for step, batch in enumerate(tqdm(train_loader, desc=f"epoch {epoch + 1}/{args.epochs}")):
@@ -168,8 +213,19 @@ def main():
         )
         gold = [inst["labels"] for inst in dev_instances]
         metrics = evaluate(gold, preds)
-        log.info(f"epoch {epoch + 1} dev metrics (tuned thresholds): " + ", ".join(f"{k}={v:.3f}" for k, v in metrics.items()))
-        wandb.log({"epoch": epoch + 1, "train_loss": train_loss, **{f"dev_{k}": v for k, v in metrics.items()}})
+        scalar_metrics = {k: v for k, v in metrics.items() if k != "per_label_f1"}
+        log.info(f"epoch {epoch + 1} dev metrics (tuned thresholds): "
+                 + ", ".join(f"{k}={v:.3f}" for k, v in scalar_metrics.items()))
+        for tier, per_label in metrics["per_label_f1"].items():
+            log.info(f"epoch {epoch + 1} dev {tier} per-label F1: "
+                     + ", ".join(f"{label}={f1:.3f}" for label, f1 in sorted(per_label.items())))
+        wandb.log({
+            "epoch": epoch + 1, "train_loss": train_loss,
+            **{f"dev_{k}": v for k, v in scalar_metrics.items()},
+            **{f"dev_{tier}_f1/{label}": f1
+               for tier, per_label in metrics["per_label_f1"].items() for label, f1 in per_label.items()},
+        })
+        label_f1 = flatten_label_f1(metrics["per_label_f1"])
 
         if metrics["mean_macro_f1"] > best_f1:
             best_f1 = metrics["mean_macro_f1"]
