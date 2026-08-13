@@ -1,3 +1,0 @@
-2026-08-06 01:57:43,423 | INFO | MainThread | logging to runs/run_20260806_015743_lora_train_generative_Qwen_Qwen3.5-4B.log
-2026-08-06 01:57:43,424 | INFO | MainThread | config: {'train': 'public_data_dev/train.jsonl', 'dev': 'public_data_dev/dev.jsonl', 'model': 'Qwen/Qwen3.5-4B', 'context': 'full', 'max_length': 4096, 'epochs': 3, 'batch_size': 4, 'grad_accum_steps': 4, 'lr': 0.0002, 'warmup_ratio': 0.06, 'lora_r': 8, 'lora_alpha': 16, 'lora_dropout': 0.1, 'target_modules': 'q_proj,v_proj', 'load_in_4bit': False, 'max_new_tokens': 128, 'sample_size': None, 'seed': 42, 'device': None, 'output_dir': 'runs/lora_qwen'} device=cuda
-2026-08-06 01:57:43,523 | INFO | MainThread | train=2353 dev=504
