@@ -48,7 +48,7 @@ from common.predict_utils import write_submission  # noqa: E402
 from lora import CONTEXT_CHOICES, SFT_TAXONOMY, SYSTEM_PROMPT, evaluate, load_split, setup_logging  # noqa: E402
 from lora.lora_data import GenerativeCollator, GenerativeDataset  # noqa: E402
 from lora.lora_generative import generate_predictions  # noqa: E402
-from lora.lora_model import PARALLELISM_CHOICES, build_peft_model_causal  # noqa: E402
+from lora.lora_model import PARALLELISM_CHOICES, build_peft_model_causal, load_peft_model_causal  # noqa: E402
 
 
 def to_device(batch: dict, device: str) -> dict:
@@ -102,6 +102,16 @@ def main():
                      "everything on --device")
     ap.add_argument("--max-new-tokens", type=int, default=128, help="generation budget for the JSON completion during dev eval")
     ap.add_argument("--sample-size", type=int, default=None, help="sample N train and N dev instances (seeded smoke test)")
+    ap.add_argument("--test-holdout", type=int, default=500, help="hold out this many instances from "
+                     "`train`, split off before training, as a generalization check separate from "
+                     "dev (which is used for per-epoch model selection and must stay untouched -- "
+                     "the ground-truth harness). Evaluated once at the end against the best-dev "
+                     "checkpoint. Pass 0 to disable")
+    ap.add_argument("--split-seed", type=int, default=None, help="seed for the train/test-holdout "
+                     "split; omit for a fresh random split each run (the default and recommended "
+                     "setting -- a fixed holdout would just become a second dev set that "
+                     "experiments quietly overfit to across many runs). Pass a fixed value only to "
+                     "reproduce a specific run's split")
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--device", default=None, help="defaults to cuda if available, else cpu")
     ap.add_argument("--output-dir", required=True)
@@ -125,6 +135,16 @@ def main():
 
     train_instances = list(load_split(args.train))
     dev_instances = list(load_split(args.dev))
+
+    split_seed = args.split_seed if args.split_seed is not None else random.SystemRandom().randint(0, 2**31 - 1)
+    shuffled = train_instances[:]
+    random.Random(split_seed).shuffle(shuffled)
+    test_holdout_instances = shuffled[:args.test_holdout]
+    train_instances = shuffled[args.test_holdout:]
+    log.info(f"train/test-holdout split (fresh random split every run unless --split-seed is "
+             f"pinned): split_seed={split_seed} train={len(train_instances)} "
+             f"test_holdout={len(test_holdout_instances)}")
+
     if args.sample_size:
         rng = random.Random(args.seed)
         train_instances = rng.sample(train_instances, min(args.sample_size, len(train_instances)))
@@ -212,6 +232,7 @@ def main():
 
         if metrics["mean_macro_f1"] > best_f1:
             best_f1 = metrics["mean_macro_f1"]
+            best_dev_scalar_metrics = scalar_metrics
             if is_main:  # avoid every rank racing to write the same adapter dir under --parallelism tensor
                 best_dir = os.path.join(checkpoint_dir, "best")
                 model.save_pretrained(best_dir)
@@ -224,6 +245,35 @@ def main():
     if is_main:
         model.save_pretrained(os.path.join(checkpoint_dir, "last"))
         log.info(f"saved final epoch adapter to {checkpoint_dir}/last (best dev mean_macro_f1={best_f1:.3f})")
+        log.info("best dev metrics: " + ", ".join(f"{k}={v:.3f}" for k, v in best_dev_scalar_metrics.items()))
+
+        if test_holdout_instances:
+            best_dir = os.path.join(checkpoint_dir, "best")
+            log.info(f"reloading best-dev checkpoint from {best_dir} for the test-holdout pass "
+                     f"(generalization check, not used for model selection)")
+            test_model = load_peft_model_causal(
+                model_path, best_dir, load_in_4bit=args.load_in_4bit, device=device,
+                local_files_only=True, parallelism=args.parallelism,
+            )
+            if args.parallelism == "none" and not args.load_in_4bit:
+                test_model = test_model.to(device)
+            test_model.eval()
+            tokenizer.padding_side = "left"
+            test_loader = DataLoader(
+                GenerativeDataset(test_holdout_instances, tokenizer, args.context, args.max_length,
+                                  system_prompt, df_text),
+                batch_size=eval_batch_size, shuffle=False, collate_fn=collate,
+            )
+            test_ids, test_preds = generate_predictions(test_model, test_loader, tokenizer, args.max_new_tokens)
+            test_gold = [inst["labels"] for inst in test_holdout_instances]
+            test_metrics = evaluate(test_gold, test_preds)
+            test_scalar_metrics = {k: v for k, v in test_metrics.items() if k != "per_label_f1"}
+            log.info("test holdout metrics: " + ", ".join(f"{k}={v:.3f}" for k, v in test_scalar_metrics.items()))
+            write_submission(
+                os.path.join(best_dir, "test_submission.jsonl"),
+                os.path.join(best_dir, "test_submission_error.jsonl"),
+                test_ids, test_holdout_instances, test_preds,
+            )
 
 
 if __name__ == "__main__":
