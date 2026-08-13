@@ -54,7 +54,7 @@ from lora.lora_model import PARALLELISM_CHOICES, build_peft_model_causal, load_p
 def to_device(batch: dict, device: str) -> dict:
     return {k: (v.to(device) if torch.is_tensor(v) else v) for k, v in batch.items()}
 
-
+# bash slurm_wrapper.sh 4 src/lora/lora_train_generative.py public_data_dev/train.jsonl public_data_dev/dev.jsonl --epochs 200 --parallelism pipeline --model Qwen/Qwen3-8B --df-path emnllp-dialog-flow-dialog-flow.json --lean-prompt --batch-size 1 --output-dir runs/lora_qwen3-8B --checkpoint-save-path $SCRATCH/8-13/Qwen3-8B-batch-size-1 --split-seed 42
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("train", help="training split, e.g. public_data_dev/train.jsonl")

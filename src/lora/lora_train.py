@@ -66,6 +66,7 @@ def curriculum_sampler(train_instances: list, label_f1: dict, epoch: int, total_
 
 
 #  python src/lora/lora_train.py public_data_dev/train.jsonl public_data_dev/dev.jsonl --model nlpaueb/legal-bert-base-uncased --epochs 200 --output-dir runs/lora_legalbert --no-wandb
+#  bash slurm_wrapper.sh 1 src/lora/lora_train.py public_data_dev/train.jsonl public_data_dev/dev.jsonl --epochs 200 --output-dir runs/lora_legalbert --no-wandb --local --grad-accum-steps 0 --lora-r 64 --lora-alpha 128  --target-modules "query,key,value,dense" --st3-loss-weight 2 --pos-weight
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("train", help="training split, e.g. public_data_dev/train.jsonl")
