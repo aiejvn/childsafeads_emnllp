@@ -8,7 +8,8 @@ Usage (run from the repo root):
         --sample-size 16 --epochs 1 --batch-size 4 --output-dir runs/lora_smoke  # smoke test
 
 Saves the best-dev-macro-F1 adapter+heads to <output-dir>/best and the final epoch's
-to <output-dir>/last (both loadable with lora_predict.py).
+to <output-dir>/last (both loadable with lora_predict.py). <output-dir>/best also gets
+that epoch's dev submission.jsonl and submission_error.jsonl (see baseline_gpt.py).
 """
 import argparse
 import os
@@ -24,7 +25,7 @@ from transformers import AutoTokenizer, get_linear_schedule_with_warmup
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))  # so `import lora` resolves src/lora as a package
 from common.dialog_flow import df_pre_context  # noqa: E402
-from common.predict_utils import save_thresholds, tune_and_decode  # noqa: E402
+from common.predict_utils import save_thresholds, tune_and_decode, write_submission  # noqa: E402
 from common.train_utils import compute_pos_weight, to_device  # noqa: E402
 from lora import CONTEXT_CHOICES, ST1_LABELS, ST2_LABELS, ST3_LABELS, evaluate, setup_logging  # noqa: E402
 from lora.lora_data import Collator, ClassificationDataset, load_split  # noqa: E402
@@ -232,6 +233,11 @@ def main():
             best_dir = os.path.join(args.output_dir, "best")
             model.save_pretrained(best_dir)
             save_thresholds(best_dir, st2_threshold, st3_threshold)
+            dev_ids = [inst["instanceID"] for inst in dev_instances]
+            write_submission(
+                os.path.join(best_dir, "submission.jsonl"), os.path.join(best_dir, "submission_error.jsonl"),
+                dev_ids, dev_instances, preds,
+            )
             log.info(f"epoch {epoch + 1}: new best mean_macro_f1={best_f1:.3f}, saved to {args.output_dir}/best")
 
     last_dir = os.path.join(args.output_dir, "last")

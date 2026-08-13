@@ -1,0 +1,139 @@
+2026-08-12 14:07:05,232 | INFO | MainThread | logging to runs/run_20260812_140705_lora_train_FacebookAI_roberta-base.log
+2026-08-12 14:07:05,232 | INFO | MainThread | config: {'train': 'public_data_dev/train.jsonl', 'dev': 'public_data_dev/dev.jsonl', 'model': 'FacebookAI/roberta-base', 'local': False, 'context': 'full', 'df_path': None, 'lean_prompt': False, 'max_length': 512, 'epochs': 200, 'batch_size': 16, 'grad_accum_steps': 1, 'lr': 0.0002, 'warmup_ratio': 0.06, 'lora_r': 64, 'lora_alpha': 128, 'lora_dropout': 0.1, 'target_modules': 'query,key,value,dense', 'st2_loss_weight': 1.0, 'st3_loss_weight': 2.0, 'pos_weight': True, 'threshold': 0.5, 'no_curriculum': False, 'curriculum_floor': 0.1, 'sample_size': None, 'seed': 42, 'device': None, 'output_dir': 'runs/lora-roberta', 'no_wandb': True} device=cuda
+2026-08-12 14:07:05,354 | INFO | MainThread | train=2353 dev=504
+2026-08-12 14:12:32,590 | INFO | MainThread | epoch 1: mean train loss = 4.5315
+2026-08-12 14:13:27,048 | INFO | MainThread | epoch 1 dev metrics (tuned thresholds): st1_macro_f1=0.350, st2_macro_f1=0.190, st3_macro_f1=0.158, st3_family_macro_f1=0.257, mean_macro_f1=0.233
+2026-08-12 14:13:27,048 | INFO | MainThread | epoch 1 dev st1 per-label F1: digital_content_or_services=0.746, none=0.000, physical_goods=0.655, physical_services=0.000
+2026-08-12 14:13:27,049 | INFO | MainThread | epoch 1 dev st2 per-label F1: apps=0.507, creator_community=0.196, education=0.050, fashion=0.181, financial=0.076, food=0.203, gambling=0.020, gambling_adjacent=0.068, hardware_electronics=0.386, health=0.270, other=0.296, toys=0.031
+2026-08-12 14:13:27,049 | INFO | MainThread | epoch 1 dev st3 per-label F1: age_restricted_or_prohibited_product=0.241, direct_exhortation=0.153, hfss_food_marketing=0.000, inadequate_disclosure=0.142, insufficient_context=0.051, misleading_claim=0.204, no_flag=0.403, undisclosed_advertising=0.074
+2026-08-12 14:13:27,049 | INFO | MainThread | epoch 1 dev st3_family per-label F1: content=0.211, disclosure=0.178, housekeeping=0.432, product=0.209
+2026-08-12 14:13:27,180 | INFO | MainThread | epoch 1: new best mean_macro_f1=0.233, saved to runs/lora-roberta/best
+2026-08-12 14:19:25,190 | INFO | MainThread | epoch 2: mean train loss = 3.7139
+2026-08-12 14:20:24,489 | INFO | MainThread | epoch 2 dev metrics (tuned thresholds): st1_macro_f1=0.589, st2_macro_f1=0.419, st3_macro_f1=0.403, st3_family_macro_f1=0.466, mean_macro_f1=0.470
+2026-08-12 14:20:24,489 | INFO | MainThread | epoch 2 dev st1 per-label F1: digital_content_or_services=0.864, none=0.000, physical_goods=0.843, physical_services=0.649
+2026-08-12 14:20:24,489 | INFO | MainThread | epoch 2 dev st2 per-label F1: apps=0.713, creator_community=0.344, education=0.389, fashion=0.522, financial=0.478, food=0.667, gambling=0.027, gambling_adjacent=0.239, hardware_electronics=0.689, health=0.513, other=0.344, toys=0.103
+2026-08-12 14:20:24,489 | INFO | MainThread | epoch 2 dev st3 per-label F1: age_restricted_or_prohibited_product=0.191, direct_exhortation=0.347, hfss_food_marketing=0.190, inadequate_disclosure=0.218, insufficient_context=0.714, misleading_claim=0.660, no_flag=0.478, undisclosed_advertising=0.429
+2026-08-12 14:20:24,489 | INFO | MainThread | epoch 2 dev st3_family per-label F1: content=0.665, disclosure=0.447, housekeeping=0.487, product=0.267
+2026-08-12 14:20:24,619 | INFO | MainThread | epoch 2: new best mean_macro_f1=0.470, saved to runs/lora-roberta/best
+2026-08-12 14:26:18,777 | INFO | MainThread | epoch 3: mean train loss = 2.7815
+2026-08-12 14:27:19,220 | INFO | MainThread | epoch 3 dev metrics (tuned thresholds): st1_macro_f1=0.597, st2_macro_f1=0.575, st3_macro_f1=0.459, st3_family_macro_f1=0.505, mean_macro_f1=0.544
+2026-08-12 14:27:19,220 | INFO | MainThread | epoch 3 dev st1 per-label F1: digital_content_or_services=0.875, none=0.000, physical_goods=0.862, physical_services=0.649
+2026-08-12 14:27:19,220 | INFO | MainThread | epoch 3 dev st2 per-label F1: apps=0.745, creator_community=0.420, education=0.600, fashion=0.527, financial=0.581, food=0.818, gambling=0.769, gambling_adjacent=0.326, hardware_electronics=0.786, health=0.642, other=0.435, toys=0.250
+2026-08-12 14:27:19,220 | INFO | MainThread | epoch 3 dev st3 per-label F1: age_restricted_or_prohibited_product=0.333, direct_exhortation=0.317, hfss_food_marketing=0.333, inadequate_disclosure=0.280, insufficient_context=0.769, misleading_claim=0.727, no_flag=0.476, undisclosed_advertising=0.437
+2026-08-12 14:27:19,220 | INFO | MainThread | epoch 3 dev st3_family per-label F1: content=0.725, disclosure=0.474, housekeeping=0.488, product=0.333
+2026-08-12 14:27:19,341 | INFO | MainThread | epoch 3: new best mean_macro_f1=0.544, saved to runs/lora-roberta/best
+2026-08-12 14:33:17,826 | INFO | MainThread | epoch 4: mean train loss = 2.3792
+2026-08-12 14:34:17,312 | INFO | MainThread | epoch 4 dev metrics (tuned thresholds): st1_macro_f1=0.604, st2_macro_f1=0.622, st3_macro_f1=0.482, st3_family_macro_f1=0.570, mean_macro_f1=0.569
+2026-08-12 14:34:17,312 | INFO | MainThread | epoch 4 dev st1 per-label F1: digital_content_or_services=0.872, none=0.000, physical_goods=0.859, physical_services=0.684
+2026-08-12 14:34:17,312 | INFO | MainThread | epoch 4 dev st2 per-label F1: apps=0.752, creator_community=0.487, education=0.700, fashion=0.581, financial=0.667, food=0.831, gambling=0.727, gambling_adjacent=0.314, hardware_electronics=0.797, health=0.764, other=0.448, toys=0.400
+2026-08-12 14:34:17,312 | INFO | MainThread | epoch 4 dev st3 per-label F1: age_restricted_or_prohibited_product=0.478, direct_exhortation=0.318, hfss_food_marketing=0.333, inadequate_disclosure=0.265, insufficient_context=0.714, misleading_claim=0.741, no_flag=0.492, undisclosed_advertising=0.514
+2026-08-12 14:34:17,312 | INFO | MainThread | epoch 4 dev st3_family per-label F1: content=0.727, disclosure=0.508, housekeeping=0.501, product=0.545
+2026-08-12 14:34:17,419 | INFO | MainThread | epoch 4: new best mean_macro_f1=0.569, saved to runs/lora-roberta/best
+2026-08-12 14:40:14,332 | INFO | MainThread | epoch 5: mean train loss = 2.1694
+2026-08-12 14:41:13,731 | INFO | MainThread | epoch 5 dev metrics (tuned thresholds): st1_macro_f1=0.594, st2_macro_f1=0.608, st3_macro_f1=0.530, st3_family_macro_f1=0.593, mean_macro_f1=0.577
+2026-08-12 14:41:13,732 | INFO | MainThread | epoch 5 dev st1 per-label F1: digital_content_or_services=0.859, none=0.000, physical_goods=0.851, physical_services=0.667
+2026-08-12 14:41:13,732 | INFO | MainThread | epoch 5 dev st2 per-label F1: apps=0.742, creator_community=0.418, education=0.667, fashion=0.596, financial=0.682, food=0.835, gambling=0.727, gambling_adjacent=0.333, hardware_electronics=0.807, health=0.752, other=0.472, toys=0.267
+2026-08-12 14:41:13,732 | INFO | MainThread | epoch 5 dev st3 per-label F1: age_restricted_or_prohibited_product=0.667, direct_exhortation=0.317, hfss_food_marketing=0.381, inadequate_disclosure=0.290, insufficient_context=0.875, misleading_claim=0.744, no_flag=0.496, undisclosed_advertising=0.469
+2026-08-12 14:41:13,732 | INFO | MainThread | epoch 5 dev st3_family per-label F1: content=0.727, disclosure=0.544, housekeeping=0.517, product=0.583
+2026-08-12 14:41:13,807 | INFO | MainThread | epoch 5: new best mean_macro_f1=0.577, saved to runs/lora-roberta/best
+2026-08-12 14:47:12,676 | INFO | MainThread | epoch 6: mean train loss = 1.9673
+2026-08-12 14:48:12,173 | INFO | MainThread | epoch 6 dev metrics (tuned thresholds): st1_macro_f1=0.626, st2_macro_f1=0.633, st3_macro_f1=0.527, st3_family_macro_f1=0.607, mean_macro_f1=0.595
+2026-08-12 14:48:12,173 | INFO | MainThread | epoch 6 dev st1 per-label F1: digital_content_or_services=0.885, none=0.000, physical_goods=0.880, physical_services=0.737
+2026-08-12 14:48:12,173 | INFO | MainThread | epoch 6 dev st2 per-label F1: apps=0.745, creator_community=0.462, education=0.583, fashion=0.578, financial=0.700, food=0.831, gambling=0.769, gambling_adjacent=0.452, hardware_electronics=0.800, health=0.746, other=0.548, toys=0.381
+2026-08-12 14:48:12,173 | INFO | MainThread | epoch 6 dev st3 per-label F1: age_restricted_or_prohibited_product=0.552, direct_exhortation=0.333, hfss_food_marketing=0.320, inadequate_disclosure=0.324, insufficient_context=0.875, misleading_claim=0.746, no_flag=0.521, undisclosed_advertising=0.544
+2026-08-12 14:48:12,173 | INFO | MainThread | epoch 6 dev st3_family per-label F1: content=0.741, disclosure=0.645, housekeeping=0.543, product=0.500
+2026-08-12 14:48:12,255 | INFO | MainThread | epoch 6: new best mean_macro_f1=0.595, saved to runs/lora-roberta/best
+2026-08-12 14:54:09,150 | INFO | MainThread | epoch 7: mean train loss = 1.8188
+2026-08-12 14:55:08,502 | INFO | MainThread | epoch 7 dev metrics (tuned thresholds): st1_macro_f1=0.614, st2_macro_f1=0.642, st3_macro_f1=0.544, st3_family_macro_f1=0.644, mean_macro_f1=0.600
+2026-08-12 14:55:08,502 | INFO | MainThread | epoch 7 dev st1 per-label F1: digital_content_or_services=0.857, none=0.000, physical_goods=0.850, physical_services=0.750
+2026-08-12 14:55:08,502 | INFO | MainThread | epoch 7 dev st2 per-label F1: apps=0.746, creator_community=0.554, education=0.696, fashion=0.485, financial=0.667, food=0.854, gambling=0.909, gambling_adjacent=0.316, hardware_electronics=0.814, health=0.737, other=0.524, toys=0.400
+2026-08-12 14:55:08,502 | INFO | MainThread | epoch 7 dev st3 per-label F1: age_restricted_or_prohibited_product=0.524, direct_exhortation=0.352, hfss_food_marketing=0.400, inadequate_disclosure=0.379, insufficient_context=0.875, misleading_claim=0.750, no_flag=0.571, undisclosed_advertising=0.500
+2026-08-12 14:55:08,502 | INFO | MainThread | epoch 7 dev st3_family per-label F1: content=0.738, disclosure=0.686, housekeeping=0.588, product=0.566
+2026-08-12 14:55:08,577 | INFO | MainThread | epoch 7: new best mean_macro_f1=0.600, saved to runs/lora-roberta/best
+2026-08-12 15:01:07,748 | INFO | MainThread | epoch 8: mean train loss = 1.6220
+2026-08-12 15:02:06,363 | INFO | MainThread | epoch 8 dev metrics (tuned thresholds): st1_macro_f1=0.637, st2_macro_f1=0.653, st3_macro_f1=0.554, st3_family_macro_f1=0.647, mean_macro_f1=0.615
+2026-08-12 15:02:06,364 | INFO | MainThread | epoch 8 dev st1 per-label F1: digital_content_or_services=0.876, none=0.000, physical_goods=0.852, physical_services=0.818
+2026-08-12 15:02:06,364 | INFO | MainThread | epoch 8 dev st2 per-label F1: apps=0.763, creator_community=0.520, education=0.615, fashion=0.600, financial=0.714, food=0.882, gambling=0.769, gambling_adjacent=0.319, hardware_electronics=0.814, health=0.857, other=0.565, toys=0.417
+2026-08-12 15:02:06,364 | INFO | MainThread | epoch 8 dev st3 per-label F1: age_restricted_or_prohibited_product=0.512, direct_exhortation=0.361, hfss_food_marketing=0.400, inadequate_disclosure=0.403, insufficient_context=0.857, misleading_claim=0.776, no_flag=0.556, undisclosed_advertising=0.571
+2026-08-12 15:02:06,364 | INFO | MainThread | epoch 8 dev st3_family per-label F1: content=0.785, disclosure=0.664, housekeeping=0.573, product=0.566
+2026-08-12 15:02:06,424 | INFO | MainThread | epoch 8: new best mean_macro_f1=0.615, saved to runs/lora-roberta/best
+2026-08-12 15:08:05,162 | INFO | MainThread | epoch 9: mean train loss = 1.4821
+2026-08-12 15:09:04,812 | INFO | MainThread | epoch 9 dev metrics (tuned thresholds): st1_macro_f1=0.681, st2_macro_f1=0.615, st3_macro_f1=0.591, st3_family_macro_f1=0.661, mean_macro_f1=0.629
+2026-08-12 15:09:04,812 | INFO | MainThread | epoch 9 dev st1 per-label F1: digital_content_or_services=0.880, none=0.250, physical_goods=0.864, physical_services=0.732
+2026-08-12 15:09:04,813 | INFO | MainThread | epoch 9 dev st2 per-label F1: apps=0.735, creator_community=0.553, education=0.560, fashion=0.595, financial=0.619, food=0.800, gambling=0.727, gambling_adjacent=0.372, hardware_electronics=0.829, health=0.780, other=0.491, toys=0.320
+2026-08-12 15:09:04,813 | INFO | MainThread | epoch 9 dev st3 per-label F1: age_restricted_or_prohibited_product=0.692, direct_exhortation=0.356, hfss_food_marketing=0.571, inadequate_disclosure=0.356, insufficient_context=0.875, misleading_claim=0.719, no_flag=0.575, undisclosed_advertising=0.583
+2026-08-12 15:09:04,813 | INFO | MainThread | epoch 9 dev st3_family per-label F1: content=0.716, disclosure=0.667, housekeeping=0.595, product=0.667
+2026-08-12 15:09:04,891 | INFO | MainThread | epoch 9: new best mean_macro_f1=0.629, saved to runs/lora-roberta/best
+2026-08-12 15:15:02,177 | INFO | MainThread | epoch 10: mean train loss = 1.2900
+2026-08-12 15:16:01,738 | INFO | MainThread | epoch 10 dev metrics (tuned thresholds): st1_macro_f1=0.732, st2_macro_f1=0.639, st3_macro_f1=0.603, st3_family_macro_f1=0.633, mean_macro_f1=0.658
+2026-08-12 15:16:01,738 | INFO | MainThread | epoch 10 dev st1 per-label F1: digital_content_or_services=0.872, none=0.435, physical_goods=0.853, physical_services=0.769
+2026-08-12 15:16:01,738 | INFO | MainThread | epoch 10 dev st2 per-label F1: apps=0.754, creator_community=0.542, education=0.538, fashion=0.578, financial=0.683, food=0.795, gambling=0.769, gambling_adjacent=0.324, hardware_electronics=0.820, health=0.865, other=0.565, toys=0.429
+2026-08-12 15:16:01,738 | INFO | MainThread | epoch 10 dev st3 per-label F1: age_restricted_or_prohibited_product=0.593, direct_exhortation=0.316, hfss_food_marketing=0.800, inadequate_disclosure=0.292, insufficient_context=0.875, misleading_claim=0.685, no_flag=0.563, undisclosed_advertising=0.704
+2026-08-12 15:16:01,739 | INFO | MainThread | epoch 10 dev st3_family per-label F1: content=0.691, disclosure=0.616, housekeeping=0.577, product=0.649
+2026-08-12 15:16:01,821 | INFO | MainThread | epoch 10: new best mean_macro_f1=0.658, saved to runs/lora-roberta/best
+2026-08-12 15:21:59,833 | INFO | MainThread | epoch 11: mean train loss = 1.2215
+2026-08-12 15:22:59,339 | INFO | MainThread | epoch 11 dev metrics (tuned thresholds): st1_macro_f1=0.619, st2_macro_f1=0.661, st3_macro_f1=0.592, st3_family_macro_f1=0.633, mean_macro_f1=0.624
+2026-08-12 15:22:59,339 | INFO | MainThread | epoch 11 dev st1 per-label F1: digital_content_or_services=0.867, none=0.000, physical_goods=0.848, physical_services=0.762
+2026-08-12 15:22:59,340 | INFO | MainThread | epoch 11 dev st2 per-label F1: apps=0.740, creator_community=0.486, education=0.667, fashion=0.667, financial=0.757, food=0.804, gambling=0.833, gambling_adjacent=0.444, hardware_electronics=0.807, health=0.804, other=0.524, toys=0.400
+2026-08-12 15:22:59,340 | INFO | MainThread | epoch 11 dev st3 per-label F1: age_restricted_or_prohibited_product=0.522, direct_exhortation=0.373, hfss_food_marketing=0.667, inadequate_disclosure=0.310, insufficient_context=0.875, misleading_claim=0.738, no_flag=0.580, undisclosed_advertising=0.674
+2026-08-12 15:22:59,340 | INFO | MainThread | epoch 11 dev st3_family per-label F1: content=0.728, disclosure=0.650, housekeeping=0.593, product=0.562
+2026-08-12 15:28:56,270 | INFO | MainThread | epoch 12: mean train loss = 1.0334
+2026-08-12 15:29:55,680 | INFO | MainThread | epoch 12 dev metrics (tuned thresholds): st1_macro_f1=0.663, st2_macro_f1=0.645, st3_macro_f1=0.567, st3_family_macro_f1=0.639, mean_macro_f1=0.625
+2026-08-12 15:29:55,680 | INFO | MainThread | epoch 12 dev st1 per-label F1: digital_content_or_services=0.865, none=0.167, physical_goods=0.851, physical_services=0.769
+2026-08-12 15:29:55,680 | INFO | MainThread | epoch 12 dev st2 per-label F1: apps=0.753, creator_community=0.568, education=0.609, fashion=0.581, financial=0.732, food=0.822, gambling=0.769, gambling_adjacent=0.343, hardware_electronics=0.828, health=0.752, other=0.528, toys=0.455
+2026-08-12 15:29:55,681 | INFO | MainThread | epoch 12 dev st3 per-label F1: age_restricted_or_prohibited_product=0.720, direct_exhortation=0.337, hfss_food_marketing=0.286, inadequate_disclosure=0.346, insufficient_context=0.923, misleading_claim=0.723, no_flag=0.551, undisclosed_advertising=0.650
+2026-08-12 15:29:55,681 | INFO | MainThread | epoch 12 dev st3_family per-label F1: content=0.731, disclosure=0.615, housekeeping=0.565, product=0.645
+2026-08-12 15:35:55,101 | INFO | MainThread | epoch 13: mean train loss = 0.9976
+2026-08-12 15:36:54,588 | INFO | MainThread | epoch 13 dev metrics (tuned thresholds): st1_macro_f1=0.627, st2_macro_f1=0.656, st3_macro_f1=0.558, st3_family_macro_f1=0.635, mean_macro_f1=0.614
+2026-08-12 15:36:54,589 | INFO | MainThread | epoch 13 dev st1 per-label F1: digital_content_or_services=0.871, none=0.125, physical_goods=0.864, physical_services=0.650
+2026-08-12 15:36:54,589 | INFO | MainThread | epoch 13 dev st2 per-label F1: apps=0.756, creator_community=0.544, education=0.593, fashion=0.571, financial=0.762, food=0.817, gambling=0.833, gambling_adjacent=0.389, hardware_electronics=0.827, health=0.746, other=0.537, toys=0.500
+2026-08-12 15:36:54,589 | INFO | MainThread | epoch 13 dev st3 per-label F1: age_restricted_or_prohibited_product=0.512, direct_exhortation=0.425, hfss_food_marketing=0.364, inadequate_disclosure=0.422, insufficient_context=0.727, misleading_claim=0.777, no_flag=0.568, undisclosed_advertising=0.667
+2026-08-12 15:36:54,590 | INFO | MainThread | epoch 13 dev st3_family per-label F1: content=0.784, disclosure=0.614, housekeeping=0.575, product=0.566
+2026-08-12 15:42:51,909 | INFO | MainThread | epoch 14: mean train loss = 0.9205
+2026-08-12 15:43:51,295 | INFO | MainThread | epoch 14 dev metrics (tuned thresholds): st1_macro_f1=0.688, st2_macro_f1=0.617, st3_macro_f1=0.557, st3_family_macro_f1=0.618, mean_macro_f1=0.620
+2026-08-12 15:43:51,296 | INFO | MainThread | epoch 14 dev st1 per-label F1: digital_content_or_services=0.845, none=0.385, physical_goods=0.840, physical_services=0.681
+2026-08-12 15:43:51,296 | INFO | MainThread | epoch 14 dev st2 per-label F1: apps=0.721, creator_community=0.521, education=0.519, fashion=0.554, financial=0.700, food=0.851, gambling=0.727, gambling_adjacent=0.316, hardware_electronics=0.809, health=0.811, other=0.475, toys=0.400
+2026-08-12 15:43:51,296 | INFO | MainThread | epoch 14 dev st3 per-label F1: age_restricted_or_prohibited_product=0.483, direct_exhortation=0.347, hfss_food_marketing=0.381, inadequate_disclosure=0.412, insufficient_context=0.857, misleading_claim=0.717, no_flag=0.591, undisclosed_advertising=0.667
+2026-08-12 15:43:51,296 | INFO | MainThread | epoch 14 dev st3_family per-label F1: content=0.720, disclosure=0.670, housekeeping=0.602, product=0.478
+2026-08-12 15:49:49,321 | INFO | MainThread | epoch 15: mean train loss = 0.7674
+2026-08-12 15:50:48,850 | INFO | MainThread | epoch 15 dev metrics (tuned thresholds): st1_macro_f1=0.673, st2_macro_f1=0.650, st3_macro_f1=0.564, st3_family_macro_f1=0.655, mean_macro_f1=0.629
+2026-08-12 15:50:48,850 | INFO | MainThread | epoch 15 dev st1 per-label F1: digital_content_or_services=0.868, none=0.133, physical_goods=0.869, physical_services=0.824
+2026-08-12 15:50:48,850 | INFO | MainThread | epoch 15 dev st2 per-label F1: apps=0.740, creator_community=0.569, education=0.593, fashion=0.617, financial=0.686, food=0.837, gambling=0.800, gambling_adjacent=0.333, hardware_electronics=0.842, health=0.818, other=0.520, toys=0.444
+2026-08-12 15:50:48,850 | INFO | MainThread | epoch 15 dev st3 per-label F1: age_restricted_or_prohibited_product=0.643, direct_exhortation=0.348, hfss_food_marketing=0.462, inadequate_disclosure=0.429, insufficient_context=0.714, misleading_claim=0.743, no_flag=0.574, undisclosed_advertising=0.596
+2026-08-12 15:50:48,850 | INFO | MainThread | epoch 15 dev st3_family per-label F1: content=0.749, disclosure=0.675, housekeeping=0.580, product=0.615
+2026-08-12 15:56:47,383 | INFO | MainThread | epoch 16: mean train loss = 0.6931
+2026-08-12 15:57:46,849 | INFO | MainThread | epoch 16 dev metrics (tuned thresholds): st1_macro_f1=0.709, st2_macro_f1=0.635, st3_macro_f1=0.564, st3_family_macro_f1=0.648, mean_macro_f1=0.636
+2026-08-12 15:57:46,850 | INFO | MainThread | epoch 16 dev st1 per-label F1: digital_content_or_services=0.877, none=0.353, physical_goods=0.862, physical_services=0.745
+2026-08-12 15:57:46,850 | INFO | MainThread | epoch 16 dev st2 per-label F1: apps=0.770, creator_community=0.485, education=0.538, fashion=0.547, financial=0.714, food=0.796, gambling=0.833, gambling_adjacent=0.400, hardware_electronics=0.800, health=0.807, other=0.502, toys=0.421
+2026-08-12 15:57:46,850 | INFO | MainThread | epoch 16 dev st3 per-label F1: age_restricted_or_prohibited_product=0.500, direct_exhortation=0.393, hfss_food_marketing=0.571, inadequate_disclosure=0.392, insufficient_context=0.800, misleading_claim=0.724, no_flag=0.565, undisclosed_advertising=0.565
+2026-08-12 15:57:46,850 | INFO | MainThread | epoch 16 dev st3_family per-label F1: content=0.734, disclosure=0.660, housekeeping=0.582, product=0.615
+2026-08-12 16:03:47,204 | INFO | MainThread | epoch 17: mean train loss = 0.5620
+2026-08-12 16:04:44,077 | INFO | MainThread | epoch 17 dev metrics (tuned thresholds): st1_macro_f1=0.706, st2_macro_f1=0.637, st3_macro_f1=0.544, st3_family_macro_f1=0.596, mean_macro_f1=0.629
+2026-08-12 16:04:44,077 | INFO | MainThread | epoch 17 dev st1 per-label F1: digital_content_or_services=0.877, none=0.381, physical_goods=0.853, physical_services=0.714
+2026-08-12 16:04:44,077 | INFO | MainThread | epoch 17 dev st2 per-label F1: apps=0.749, creator_community=0.541, education=0.519, fashion=0.553, financial=0.769, food=0.830, gambling=0.769, gambling_adjacent=0.302, hardware_electronics=0.814, health=0.863, other=0.518, toys=0.421
+2026-08-12 16:04:44,077 | INFO | MainThread | epoch 17 dev st3 per-label F1: age_restricted_or_prohibited_product=0.529, direct_exhortation=0.351, hfss_food_marketing=0.421, inadequate_disclosure=0.403, insufficient_context=0.824, misleading_claim=0.651, no_flag=0.516, undisclosed_advertising=0.658
+2026-08-12 16:04:44,077 | INFO | MainThread | epoch 17 dev st3_family per-label F1: content=0.637, disclosure=0.665, housekeeping=0.530, product=0.553
+2026-08-12 16:10:24,622 | INFO | MainThread | epoch 18: mean train loss = 0.5337
+2026-08-12 16:11:21,314 | INFO | MainThread | epoch 18 dev metrics (tuned thresholds): st1_macro_f1=0.675, st2_macro_f1=0.649, st3_macro_f1=0.619, st3_family_macro_f1=0.676, mean_macro_f1=0.648
+2026-08-12 16:11:21,314 | INFO | MainThread | epoch 18 dev st1 per-label F1: digital_content_or_services=0.878, none=0.118, physical_goods=0.864, physical_services=0.840
+2026-08-12 16:11:21,314 | INFO | MainThread | epoch 18 dev st2 per-label F1: apps=0.757, creator_community=0.534, education=0.560, fashion=0.620, financial=0.700, food=0.788, gambling=0.769, gambling_adjacent=0.290, hardware_electronics=0.838, health=0.826, other=0.551, toys=0.556
+2026-08-12 16:11:21,314 | INFO | MainThread | epoch 18 dev st3 per-label F1: age_restricted_or_prohibited_product=0.786, direct_exhortation=0.373, hfss_food_marketing=0.600, inadequate_disclosure=0.413, insufficient_context=0.824, misleading_claim=0.779, no_flag=0.519, undisclosed_advertising=0.658
+2026-08-12 16:11:21,314 | INFO | MainThread | epoch 18 dev st3_family per-label F1: content=0.773, disclosure=0.645, housekeeping=0.548, product=0.737
+2026-08-12 16:16:53,447 | INFO | MainThread | epoch 19: mean train loss = 0.4575
+2026-08-12 16:17:48,924 | INFO | MainThread | epoch 19 dev metrics (tuned thresholds): st1_macro_f1=0.624, st2_macro_f1=0.662, st3_macro_f1=0.591, st3_family_macro_f1=0.639, mean_macro_f1=0.626
+2026-08-12 16:17:48,924 | INFO | MainThread | epoch 19 dev st1 per-label F1: digital_content_or_services=0.868, none=0.125, physical_goods=0.869, physical_services=0.636
+2026-08-12 16:17:48,924 | INFO | MainThread | epoch 19 dev st2 per-label F1: apps=0.745, creator_community=0.549, education=0.593, fashion=0.638, financial=0.700, food=0.832, gambling=0.833, gambling_adjacent=0.351, hardware_electronics=0.814, health=0.863, other=0.603, toys=0.421
+2026-08-12 16:17:48,924 | INFO | MainThread | epoch 19 dev st3 per-label F1: age_restricted_or_prohibited_product=0.640, direct_exhortation=0.377, hfss_food_marketing=0.500, inadequate_disclosure=0.442, insufficient_context=0.875, misleading_claim=0.734, no_flag=0.542, undisclosed_advertising=0.619
+2026-08-12 16:17:48,924 | INFO | MainThread | epoch 19 dev st3_family per-label F1: content=0.741, disclosure=0.648, housekeeping=0.560, product=0.606
+2026-08-12 16:23:22,888 | INFO | MainThread | epoch 20: mean train loss = 0.3835
+2026-08-12 16:24:18,349 | INFO | MainThread | epoch 20 dev metrics (tuned thresholds): st1_macro_f1=0.716, st2_macro_f1=0.669, st3_macro_f1=0.580, st3_family_macro_f1=0.649, mean_macro_f1=0.655
+2026-08-12 16:24:18,350 | INFO | MainThread | epoch 20 dev st1 per-label F1: digital_content_or_services=0.874, none=0.417, physical_goods=0.849, physical_services=0.723
+2026-08-12 16:24:18,350 | INFO | MainThread | epoch 20 dev st2 per-label F1: apps=0.777, creator_community=0.554, education=0.538, fashion=0.667, financial=0.783, food=0.776, gambling=0.833, gambling_adjacent=0.368, hardware_electronics=0.810, health=0.871, other=0.520, toys=0.526
+2026-08-12 16:24:18,350 | INFO | MainThread | epoch 20 dev st3 per-label F1: age_restricted_or_prohibited_product=0.621, direct_exhortation=0.404, hfss_food_marketing=0.571, inadequate_disclosure=0.391, insufficient_context=0.800, misleading_claim=0.724, no_flag=0.559, undisclosed_advertising=0.573
+2026-08-12 16:24:18,350 | INFO | MainThread | epoch 20 dev st3_family per-label F1: content=0.733, disclosure=0.680, housekeeping=0.571, product=0.611
+2026-08-12 16:30:07,089 | INFO | MainThread | epoch 21: mean train loss = 0.3623
+2026-08-12 16:31:09,939 | INFO | MainThread | epoch 21 dev metrics (tuned thresholds): st1_macro_f1=0.679, st2_macro_f1=0.660, st3_macro_f1=0.575, st3_family_macro_f1=0.669, mean_macro_f1=0.638
+2026-08-12 16:31:09,939 | INFO | MainThread | epoch 21 dev st1 per-label F1: digital_content_or_services=0.868, none=0.286, physical_goods=0.851, physical_services=0.711
+2026-08-12 16:31:09,939 | INFO | MainThread | epoch 21 dev st2 per-label F1: apps=0.752, creator_community=0.585, education=0.583, fashion=0.598, financial=0.750, food=0.817, gambling=0.769, gambling_adjacent=0.429, hardware_electronics=0.805, health=0.885, other=0.527, toys=0.421
+2026-08-12 16:31:09,940 | INFO | MainThread | epoch 21 dev st3 per-label F1: age_restricted_or_prohibited_product=0.667, direct_exhortation=0.397, hfss_food_marketing=0.615, inadequate_disclosure=0.400, insufficient_context=0.588, misleading_claim=0.738, no_flag=0.563, undisclosed_advertising=0.628
+2026-08-12 16:31:09,940 | INFO | MainThread | epoch 21 dev st3_family per-label F1: content=0.752, disclosure=0.688, housekeeping=0.571, product=0.667

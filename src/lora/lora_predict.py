@@ -14,7 +14,6 @@ generation -- can produce: undisclosed_advertising/inadequate_disclosure both fi
 (kept: the higher-probability one), and an empty st2 (fallback: its top-1 label).
 """
 import argparse
-import json
 import os
 import random
 import shutil
@@ -27,8 +26,11 @@ from transformers import AutoTokenizer
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))  # so `import lora` resolves src/lora as a package
 from common.dialog_flow import df_pre_context  # noqa: E402
-from common.predict_utils import decode, load_thresholds, multi_hot_matrix, run_inference, tune_per_label_thresholds  # noqa: E402
-from lora import CONTEXT_CHOICES, ST1_LABELS, ST2_LABELS, ST3_LABELS, evaluate, prediction_errors, setup_logging  # noqa: E402
+from common.predict_utils import (  # noqa: E402
+    decode, load_thresholds, log_evaluation, multi_hot_matrix, run_inference, tune_per_label_thresholds,
+    write_submission,
+)
+from lora import CONTEXT_CHOICES, ST1_LABELS, ST2_LABELS, ST3_LABELS, evaluate, setup_logging  # noqa: E402
 from lora.lora_data import Collator, ClassificationDataset, load_split  # noqa: E402
 from lora.lora_model import load_peft_model  # noqa: E402
 
@@ -107,18 +109,7 @@ def main():
 
     out = args.out or os.path.join("runs", f"submission_lora_{timestamp}.jsonl")
     error_out = os.path.join("runs", f"submission_lora_error_{timestamp}.jsonl")
-    os.makedirs(os.path.dirname(out) or ".", exist_ok=True)
-    gold = []
-    n_errors = 0
-    with open(out, "w", encoding="utf-8") as f, open(error_out, "w", encoding="utf-8") as f_err:
-        for iid, inst, pred in zip(ids, instances, predictions):
-            f.write(json.dumps({"instanceID": iid, **pred}) + "\n")
-            if inst.get("labels"):
-                gold.append(inst["labels"])
-                errors = prediction_errors(inst["labels"], pred)
-                if errors:
-                    n_errors += 1
-                    f_err.write(json.dumps({"instanceID": iid, "gold": inst["labels"], "pred": pred, "errors": errors}) + "\n")
+    gold, n_errors = write_submission(out, error_out, ids, instances, predictions)
     log.info(f"wrote {len(predictions)} predictions to {out}")
 
     canonical = "submission_lora.jsonl"
@@ -128,9 +119,7 @@ def main():
     if gold:
         log.info(f"wrote {n_errors} misclassified instance(s) to {error_out}")
         metrics = evaluate(gold, predictions)
-        log.info("Evaluation:")
-        for k, v in metrics.items():
-            log.info(f"  {k}: {v:.3f}")
+        log_evaluation(log, metrics)
     else:
         log.info("target has no gold labels -- skipping evaluation")
 

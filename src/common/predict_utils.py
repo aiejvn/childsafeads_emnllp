@@ -12,7 +12,7 @@ import os
 import torch
 from tqdm import tqdm
 
-from . import ST1_LABELS, ST2_LABELS, ST3_LABELS, sanitize_st3
+from . import ST1_LABELS, ST2_LABELS, ST3_LABELS, prediction_errors, sanitize_st3
 from .train_utils import to_device
 
 UNDISCLOSED, INADEQUATE = "undisclosed_advertising", "inadequate_disclosure"
@@ -110,6 +110,43 @@ def tune_and_decode(model, loader, device, instances: list, default_threshold: f
     )
     predictions = decode(st1_idx, st2_probs, st3_probs, st2_threshold, st3_threshold)
     return predictions, st2_threshold, st3_threshold
+
+
+def write_submission(out_path: str, error_path: str, ids: list, instances: list, predictions: list) -> tuple:
+    """Writes one prediction per line to out_path, matching baseline_gpt.py's submission
+    format (`{"instanceID": ..., "st1": ..., "st2": [...], "st3": [...]}`); `ids`,
+    `instances`, and `predictions` must all be in the same order. For instances that carry
+    gold `labels` (train/dev, not the withheld test set), also writes any misclassified
+    ones to error_path via `prediction_errors`. Returns (gold, n_errors): the collected
+    gold label dicts (empty if `instances` carries none) and how many of them were
+    misclassified, for the caller to log and/or feed to `evaluate`/`log_evaluation`."""
+    os.makedirs(os.path.dirname(out_path) or ".", exist_ok=True)
+    gold = []
+    n_errors = 0
+    with open(out_path, "w", encoding="utf-8") as f, open(error_path, "w", encoding="utf-8") as f_err:
+        for iid, inst, pred in zip(ids, instances, predictions):
+            f.write(json.dumps({"instanceID": iid, **pred}) + "\n")
+            if inst.get("labels"):
+                gold.append(inst["labels"])
+                errors = prediction_errors(inst["labels"], pred)
+                if errors:
+                    n_errors += 1
+                    f_err.write(json.dumps({
+                        "instanceID": iid, "gold": inst["labels"], "pred": pred, "errors": errors,
+                    }) + "\n")
+    return gold, n_errors
+
+
+def log_evaluation(log, metrics: dict) -> None:
+    """Logs an `evaluate()` result the way baseline_gpt.py does: the scalar st1/st2/st3/
+    st3_family/mean macro-F1 values, then each tier's per-label F1 breakdown."""
+    log.info("Evaluation:")
+    for k, v in metrics.items():
+        if k == "per_label_f1":
+            continue
+        log.info(f"  {k}: {v:.3f}")
+    for tier, per_label in metrics["per_label_f1"].items():
+        log.info(f"  {tier} per-label F1: " + ", ".join(f"{l}={f:.3f}" for l, f in sorted(per_label.items())))
 
 
 def save_thresholds(output_dir: str, st2_threshold: torch.Tensor, st3_threshold: torch.Tensor) -> None:

@@ -23,7 +23,8 @@ same schema (see lora_generative.py); a completion that fails to parse is regene
 Saves the best-dev-macro-F1 adapter to <output-dir>/best and the final epoch's to
 <output-dir>/last (both loadable with lora_predict_generative.py). Pass --checkpoint-save-path
 to write the best/last checkpoints elsewhere (e.g. a scratch disk) while --output-dir still
-anchors the run's logs.
+anchors the run's logs. The best checkpoint's dev submission.jsonl and submission_error.jsonl
+(see baseline_gpt.py) are written alongside it.
 
 To download a model:
 
@@ -43,6 +44,7 @@ from transformers import AutoTokenizer, get_linear_schedule_with_warmup
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))  # so `import lora` resolves src/lora as a package
 from common.dialog_flow import df_pre_context  # noqa: E402
+from common.predict_utils import write_submission  # noqa: E402
 from lora import CONTEXT_CHOICES, SFT_TAXONOMY, SYSTEM_PROMPT, evaluate, load_split, setup_logging  # noqa: E402
 from lora.lora_data import GenerativeCollator, GenerativeDataset  # noqa: E402
 from lora.lora_generative import generate_predictions  # noqa: E402
@@ -193,15 +195,24 @@ def main():
         log.info(f"epoch {epoch + 1}: mean train loss = {running_loss / len(train_loader):.4f}")
 
         tokenizer.padding_side = "left"  # batched model.generate() needs left-padding
-        _, preds = generate_predictions(model, dev_loader, tokenizer, args.max_new_tokens)
+        ids, preds = generate_predictions(model, dev_loader, tokenizer, args.max_new_tokens)
         gold = [inst["labels"] for inst in dev_instances]
         metrics = evaluate(gold, preds)
-        log.info(f"epoch {epoch + 1} dev metrics: " + ", ".join(f"{k}={v:.3f}" for k, v in metrics.items()))
+        scalar_metrics = {k: v for k, v in metrics.items() if k != "per_label_f1"}
+        log.info(f"epoch {epoch + 1} dev metrics: " + ", ".join(f"{k}={v:.3f}" for k, v in scalar_metrics.items()))
+        for tier, per_label in metrics["per_label_f1"].items():
+            log.info(f"epoch {epoch + 1} dev {tier} per-label F1: "
+                     + ", ".join(f"{label}={f1:.3f}" for label, f1 in sorted(per_label.items())))
 
         if metrics["mean_macro_f1"] > best_f1:
             best_f1 = metrics["mean_macro_f1"]
             if is_main:  # avoid every rank racing to write the same adapter dir under --parallelism tensor
-                model.save_pretrained(os.path.join(checkpoint_dir, "best"))
+                best_dir = os.path.join(checkpoint_dir, "best")
+                model.save_pretrained(best_dir)
+                write_submission(
+                    os.path.join(best_dir, "submission.jsonl"), os.path.join(best_dir, "submission_error.jsonl"),
+                    ids, dev_instances, preds,
+                )
                 log.info(f"epoch {epoch + 1}: new best mean_macro_f1={best_f1:.3f}, saved to {checkpoint_dir}/best")
 
     if is_main:
