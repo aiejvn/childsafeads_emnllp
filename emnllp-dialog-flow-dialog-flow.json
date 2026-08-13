@@ -135,7 +135,7 @@
         "label": "Insufficient Context",
         "config": {
           "responseType": "structured",
-          "template": "ST1: insufficient\\_context\nST2: insufficient\\_context\nST3: insufficient\\_context\n\nRationale:\n\n\n{{ Explain briefly that the segment does not provide enough context to reliably classify the commercial type, product categories, or compliance flags. Tie the explanation to the absence of sufficient textual evidence. }}\n\n",
+          "template": "ST1: {{State the commercial type as usual -- insufficient context affects ST3 only, not ST1.}}\nST2: {{List the applicable product categories as usual, or other if none clearly fit -- insufficient context affects ST3 only, not ST2.}}\nST3: insufficient\\_context\n\nRationale:\n\n\n{{ Explain briefly that the segment does not provide enough context to reliably assess compliance risk (ST3), even though a commercial type and product category can still be identified. }}\n\n",
           "mustIncludeOutcomeNode": []
         },
         "prompt": ""

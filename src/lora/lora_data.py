@@ -28,8 +28,18 @@ _SEGMENT_PLACEHOLDER = "\x00SEGMENT_TEXT\x00"  # never occurs in real transcript
 def format_completion(labels: dict) -> str:
     """Gold st1/st2/st3 rendered as JSON matching baseline_gpt.py's `Prediction` schema --
     this is the text the causal LM is trained to generate."""
-    pred = {"st1": labels["st1"], "st2": sorted(labels["st2"]), "st3": sorted(labels["st3"])}
-    return json.dumps(pred, separators=(",", ":"))
+    prefix, st3_part = format_completion_parts(labels)
+    return prefix + st3_part
+
+
+def format_completion_parts(labels: dict) -> tuple:
+    """Same rendering as format_completion, split right before the "st3" key so callers
+    (GenerativeDataset) can tokenize the st3 span separately and weight its loss
+    differently -- see --st3-loss-weight in lora_train_generative.py. Concatenating the
+    two strings reproduces format_completion's output exactly."""
+    prefix = json.dumps({"st1": labels["st1"], "st2": sorted(labels["st2"])}, separators=(",", ":"))[:-1] + ","
+    st3_part = json.dumps({"st3": sorted(labels["st3"])}, separators=(",", ":"))[1:]
+    return prefix, st3_part
 
 
 class GenerativeDataset(Dataset):
@@ -53,11 +63,12 @@ class GenerativeDataset(Dataset):
     """
 
     def __init__(self, instances: list, tokenizer, context: str = "full", max_length: int = 4096,
-                 system_prompt: str = SYSTEM_PROMPT, df_text: str = None):
+                 system_prompt: str = SYSTEM_PROMPT, df_text: str = None, st3_loss_weight: float = 1.0):
         self.instances = instances
         self.tokenizer = tokenizer
         self.context = context
         self.max_length = max_length
+        self.st3_loss_weight = st3_loss_weight
         # df_text joins the system message rather than going in front of the per-instance
         # text the way ClassificationDataset prepends it. It is identical for every
         # instance, so it belongs with the rest of the fixed scaffolding: tokenized once
@@ -107,12 +118,23 @@ class GenerativeDataset(Dataset):
         item = {"instanceID": inst["instanceID"]}
         labels = inst.get("labels")
         if labels:
-            completion_ids = self.tokenizer(
-                format_completion(labels) + self.tokenizer.eos_token, add_special_tokens=False,
-            )["input_ids"]
+            # st3 tokenized separately from the st1/st2 prefix (same splice-and-concatenate
+            # approach as prefix_ids/suffix_ids above) so its tokens can carry a different
+            # loss weight -- st3 is this task's weakest, most-imbalanced subtask, see
+            # --st3-loss-weight.
+            prefix_str, st3_str = format_completion_parts(labels)
+            prefix_completion_ids = self.tokenizer(prefix_str, add_special_tokens=False)["input_ids"]
+            st3_completion_ids = self.tokenizer(st3_str, add_special_tokens=False)["input_ids"]
+            eos_ids = [self.tokenizer.eos_token_id]
+            completion_ids = prefix_completion_ids + st3_completion_ids + eos_ids
             item["input_ids"] = prompt_ids + completion_ids
             item["attention_mask"] = [1] * len(item["input_ids"])
             item["labels"] = [-100] * len(prompt_ids) + completion_ids
+            item["loss_weight"] = (
+                [1.0] * (len(prompt_ids) + len(prefix_completion_ids))
+                + [self.st3_loss_weight] * len(st3_completion_ids)
+                + [1.0] * len(eos_ids)
+            )
         else:
             item["input_ids"] = prompt_ids
             item["attention_mask"] = [1] * len(prompt_ids)
@@ -134,7 +156,7 @@ class GenerativeCollator:
         pad_id = self.tokenizer.pad_token_id
         left = self.tokenizer.padding_side == "left"
 
-        input_ids, attention_mask, labels = [], [], []
+        input_ids, attention_mask, labels, loss_weight = [], [], [], []
         for b in batch:
             pad_n = max_len - len(b["input_ids"])
             pad_ids = [pad_id] * pad_n
@@ -144,11 +166,13 @@ class GenerativeCollator:
                 attention_mask.append(pad_mask + b["attention_mask"])
                 if has_labels:
                     labels.append([-100] * pad_n + b["labels"])
+                    loss_weight.append([0.0] * pad_n + b["loss_weight"])
             else:
                 input_ids.append(b["input_ids"] + pad_ids)
                 attention_mask.append(b["attention_mask"] + pad_mask)
                 if has_labels:
                     labels.append(b["labels"] + [-100] * pad_n)
+                    loss_weight.append(b["loss_weight"] + [0.0] * pad_n)
 
         out = {
             "instanceID": [b["instanceID"] for b in batch],
@@ -157,4 +181,5 @@ class GenerativeCollator:
         }
         if has_labels:
             out["labels"] = torch.tensor(labels, dtype=torch.long)
+            out["loss_weight"] = torch.tensor(loss_weight, dtype=torch.float)
         return out
