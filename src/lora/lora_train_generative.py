@@ -83,6 +83,11 @@ def main():
                      "much larger than lora_train.py's default")
     ap.add_argument("--epochs", type=int, default=3)
     ap.add_argument("--batch-size", type=int, default=4)
+    ap.add_argument("--eval-batch-size", type=int, default=None, help="batch size for the per-epoch dev "
+                     "generate() eval; defaults to --batch-size. Decoupled because training's per-token "
+                     "loss forward pass (logits.float() over the full sequence x vocab) is far more "
+                     "memory-hungry than generate()'s one-token-at-a-time decode, so eval can usually run "
+                     "at a much larger batch size than training without risking OOM")
     ap.add_argument("--grad-accum-steps", type=int, default=4)
     ap.add_argument("--lr", type=float, default=2e-4)
     ap.add_argument("--warmup-ratio", type=float, default=0.06)
@@ -164,7 +169,8 @@ def main():
     dev_ds = GenerativeDataset(dev_instances, tokenizer, args.context, args.max_length,
                                system_prompt, df_text)
     train_loader = DataLoader(train_ds, batch_size=args.batch_size, shuffle=True, collate_fn=collate)
-    dev_loader = DataLoader(dev_ds, batch_size=args.batch_size, shuffle=False, collate_fn=collate)
+    eval_batch_size = args.eval_batch_size or args.batch_size
+    dev_loader = DataLoader(dev_ds, batch_size=eval_batch_size, shuffle=False, collate_fn=collate)
 
     trainable = [p for p in model.parameters() if p.requires_grad]
     optimizer = torch.optim.AdamW(trainable, lr=args.lr)
