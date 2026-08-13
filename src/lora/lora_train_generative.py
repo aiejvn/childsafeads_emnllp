@@ -55,6 +55,25 @@ def to_device(batch: dict, device: str) -> dict:
     return {k: (v.to(device) if torch.is_tensor(v) else v) for k, v in batch.items()}
 
 # bash slurm_wrapper.sh 4 src/lora/lora_train_generative.py public_data_dev/train.jsonl public_data_dev/dev.jsonl --epochs 200 --parallelism pipeline --model Qwen/Qwen3-8B --df-path emnllp-dialog-flow-dialog-flow.json --lean-prompt --batch-size 1 --output-dir runs/lora_qwen3-8B --checkpoint-save-path $SCRATCH/8-13/Qwen3-8B-batch-size-1 --split-seed 42
+
+def weighted_lm_loss(logits: torch.Tensor, labels: torch.Tensor, loss_weight: torch.Tensor) -> torch.Tensor:
+    """Next-token cross-entropy, per-token weighted by `loss_weight` (see --st3-loss-weight
+    and GenerativeDataset/GenerativeCollator, which build it as 1.0 everywhere except the
+    completion's "st3":[...] span). Reduces to plain HF-style mean CE (identical to
+    `model(..., labels=...).loss`) whenever loss_weight is 1.0 on every non-masked token, so
+    passing --st3-loss-weight 1.0 (the default) reproduces prior runs exactly."""
+    shift_logits = logits[:, :-1, :].contiguous()
+    shift_labels = labels[:, 1:].contiguous()
+    shift_weight = loss_weight[:, 1:].contiguous()
+    per_token = torch.nn.functional.cross_entropy(
+        shift_logits.view(-1, shift_logits.size(-1)), shift_labels.view(-1),
+        ignore_index=-100, reduction="none",
+    ).view(shift_labels.shape)
+    mask = (shift_labels != -100).float()
+    weighted = per_token * shift_weight * mask
+    return weighted.sum() / (shift_weight * mask).sum().clamp_min(1e-6)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("train", help="training split, e.g. public_data_dev/train.jsonl")
@@ -95,6 +114,11 @@ def main():
     ap.add_argument("--lora-alpha", type=int, default=16)
     ap.add_argument("--lora-dropout", type=float, default=0.1)
     ap.add_argument("--target-modules", default="q_proj,v_proj", help="comma-separated module names to LoRA-adapt")
+    ap.add_argument("--st3-loss-weight", type=float, default=1.0, help="multiply the next-token "
+                     "CE loss on the completion's \"st3\":[...] span by this factor (st1/st2 "
+                     "tokens are unaffected). st3 is this task's weakest, most class-imbalanced "
+                     "subtask (insufficient_context/hfss_food_marketing/age_restricted are all "
+                     "under 3%% of train); default 1.0 reproduces the unweighted loss exactly")
     ap.add_argument("--load-in-4bit", action="store_true", help="QLoRA via bitsandbytes (must be installed separately)")
     ap.add_argument("--parallelism", choices=PARALLELISM_CHOICES, default="none", help="split the model "
                      "across GPUs (requires >=2): \"pipeline\" shards layers via device_map=\"auto\"; \"tensor\" "
@@ -185,7 +209,7 @@ def main():
 
     collate = GenerativeCollator(tokenizer)
     train_ds = GenerativeDataset(train_instances, tokenizer, args.context, args.max_length,
-                                 system_prompt, df_text)
+                                 system_prompt, df_text, st3_loss_weight=args.st3_loss_weight)
     dev_ds = GenerativeDataset(dev_instances, tokenizer, args.context, args.max_length,
                                system_prompt, df_text)
     train_loader = DataLoader(train_ds, batch_size=args.batch_size, shuffle=True, collate_fn=collate)
@@ -209,10 +233,11 @@ def main():
         running_loss = 0.0
         for step, batch in enumerate(tqdm(train_loader, desc=f"epoch {epoch + 1}/{args.epochs}", disable=not is_main)):
             batch = to_device(batch, model.device)
-            out = model(input_ids=batch["input_ids"], attention_mask=batch["attention_mask"], labels=batch["labels"])
-            loss = out.loss / args.grad_accum_steps
+            out = model(input_ids=batch["input_ids"], attention_mask=batch["attention_mask"])
+            raw_loss = weighted_lm_loss(out.logits, batch["labels"], batch["loss_weight"])
+            loss = raw_loss / args.grad_accum_steps
             loss.backward()
-            running_loss += out.loss.item()
+            running_loss += raw_loss.item()
             if (step + 1) % args.grad_accum_steps == 0 or step + 1 == len(train_loader):
                 torch.nn.utils.clip_grad_norm_(trainable, 1.0)
                 optimizer.step()
@@ -269,7 +294,7 @@ def main():
             test_metrics = evaluate(test_gold, test_preds)
             test_scalar_metrics = {k: v for k, v in test_metrics.items() if k != "per_label_f1"}
             log.info("test holdout metrics: " + ", ".join(f"{k}={v:.3f}" for k, v in test_scalar_metrics.items()))
-            for tier, per_label in test_scalar_metrics["per_label_f1"].items():
+            for tier, per_label in test_metrics["per_label_f1"].items():
                 log.info(f"{tier} per-label F1: "
                         + ", ".join(f"{label}={f1:.3f}" for label, f1 in sorted(per_label.items())))
             write_submission(
