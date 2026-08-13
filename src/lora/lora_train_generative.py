@@ -269,6 +269,9 @@ def main():
             test_metrics = evaluate(test_gold, test_preds)
             test_scalar_metrics = {k: v for k, v in test_metrics.items() if k != "per_label_f1"}
             log.info("test holdout metrics: " + ", ".join(f"{k}={v:.3f}" for k, v in test_scalar_metrics.items()))
+            for tier, per_label in test_scalar_metrics["per_label_f1"].items():
+                log.info(f"{tier} per-label F1: "
+                        + ", ".join(f"{label}={f1:.3f}" for label, f1 in sorted(per_label.items())))
             write_submission(
                 os.path.join(best_dir, "test_submission.jsonl"),
                 os.path.join(best_dir, "test_submission_error.jsonl"),
