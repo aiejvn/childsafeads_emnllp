@@ -45,7 +45,10 @@ from transformers import AutoTokenizer, get_linear_schedule_with_warmup
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))  # so `import lora` resolves src/lora as a package
 from common.dialog_flow import df_pre_context  # noqa: E402
 from common.predict_utils import write_submission  # noqa: E402
-from lora import CONTEXT_CHOICES, SFT_TAXONOMY, SYSTEM_PROMPT, evaluate, load_split, setup_logging  # noqa: E402
+from common.train_utils import compute_pos_weight  # noqa: E402
+from lora import (  # noqa: E402
+    CONTEXT_CHOICES, SFT_TAXONOMY, ST2_LABELS, ST3_LABELS, SYSTEM_PROMPT, evaluate, load_split, setup_logging,
+)
 from lora.lora_data import GenerativeCollator, GenerativeDataset  # noqa: E402
 from lora.lora_generative import generate_predictions  # noqa: E402
 from lora.lora_model import PARALLELISM_CHOICES, build_peft_model_causal, load_peft_model_causal  # noqa: E402
@@ -118,6 +121,13 @@ def main():
                      "tokens are unaffected). st3 is this task's weakest, most class-imbalanced "
                      "subtask (insufficient_context/hfss_food_marketing/age_restricted are all "
                      "under 3%% of train); default 1.0 reproduces the unweighted loss exactly")
+    ap.add_argument("--pos-weight", action="store_true", help="reweight each st2/st3 label's "
+                     "own completion-token span by its inverse train-set frequency (same "
+                     "neg/pos-per-label computation as lora_train.py's --pos-weight for the "
+                     "encoder/BCE path, adapted here to per-token CE weighting -- see "
+                     "common.train_utils.compute_pos_weight). Composes with --st3-loss-weight "
+                     "(multiplicative): pos-weight corrects imbalance within st2/st3, "
+                     "st3-loss-weight is an additional flat multiplier for the whole st3 field")
     ap.add_argument("--load-in-4bit", action="store_true", help="QLoRA via bitsandbytes (must be installed separately)")
     ap.add_argument("--parallelism", choices=PARALLELISM_CHOICES, default="none", help="split the model "
                      "across GPUs (requires >=2): \"pipeline\" shards layers via device_map=\"auto\"; \"tensor\" "
@@ -206,9 +216,17 @@ def main():
     log.info(f"system prompt: {'lean' if args.lean_prompt else 'full'} ({len(system_prompt)} chars)"
              + (f" + dialog flow from {args.df_path} ({len(df_text)} chars)" if df_text else ""))
 
+    st2_pos_weight = st3_pos_weight = None
+    if args.pos_weight:
+        st2_pos_weight = dict(zip(ST2_LABELS, compute_pos_weight(train_instances, "st2", ST2_LABELS).tolist()))
+        st3_pos_weight = dict(zip(ST3_LABELS, compute_pos_weight(train_instances, "st3", ST3_LABELS).tolist()))
+        log.info(f"pos_weight st2: {st2_pos_weight}")
+        log.info(f"pos_weight st3: {st3_pos_weight}")
+
     collate = GenerativeCollator(tokenizer)
     train_ds = GenerativeDataset(train_instances, tokenizer, args.context, args.max_length,
-                                 system_prompt, df_text, st3_loss_weight=args.st3_loss_weight)
+                                 system_prompt, df_text, st3_loss_weight=args.st3_loss_weight,
+                                 st2_pos_weight=st2_pos_weight, st3_pos_weight=st3_pos_weight)
     dev_ds = GenerativeDataset(dev_instances, tokenizer, args.context, args.max_length,
                                system_prompt, df_text)
     train_loader = DataLoader(train_ds, batch_size=args.batch_size, shuffle=True, collate_fn=collate)
