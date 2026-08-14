@@ -75,15 +75,19 @@ def _load_causal_base(
     is opt-in and requires `bitsandbytes`, which is not installed by default -- raises with
     a clear message rather than importing it eagerly.
 
-    `parallelism` (see PARALLELISM_CHOICES): "none" keeps the old single-`device` behavior
-    (quantized weights via device_map at load time, since bnb layers can't be moved with a
-    later plain `.to(device)`); "pipeline" (device_map="auto") splits the model's layers
-    across GPUs; "tensor" (tp_plan="auto", needs torchrun -- see _require_multi_gpu) splits
-    individual weight matrices across GPUs. For Qwen3.5 specifically, its registered
-    `_tp_plan` only covers `lm_head`, so "tensor" here really means "shard just the huge
-    vocab-sized logits tensor, replicate the 32 backbone layers per rank" -- not a full split.
-    Either "pipeline" or "tensor" places the model already; callers should not additionally
-    call `.to(device)` in those cases."""
+    `parallelism` (see PARALLELISM_CHOICES): "none" streams weights straight to `device` via
+    device_map at load time (matters whenever a model's on-disk size is a large fraction of
+    system RAM: `from_pretrained` without device_map stages the *entire* model in CPU RAM
+    first regardless of dtype/quantization, before any later `.to(device)` moves it -- on a
+    RAM-constrained box that can OOM before training ever gets a chance to, even though the
+    weights would fit comfortably in GPU VRAM); "pipeline" (device_map="auto") splits the
+    model's layers across GPUs; "tensor" (tp_plan="auto", needs torchrun -- see
+    _require_multi_gpu) splits individual weight matrices across GPUs. For Qwen3.5
+    specifically, its registered `_tp_plan` only covers `lm_head`, so "tensor" here really
+    means "shard just the huge vocab-sized logits tensor, replicate the 32 backbone layers
+    per rank" -- not a full split. All three parallelism modes place the model already;
+    callers should not additionally call `.to(device)` in any of them (though doing so
+    anyway is a harmless no-op once the model's already there)."""
     _require_multi_gpu(parallelism)
     quantization_config = None
     if load_in_4bit:
@@ -104,7 +108,7 @@ def _load_causal_base(
         load_kwargs["tp_plan"] = "auto"
     elif parallelism == "pipeline":
         load_kwargs["device_map"] = "balanced_low_0" # auto, balanced, balanced_low_0, or sequential
-    elif load_in_4bit:
+    else:
         load_kwargs["device_map"] = {"": device}
     return AutoModelForCausalLM.from_pretrained(base_model_name, **load_kwargs)
 
