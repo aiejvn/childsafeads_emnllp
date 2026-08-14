@@ -1,0 +1,75 @@
+2026-08-14 06:34:27,552 | INFO | MainThread | logging to runs/baseline_decision_tree/run_20260814_063427_decision_tree_sklearn.log
+2026-08-14 06:34:27,687 | INFO | MainThread | split_seed=696232051 train=1853 test_holdout=500 dev=504
+2026-08-14 06:34:37,152 | INFO | MainThread | engineered 28 structural features: ['age_restricted__adult_sex_toys', 'age_restricted__alcohol', 'age_restricted__betting_gambling', 'age_restricted__energy_caffeine', 'age_restricted__other_restricted', 'age_restricted__skin_gambling', 'age_restricted__thc_cbd', 'age_restricted__vaping_nicotine', 'description_has_disclosure_lang', 'disclosure_only_in_description', 'disclosure_relative_position', 'guarantee_promise_hit', 'has_product_page', 'hfss__candy_subscription_brand', 'hfss__energy_drink_brand', 'hfss__misc_candy_soda', 'imperative_verb_count', 'imperative_verb_density', 'imperative_zero', 'numeric_comparative_claim_hit', 'official_disclosure_false', 'official_disclosure_missing', 'official_disclosure_true', 'superlative_hit', 'transcript_char_len', 'transcript_has_disclosure_lang', 'transcript_near_empty', 'transcript_word_len']
+2026-08-14 06:34:46,927 | INFO | MainThread |   grid estimator=forest params={'max_depth': None, 'min_samples_leaf': 1, 'n_estimators': 200} -> dev_st3_macro_f1=0.539
+2026-08-14 06:35:04,872 | INFO | MainThread |   grid estimator=forest params={'max_depth': None, 'min_samples_leaf': 1, 'n_estimators': 500} -> dev_st3_macro_f1=0.488
+2026-08-14 06:35:11,793 | INFO | MainThread |   grid estimator=forest params={'max_depth': None, 'min_samples_leaf': 2, 'n_estimators': 200} -> dev_st3_macro_f1=0.517
+2026-08-14 06:35:28,535 | INFO | MainThread |   grid estimator=forest params={'max_depth': None, 'min_samples_leaf': 2, 'n_estimators': 500} -> dev_st3_macro_f1=0.502
+2026-08-14 06:35:34,516 | INFO | MainThread |   grid estimator=forest params={'max_depth': None, 'min_samples_leaf': 5, 'n_estimators': 200} -> dev_st3_macro_f1=0.488
+2026-08-14 06:35:49,081 | INFO | MainThread |   grid estimator=forest params={'max_depth': None, 'min_samples_leaf': 5, 'n_estimators': 500} -> dev_st3_macro_f1=0.506
+2026-08-14 06:35:54,300 | INFO | MainThread |   grid estimator=forest params={'max_depth': 10, 'min_samples_leaf': 1, 'n_estimators': 200} -> dev_st3_macro_f1=0.511
+2026-08-14 06:36:07,005 | INFO | MainThread |   grid estimator=forest params={'max_depth': 10, 'min_samples_leaf': 1, 'n_estimators': 500} -> dev_st3_macro_f1=0.511
+2026-08-14 06:36:12,119 | INFO | MainThread |   grid estimator=forest params={'max_depth': 10, 'min_samples_leaf': 2, 'n_estimators': 200} -> dev_st3_macro_f1=0.485
+2026-08-14 06:36:24,541 | INFO | MainThread |   grid estimator=forest params={'max_depth': 10, 'min_samples_leaf': 2, 'n_estimators': 500} -> dev_st3_macro_f1=0.484
+2026-08-14 06:36:29,514 | INFO | MainThread |   grid estimator=forest params={'max_depth': 10, 'min_samples_leaf': 5, 'n_estimators': 200} -> dev_st3_macro_f1=0.493
+2026-08-14 06:36:41,741 | INFO | MainThread |   grid estimator=forest params={'max_depth': 10, 'min_samples_leaf': 5, 'n_estimators': 500} -> dev_st3_macro_f1=0.484
+2026-08-14 06:36:48,390 | INFO | MainThread |   grid estimator=forest params={'max_depth': 20, 'min_samples_leaf': 1, 'n_estimators': 200} -> dev_st3_macro_f1=0.501
+2026-08-14 06:37:04,603 | INFO | MainThread |   grid estimator=forest params={'max_depth': 20, 'min_samples_leaf': 1, 'n_estimators': 500} -> dev_st3_macro_f1=0.505
+2026-08-14 06:37:10,985 | INFO | MainThread |   grid estimator=forest params={'max_depth': 20, 'min_samples_leaf': 2, 'n_estimators': 200} -> dev_st3_macro_f1=0.530
+2026-08-14 06:37:26,604 | INFO | MainThread |   grid estimator=forest params={'max_depth': 20, 'min_samples_leaf': 2, 'n_estimators': 500} -> dev_st3_macro_f1=0.501
+2026-08-14 06:37:32,485 | INFO | MainThread |   grid estimator=forest params={'max_depth': 20, 'min_samples_leaf': 5, 'n_estimators': 200} -> dev_st3_macro_f1=0.486
+2026-08-14 06:37:46,654 | INFO | MainThread |   grid estimator=forest params={'max_depth': 20, 'min_samples_leaf': 5, 'n_estimators': 500} -> dev_st3_macro_f1=0.491
+2026-08-14 06:37:46,885 | INFO | MainThread |   grid estimator=logreg params={'C': 0.01} -> dev_st3_macro_f1=0.431
+2026-08-14 06:37:47,143 | INFO | MainThread |   grid estimator=logreg params={'C': 0.03} -> dev_st3_macro_f1=0.478
+2026-08-14 06:37:47,444 | INFO | MainThread |   grid estimator=logreg params={'C': 0.1} -> dev_st3_macro_f1=0.486
+2026-08-14 06:37:47,792 | INFO | MainThread |   grid estimator=logreg params={'C': 0.3} -> dev_st3_macro_f1=0.492
+2026-08-14 06:37:48,208 | INFO | MainThread |   grid estimator=logreg params={'C': 1.0} -> dev_st3_macro_f1=0.485
+2026-08-14 06:37:48,724 | INFO | MainThread |   grid estimator=logreg params={'C': 3.0} -> dev_st3_macro_f1=0.488
+2026-08-14 06:37:49,385 | INFO | MainThread |   grid estimator=logreg params={'C': 10.0} -> dev_st3_macro_f1=0.479
+2026-08-14 06:37:49,386 | INFO | MainThread | selected estimator=forest params={'max_depth': None, 'min_samples_leaf': 1, 'n_estimators': 200} by dev_st3_macro_f1=0.539
+2026-08-14 06:37:49,386 | INFO | MainThread | tuned per-label thresholds: {'age_restricted_or_prohibited_product': 0.25, 'direct_exhortation': 0.3, 'hfss_food_marketing': 0.55, 'inadequate_disclosure': 0.35, 'insufficient_context': 0.3, 'misleading_claim': 0.35, 'no_flag': 0.4, 'undisclosed_advertising': 0.35}
+2026-08-14 06:37:50,457 | INFO | MainThread | === train (fit) ===
+2026-08-14 06:37:50,458 | INFO | MainThread | st3_macro_f1=0.921 st3_family_macro_f1=0.956
+2026-08-14 06:37:50,458 | INFO | MainThread | === dev (model + threshold selection) ===
+2026-08-14 06:37:50,458 | INFO | MainThread | st3_macro_f1=0.539 st3_family_macro_f1=0.577
+2026-08-14 06:37:50,458 | INFO | MainThread |   age_restricted_or_prohibited_product: 0.333
+2026-08-14 06:37:50,458 | INFO | MainThread |   direct_exhortation: 0.370
+2026-08-14 06:37:50,458 | INFO | MainThread |   hfss_food_marketing: 0.571
+2026-08-14 06:37:50,458 | INFO | MainThread |   inadequate_disclosure: 0.404
+2026-08-14 06:37:50,458 | INFO | MainThread |   insufficient_context: 0.560
+2026-08-14 06:37:50,458 | INFO | MainThread |   misleading_claim: 0.698
+2026-08-14 06:37:50,458 | INFO | MainThread |   no_flag: 0.550
+2026-08-14 06:37:50,458 | INFO | MainThread |   undisclosed_advertising: 0.828
+2026-08-14 06:37:50,458 | INFO | MainThread | === test-holdout (final check) ===
+2026-08-14 06:37:50,458 | INFO | MainThread | st3_macro_f1=0.433 st3_family_macro_f1=0.597
+2026-08-14 06:37:50,458 | INFO | MainThread |   age_restricted_or_prohibited_product: 0.375
+2026-08-14 06:37:50,459 | INFO | MainThread |   direct_exhortation: 0.352
+2026-08-14 06:37:50,459 | INFO | MainThread |   hfss_food_marketing: 0.133
+2026-08-14 06:37:50,459 | INFO | MainThread |   inadequate_disclosure: 0.426
+2026-08-14 06:37:50,459 | INFO | MainThread |   insufficient_context: 0.000
+2026-08-14 06:37:50,459 | INFO | MainThread |   misleading_claim: 0.750
+2026-08-14 06:37:50,459 | INFO | MainThread |   no_flag: 0.584
+2026-08-14 06:37:50,459 | INFO | MainThread |   undisclosed_advertising: 0.844
+2026-08-14 06:37:50,832 | INFO | MainThread | === top 20 features by mean importance across per-label trees ===
+2026-08-14 06:37:50,833 | INFO | MainThread |   transcript_char_len: 0.0201
+2026-08-14 06:37:50,833 | INFO | MainThread |   transcript_word_len: 0.0197
+2026-08-14 06:37:50,833 | INFO | MainThread |   official_disclosure_true: 0.0194
+2026-08-14 06:37:50,833 | INFO | MainThread |   disclosure_relative_position: 0.0185
+2026-08-14 06:37:50,833 | INFO | MainThread |   transcript_has_disclosure_lang: 0.0171
+2026-08-14 06:37:50,833 | INFO | MainThread |   official_disclosure_false: 0.0115
+2026-08-14 06:37:50,833 | INFO | MainThread |   imperative_verb_density: 0.0092
+2026-08-14 06:37:50,833 | INFO | MainThread |   imperative_verb_count: 0.0082
+2026-08-14 06:37:50,833 | INFO | MainThread |   tfidf__just: 0.0078
+2026-08-14 06:37:50,833 | INFO | MainThread |   tfidf__video: 0.0077
+2026-08-14 06:37:50,834 | INFO | MainThread |   description_has_disclosure_lang: 0.0075
+2026-08-14 06:37:50,834 | INFO | MainThread |   tfidf__sponsor: 0.0074
+2026-08-14 06:37:50,834 | INFO | MainThread |   tfidf__code: 0.0067
+2026-08-14 06:37:50,834 | INFO | MainThread |   imperative_zero: 0.0065
+2026-08-14 06:37:50,834 | INFO | MainThread |   tfidf__flavor: 0.0062
+2026-08-14 06:37:50,834 | INFO | MainThread |   age_restricted__energy_caffeine: 0.0062
+2026-08-14 06:37:50,834 | INFO | MainThread |   tfidf__sponsoring: 0.0061
+2026-08-14 06:37:50,834 | INFO | MainThread |   tfidf__link: 0.0055
+2026-08-14 06:37:50,834 | INFO | MainThread |   tfidf__don: 0.0054
+2026-08-14 06:37:50,834 | INFO | MainThread |   transcript_near_empty: 0.0054
+2026-08-14 06:37:50,837 | INFO | MainThread | wrote test-holdout predictions to runs/submission_dt_20260814_063427.jsonl
+2026-08-14 06:37:50,840 | INFO | MainThread | appended results row to runs/baseline_decision_tree/results.csv

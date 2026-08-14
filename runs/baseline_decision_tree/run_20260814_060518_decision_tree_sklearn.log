@@ -1,0 +1,67 @@
+2026-08-14 06:05:18,311 | INFO | MainThread | logging to runs/baseline_decision_tree/run_20260814_060518_decision_tree_sklearn.log
+2026-08-14 06:05:18,446 | INFO | MainThread | split_seed=608327995 train=1853 test_holdout=500 dev=504
+2026-08-14 06:05:28,278 | INFO | MainThread | engineered 26 structural features: ['age_restricted__adult_sex_toys', 'age_restricted__alcohol', 'age_restricted__betting_gambling', 'age_restricted__energy_caffeine', 'age_restricted__other_restricted', 'age_restricted__skin_gambling', 'age_restricted__thc_cbd', 'age_restricted__vaping_nicotine', 'description_has_disclosure_lang', 'disclosure_only_in_description', 'guarantee_promise_hit', 'has_product_page', 'hfss__candy_subscription_brand', 'hfss__energy_drink_brand', 'hfss__misc_candy_soda', 'imperative_verb_count', 'imperative_zero', 'numeric_comparative_claim_hit', 'official_disclosure_false', 'official_disclosure_missing', 'official_disclosure_true', 'superlative_hit', 'transcript_char_len', 'transcript_has_disclosure_lang', 'transcript_near_empty', 'transcript_word_len']
+2026-08-14 06:05:30,892 | INFO | MainThread |   grid max_depth=4 min_samples_leaf=1 -> dev_st3_macro_f1=0.391
+2026-08-14 06:05:33,408 | INFO | MainThread |   grid max_depth=4 min_samples_leaf=2 -> dev_st3_macro_f1=0.390
+2026-08-14 06:05:35,988 | INFO | MainThread |   grid max_depth=4 min_samples_leaf=5 -> dev_st3_macro_f1=0.392
+2026-08-14 06:05:38,723 | INFO | MainThread |   grid max_depth=6 min_samples_leaf=1 -> dev_st3_macro_f1=0.406
+2026-08-14 06:05:41,423 | INFO | MainThread |   grid max_depth=6 min_samples_leaf=2 -> dev_st3_macro_f1=0.403
+2026-08-14 06:05:44,128 | INFO | MainThread |   grid max_depth=6 min_samples_leaf=5 -> dev_st3_macro_f1=0.411
+2026-08-14 06:05:46,994 | INFO | MainThread |   grid max_depth=8 min_samples_leaf=1 -> dev_st3_macro_f1=0.397
+2026-08-14 06:05:49,831 | INFO | MainThread |   grid max_depth=8 min_samples_leaf=2 -> dev_st3_macro_f1=0.401
+2026-08-14 06:05:52,607 | INFO | MainThread |   grid max_depth=8 min_samples_leaf=5 -> dev_st3_macro_f1=0.396
+2026-08-14 06:05:55,453 | INFO | MainThread |   grid max_depth=10 min_samples_leaf=1 -> dev_st3_macro_f1=0.384
+2026-08-14 06:05:58,371 | INFO | MainThread |   grid max_depth=10 min_samples_leaf=2 -> dev_st3_macro_f1=0.380
+2026-08-14 06:06:01,211 | INFO | MainThread |   grid max_depth=10 min_samples_leaf=5 -> dev_st3_macro_f1=0.375
+2026-08-14 06:06:04,277 | INFO | MainThread |   grid max_depth=15 min_samples_leaf=1 -> dev_st3_macro_f1=0.365
+2026-08-14 06:06:07,320 | INFO | MainThread |   grid max_depth=15 min_samples_leaf=2 -> dev_st3_macro_f1=0.369
+2026-08-14 06:06:10,277 | INFO | MainThread |   grid max_depth=15 min_samples_leaf=5 -> dev_st3_macro_f1=0.347
+2026-08-14 06:06:13,634 | INFO | MainThread |   grid max_depth=None min_samples_leaf=1 -> dev_st3_macro_f1=0.326
+2026-08-14 06:06:16,903 | INFO | MainThread |   grid max_depth=None min_samples_leaf=2 -> dev_st3_macro_f1=0.344
+2026-08-14 06:06:20,036 | INFO | MainThread |   grid max_depth=None min_samples_leaf=5 -> dev_st3_macro_f1=0.339
+2026-08-14 06:06:20,036 | INFO | MainThread | selected max_depth=6 min_samples_leaf=5 by dev_st3_macro_f1=0.411
+2026-08-14 06:06:21,218 | INFO | MainThread | === train (fit) ===
+2026-08-14 06:06:21,218 | INFO | MainThread | st3_macro_f1=0.556 st3_family_macro_f1=0.628
+2026-08-14 06:06:21,218 | INFO | MainThread | === dev (model selection) ===
+2026-08-14 06:06:21,218 | INFO | MainThread | st3_macro_f1=0.411 st3_family_macro_f1=0.484
+2026-08-14 06:06:21,218 | INFO | MainThread |   age_restricted_or_prohibited_product: 0.182
+2026-08-14 06:06:21,218 | INFO | MainThread |   direct_exhortation: 0.315
+2026-08-14 06:06:21,219 | INFO | MainThread |   hfss_food_marketing: 0.160
+2026-08-14 06:06:21,219 | INFO | MainThread |   inadequate_disclosure: 0.418
+2026-08-14 06:06:21,219 | INFO | MainThread |   insufficient_context: 0.400
+2026-08-14 06:06:21,219 | INFO | MainThread |   misleading_claim: 0.499
+2026-08-14 06:06:21,219 | INFO | MainThread |   no_flag: 0.477
+2026-08-14 06:06:21,219 | INFO | MainThread |   undisclosed_advertising: 0.838
+2026-08-14 06:06:21,219 | INFO | MainThread | === test-holdout (final check) ===
+2026-08-14 06:06:21,219 | INFO | MainThread | st3_macro_f1=0.357 st3_family_macro_f1=0.467
+2026-08-14 06:06:21,219 | INFO | MainThread |   age_restricted_or_prohibited_product: 0.136
+2026-08-14 06:06:21,219 | INFO | MainThread |   direct_exhortation: 0.254
+2026-08-14 06:06:21,220 | INFO | MainThread |   hfss_food_marketing: 0.421
+2026-08-14 06:06:21,220 | INFO | MainThread |   inadequate_disclosure: 0.344
+2026-08-14 06:06:21,220 | INFO | MainThread |   insufficient_context: 0.000
+2026-08-14 06:06:21,220 | INFO | MainThread |   misleading_claim: 0.550
+2026-08-14 06:06:21,220 | INFO | MainThread |   no_flag: 0.394
+2026-08-14 06:06:21,220 | INFO | MainThread |   undisclosed_advertising: 0.758
+2026-08-14 06:06:21,221 | INFO | MainThread | === top 20 features by mean importance across per-label trees ===
+2026-08-14 06:06:21,221 | INFO | MainThread |   transcript_has_disclosure_lang: 0.1309
+2026-08-14 06:06:21,221 | INFO | MainThread |   transcript_char_len: 0.1112
+2026-08-14 06:06:21,221 | INFO | MainThread |   official_disclosure_true: 0.0713
+2026-08-14 06:06:21,221 | INFO | MainThread |   tfidf__flavor: 0.0698
+2026-08-14 06:06:21,222 | INFO | MainThread |   transcript_word_len: 0.0636
+2026-08-14 06:06:21,222 | INFO | MainThread |   age_restricted__energy_caffeine: 0.0278
+2026-08-14 06:06:21,222 | INFO | MainThread |   tfidf__free: 0.0247
+2026-08-14 06:06:21,222 | INFO | MainThread |   tfidf__100: 0.0181
+2026-08-14 06:06:21,222 | INFO | MainThread |   tfidf__effects: 0.0175
+2026-08-14 06:06:21,222 | INFO | MainThread |   tfidf__home: 0.0175
+2026-08-14 06:06:21,222 | INFO | MainThread |   age_restricted__adult_sex_toys: 0.0170
+2026-08-14 06:06:21,222 | INFO | MainThread |   tfidf__code: 0.0162
+2026-08-14 06:06:21,222 | INFO | MainThread |   tfidf__skins: 0.0144
+2026-08-14 06:06:21,222 | INFO | MainThread |   tfidf__health: 0.0141
+2026-08-14 06:06:21,222 | INFO | MainThread |   tfidf__guarantee: 0.0136
+2026-08-14 06:06:21,223 | INFO | MainThread |   tfidf__japanese: 0.0134
+2026-08-14 06:06:21,223 | INFO | MainThread |   tfidf__uh: 0.0133
+2026-08-14 06:06:21,223 | INFO | MainThread |   description_has_disclosure_lang: 0.0132
+2026-08-14 06:06:21,223 | INFO | MainThread |   tfidf__style: 0.0118
+2026-08-14 06:06:21,223 | INFO | MainThread |   tfidf__service: 0.0100
+2026-08-14 06:06:21,225 | INFO | MainThread | wrote test-holdout predictions to runs/submission_dt_20260814_060518.jsonl
+2026-08-14 06:06:21,227 | INFO | MainThread | appended results row to runs/baseline_decision_tree/results.csv

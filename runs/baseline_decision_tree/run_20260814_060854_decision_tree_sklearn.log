@@ -1,0 +1,24 @@
+2026-08-14 06:08:54,620 | INFO | MainThread | logging to runs/baseline_decision_tree/run_20260814_060854_decision_tree_sklearn.log
+2026-08-14 06:08:54,792 | INFO | MainThread | split_seed=42 train=1853 test_holdout=500 dev=504
+2026-08-14 06:09:05,192 | INFO | MainThread | engineered 28 structural features: ['age_restricted__adult_sex_toys', 'age_restricted__alcohol', 'age_restricted__betting_gambling', 'age_restricted__energy_caffeine', 'age_restricted__other_restricted', 'age_restricted__skin_gambling', 'age_restricted__thc_cbd', 'age_restricted__vaping_nicotine', 'description_has_disclosure_lang', 'disclosure_only_in_description', 'disclosure_relative_position', 'guarantee_promise_hit', 'has_product_page', 'hfss__candy_subscription_brand', 'hfss__energy_drink_brand', 'hfss__misc_candy_soda', 'imperative_verb_count', 'imperative_verb_density', 'imperative_zero', 'numeric_comparative_claim_hit', 'official_disclosure_false', 'official_disclosure_missing', 'official_disclosure_true', 'superlative_hit', 'transcript_char_len', 'transcript_has_disclosure_lang', 'transcript_near_empty', 'transcript_word_len']
+2026-08-14 06:09:08,154 | INFO | MainThread |   grid estimator=tree max_depth=4 min_samples_leaf=1 n_estimators=None -> dev_st3_macro_f1=0.365
+2026-08-14 06:09:08,644 | INFO | MainThread |   grid estimator=tree max_depth=4 min_samples_leaf=2 n_estimators=None -> dev_st3_macro_f1=0.363
+2026-08-14 06:09:09,132 | INFO | MainThread |   grid estimator=tree max_depth=4 min_samples_leaf=5 n_estimators=None -> dev_st3_macro_f1=0.361
+2026-08-14 06:09:09,789 | INFO | MainThread |   grid estimator=tree max_depth=6 min_samples_leaf=1 n_estimators=None -> dev_st3_macro_f1=0.389
+2026-08-14 06:09:10,442 | INFO | MainThread |   grid estimator=tree max_depth=6 min_samples_leaf=2 n_estimators=None -> dev_st3_macro_f1=0.391
+2026-08-14 06:09:11,077 | INFO | MainThread |   grid estimator=tree max_depth=6 min_samples_leaf=5 n_estimators=None -> dev_st3_macro_f1=0.368
+2026-08-14 06:09:11,891 | INFO | MainThread |   grid estimator=tree max_depth=8 min_samples_leaf=1 n_estimators=None -> dev_st3_macro_f1=0.386
+2026-08-14 06:09:12,711 | INFO | MainThread |   grid estimator=tree max_depth=8 min_samples_leaf=2 n_estimators=None -> dev_st3_macro_f1=0.387
+2026-08-14 06:09:13,492 | INFO | MainThread |   grid estimator=tree max_depth=8 min_samples_leaf=5 n_estimators=None -> dev_st3_macro_f1=0.391
+2026-08-14 06:09:14,468 | INFO | MainThread |   grid estimator=tree max_depth=10 min_samples_leaf=1 n_estimators=None -> dev_st3_macro_f1=0.370
+2026-08-14 06:09:15,412 | INFO | MainThread |   grid estimator=tree max_depth=10 min_samples_leaf=2 n_estimators=None -> dev_st3_macro_f1=0.378
+2026-08-14 06:09:16,304 | INFO | MainThread |   grid estimator=tree max_depth=10 min_samples_leaf=5 n_estimators=None -> dev_st3_macro_f1=0.388
+2026-08-14 06:09:17,552 | INFO | MainThread |   grid estimator=tree max_depth=15 min_samples_leaf=1 n_estimators=None -> dev_st3_macro_f1=0.348
+2026-08-14 06:09:18,758 | INFO | MainThread |   grid estimator=tree max_depth=15 min_samples_leaf=2 n_estimators=None -> dev_st3_macro_f1=0.346
+2026-08-14 06:09:19,870 | INFO | MainThread |   grid estimator=tree max_depth=15 min_samples_leaf=5 n_estimators=None -> dev_st3_macro_f1=0.374
+2026-08-14 06:09:21,580 | INFO | MainThread |   grid estimator=tree max_depth=None min_samples_leaf=1 n_estimators=None -> dev_st3_macro_f1=0.304
+2026-08-14 06:09:23,152 | INFO | MainThread |   grid estimator=tree max_depth=None min_samples_leaf=2 n_estimators=None -> dev_st3_macro_f1=0.323
+2026-08-14 06:09:24,421 | INFO | MainThread |   grid estimator=tree max_depth=None min_samples_leaf=5 n_estimators=None -> dev_st3_macro_f1=0.363
+2026-08-14 06:09:31,518 | INFO | MainThread |   grid estimator=forest max_depth=None min_samples_leaf=1 n_estimators=200 -> dev_st3_macro_f1=0.479
+2026-08-14 06:09:49,171 | INFO | MainThread |   grid estimator=forest max_depth=None min_samples_leaf=1 n_estimators=500 -> dev_st3_macro_f1=0.495
+2026-08-14 06:09:55,994 | INFO | MainThread |   grid estimator=forest max_depth=None min_samples_leaf=2 n_estimators=200 -> dev_st3_macro_f1=0.512

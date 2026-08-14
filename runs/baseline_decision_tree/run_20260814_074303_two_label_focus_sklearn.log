@@ -1,0 +1,12 @@
+2026-08-14 07:43:03,968 | INFO | MainThread | logging to runs/baseline_decision_tree/run_20260814_074303_two_label_focus_sklearn.log
+2026-08-14 07:43:04,212 | INFO | MainThread | split_seed=940129387 train=1853 test_holdout=500 dev=504
+2026-08-14 07:43:23,192 | INFO | MainThread | [undisclosed_advertising] n_train_pos=271 n_dev_pos=74 n_test_pos=81 features=['official_disclosure_true', 'official_disclosure_false', 'official_disclosure_missing', 'transcript_has_disclosure_lang', 'description_has_disclosure_lang', 'disclosure_only_in_description', 'disclosure_relative_position']+tfidf
+2026-08-14 07:43:23,548 | INFO | MainThread |   [undisclosed_advertising] 5-fold CV mean F1 per candidate: logreg_C0.1=0.870, logreg_C1.0=0.875, tree_d2=0.816, tree_d3=0.835
+2026-08-14 07:43:23,566 | INFO | MainThread | [undisclosed_advertising] winner=logreg_C1.0 threshold=0.75 dev_f1=0.871 test_f1=0.839 (test tp=73 fp=20 fn=8, precision=0.785 recall=0.901)
+2026-08-14 07:43:23,569 | INFO | MainThread | [insufficient_context] n_train_pos=13 n_dev_pos=7 n_test_pos=2 features=['transcript_word_len', 'transcript_char_len', 'transcript_near_empty', 'description_word_len', 'description_commercial_hit', 'context_insufficient']
+2026-08-14 07:43:23,717 | INFO | MainThread |   [insufficient_context] 5-fold CV mean F1 per candidate: logreg_C0.1=0.310, logreg_C1.0=0.330, tree_d2=0.296, tree_d3=0.294
+2026-08-14 07:43:23,730 | INFO | MainThread | [insufficient_context] winner=logreg_C1.0 threshold=0.95 dev_f1=0.348 test_f1=0.333 (test tp=2 fp=8 fn=0, precision=0.200 recall=1.000)
+2026-08-14 07:43:23,730 | INFO | MainThread | === summary ===
+2026-08-14 07:43:23,730 | INFO | MainThread |   undisclosed_advertising: model=logreg_C1.0 dev_f1=0.871 test_f1=0.839
+2026-08-14 07:43:23,730 | INFO | MainThread |   insufficient_context: model=logreg_C1.0 dev_f1=0.348 test_f1=0.333
+2026-08-14 07:43:23,733 | INFO | MainThread | appended results row to runs/baseline_decision_tree/results.csv

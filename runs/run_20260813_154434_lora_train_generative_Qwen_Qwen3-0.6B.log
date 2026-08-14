@@ -1,0 +1,30 @@
+2026-08-13 15:44:34,829 | INFO | MainThread | logging to runs/run_20260813_154434_lora_train_generative_Qwen_Qwen3-0.6B.log
+2026-08-13 15:44:34,829 | INFO | MainThread | config: {'train': 'public_data_dev/train.jsonl', 'dev': 'public_data_dev/dev.jsonl', 'model': 'Qwen/Qwen3-0.6B', 'model_path': None, 'context': 'full', 'lean_prompt': True, 'df_path': 'emnllp-dialog-flow-dialog-flow.json', 'max_length': 4096, 'epochs': 3, 'batch_size': 1, 'eval_batch_size': None, 'grad_accum_steps': 4, 'lr': 0.0002, 'warmup_ratio': 0.06, 'lora_r': 8, 'lora_alpha': 16, 'lora_dropout': 0.1, 'target_modules': 'q_proj,v_proj', 'load_in_4bit': False, 'parallelism': 'none', 'max_new_tokens': 128, 'sample_size': None, 'test_holdout': 500, 'split_seed': None, 'seed': 42, 'device': None, 'output_dir': 'runs/lora-qwen3-0.6B', 'checkpoint_save_path': None} device=cuda
+2026-08-13 15:44:34,958 | INFO | MainThread | train/test-holdout split (fresh random split every run unless --split-seed is pinned): split_seed=1667046644 train=1853 test_holdout=500
+2026-08-13 15:44:34,958 | INFO | MainThread | train=1853 dev=504
+2026-08-13 15:44:34,959 | INFO | MainThread | loading model/tokenizer from local path models/Qwen/Qwen3-0.6B (no remote download)
+2026-08-13 15:44:36,252 | INFO | MainThread | system prompt: lean (1698 chars) + dialog flow from emnllp-dialog-flow-dialog-flow.json (4507 chars)
+2026-08-13 16:01:55,060 | INFO | MainThread | epoch 1: mean train loss = 0.3341
+2026-08-13 16:12:54,144 | INFO | MainThread | epoch 1 dev metrics: st1_macro_f1=0.673, st2_macro_f1=0.839, st3_macro_f1=0.489, st3_family_macro_f1=0.709, mean_macro_f1=0.667
+2026-08-13 16:12:54,145 | INFO | MainThread | epoch 1 dev st1 per-label F1: digital_content_or_services=0.957, none=0.833, other=0.000, physical_goods=0.947, physical_services=0.629
+2026-08-13 16:12:54,145 | INFO | MainThread | epoch 1 dev st2 per-label F1: apps=0.926, creator_community=0.898, education=0.909, fashion=0.804, financial=0.974, food=0.958, gambling=0.571, gambling_adjacent=0.800, hardware_electronics=0.802, health=0.916, other=0.841, toys=0.667
+2026-08-13 16:12:54,145 | INFO | MainThread | epoch 1 dev st3 per-label F1: age_restricted_or_prohibited_product=0.667, direct_exhortation=0.563, hfss_food_marketing=0.500, inadequate_disclosure=0.604, insufficient_context=0.000, misleading_claim=0.548, no_flag=0.787, undisclosed_advertising=0.241
+2026-08-13 16:12:54,145 | INFO | MainThread | epoch 1 dev st3_family per-label F1: content=0.747, disclosure=0.700, housekeeping=0.757, product=0.632
+2026-08-13 16:12:54,184 | INFO | MainThread | epoch 1: new best mean_macro_f1=0.667, saved to runs/lora-qwen3-0.6B/best
+2026-08-13 16:30:11,656 | INFO | MainThread | epoch 2: mean train loss = 0.1328
+2026-08-13 16:41:37,792 | INFO | MainThread | epoch 2 dev metrics: st1_macro_f1=0.909, st2_macro_f1=0.853, st3_macro_f1=0.501, st3_family_macro_f1=0.730, mean_macro_f1=0.754
+2026-08-13 16:41:37,792 | INFO | MainThread | epoch 2 dev st1 per-label F1: digital_content_or_services=0.929, none=0.923, physical_goods=0.926, physical_services=0.857
+2026-08-13 16:41:37,792 | INFO | MainThread | epoch 2 dev st2 per-label F1: apps=0.883, creator_community=0.819, education=0.880, fashion=0.872, financial=0.909, food=0.947, gambling=0.889, gambling_adjacent=0.865, hardware_electronics=0.780, health=0.887, other=0.732, toys=0.769
+2026-08-13 16:41:37,792 | INFO | MainThread | epoch 2 dev st3 per-label F1: age_restricted_or_prohibited_product=0.667, direct_exhortation=0.426, hfss_food_marketing=0.750, inadequate_disclosure=0.475, insufficient_context=0.000, misleading_claim=0.514, no_flag=0.908, undisclosed_advertising=0.268
+2026-08-13 16:41:37,792 | INFO | MainThread | epoch 2 dev st3_family per-label F1: content=0.671, disclosure=0.632, housekeeping=0.890, product=0.727
+2026-08-13 16:41:37,828 | INFO | MainThread | epoch 2: new best mean_macro_f1=0.754, saved to runs/lora-qwen3-0.6B/best
+2026-08-13 16:58:55,428 | INFO | MainThread | epoch 3: mean train loss = 0.1023
+2026-08-13 17:10:56,371 | INFO | MainThread | epoch 3 dev metrics: st1_macro_f1=0.654, st2_macro_f1=0.756, st3_macro_f1=0.451, st3_family_macro_f1=0.659, mean_macro_f1=0.620
+2026-08-13 17:10:56,371 | INFO | MainThread | epoch 3 dev st1 per-label F1: digital_content_or_services=0.891, none=0.783, other=0.000, physical_goods=0.859, physical_services=0.737
+2026-08-13 17:10:56,371 | INFO | MainThread | epoch 3 dev st2 per-label F1: apps=0.830, creator_community=0.659, education=0.917, fashion=0.713, financial=0.857, food=0.824, gambling=0.571, gambling_adjacent=0.667, hardware_electronics=0.774, health=0.854, other=0.741, toys=0.667
+2026-08-13 17:10:56,371 | INFO | MainThread | epoch 3 dev st3 per-label F1: age_restricted_or_prohibited_product=0.471, direct_exhortation=0.413, hfss_food_marketing=0.571, inadequate_disclosure=0.343, insufficient_context=0.041, misleading_claim=0.718, no_flag=0.762, undisclosed_advertising=0.286
+2026-08-13 17:10:56,371 | INFO | MainThread | epoch 3 dev st3_family per-label F1: content=0.819, disclosure=0.495, housekeeping=0.766, product=0.558
+2026-08-13 17:10:56,398 | INFO | MainThread | saved final epoch adapter to runs/lora-qwen3-0.6B/last (best dev mean_macro_f1=0.754)
+2026-08-13 17:10:56,398 | INFO | MainThread | best dev metrics: st1_macro_f1=0.909, st2_macro_f1=0.853, st3_macro_f1=0.501, st3_family_macro_f1=0.730, mean_macro_f1=0.754
+2026-08-13 17:10:56,398 | INFO | MainThread | reloading best-dev checkpoint from runs/lora-qwen3-0.6B/best for the test-holdout pass (generalization check, not used for model selection)
+2026-08-13 17:22:29,095 | INFO | MainThread | test holdout metrics: st1_macro_f1=0.682, st2_macro_f1=0.838, st3_macro_f1=0.407, st3_family_macro_f1=0.714, mean_macro_f1=0.643

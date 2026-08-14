@@ -1,0 +1,43 @@
+2026-08-14 07:11:06,782 | INFO | MainThread | logging to runs/baseline_decision_tree/run_20260814_071106_per_label_ensemble_sklearn_xgboost.log
+2026-08-14 07:11:06,921 | INFO | MainThread | split_seed=469539987 train=1853 test_holdout=500 dev=504
+2026-08-14 07:11:44,368 | INFO | MainThread | [age_restricted_or_prohibited_product] n_train_pos=42 -> winner view=structural model=tree threshold=0.85 dev_f1=0.439 (candidates tried: 11)
+2026-08-14 07:12:10,664 | INFO | MainThread | [direct_exhortation] n_train_pos=232 -> winner view=full model=logreg threshold=0.45 dev_f1=0.353 (candidates tried: 11)
+2026-08-14 07:12:34,475 | INFO | MainThread | [hfss_food_marketing] n_train_pos=31 -> winner view=full model=histgb threshold=0.15 dev_f1=0.750 (candidates tried: 11)
+2026-08-14 07:13:01,953 | INFO | MainThread | [inadequate_disclosure] n_train_pos=493 -> winner view=disclosure model=tree threshold=0.35 dev_f1=0.551 (candidates tried: 16)
+2026-08-14 07:13:25,125 | INFO | MainThread | [insufficient_context] n_train_pos=12 -> winner view=emptiness model=tree threshold=0.95 dev_f1=0.545 (candidates tried: 16)
+2026-08-14 07:13:51,189 | INFO | MainThread | [misleading_claim] n_train_pos=1012 -> winner view=full model=histgb threshold=0.25 dev_f1=0.739 (candidates tried: 11)
+2026-08-14 07:14:18,806 | INFO | MainThread | [no_flag] n_train_pos=409 -> winner view=full model=voting_ensemble threshold=0.30 dev_f1=0.574 (candidates tried: 16)
+2026-08-14 07:14:44,994 | INFO | MainThread | [undisclosed_advertising] n_train_pos=273 -> winner view=full model=xgboost threshold=0.65 dev_f1=0.882 (candidates tried: 16)
+2026-08-14 07:14:45,012 | INFO | MainThread | === per-label winners ===
+2026-08-14 07:14:45,012 | INFO | MainThread |   age_restricted_or_prohibited_product: view=structural model=tree dev_f1=0.439
+2026-08-14 07:14:45,012 | INFO | MainThread |   direct_exhortation: view=full model=logreg dev_f1=0.353
+2026-08-14 07:14:45,012 | INFO | MainThread |   hfss_food_marketing: view=full model=histgb dev_f1=0.750
+2026-08-14 07:14:45,013 | INFO | MainThread |   inadequate_disclosure: view=disclosure model=tree dev_f1=0.551
+2026-08-14 07:14:45,013 | INFO | MainThread |   insufficient_context: view=emptiness model=tree dev_f1=0.545
+2026-08-14 07:14:45,013 | INFO | MainThread |   misleading_claim: view=full model=histgb dev_f1=0.739
+2026-08-14 07:14:45,013 | INFO | MainThread |   no_flag: view=full model=voting_ensemble dev_f1=0.574
+2026-08-14 07:14:45,013 | INFO | MainThread |   undisclosed_advertising: view=full model=xgboost dev_f1=0.882
+2026-08-14 07:14:45,013 | INFO | MainThread | === train (fit) ===
+2026-08-14 07:14:45,013 | INFO | MainThread | st3_macro_f1=0.670 st3_family_macro_f1=0.709
+2026-08-14 07:14:45,013 | INFO | MainThread | === dev (model + threshold selection) ===
+2026-08-14 07:14:45,013 | INFO | MainThread | st3_macro_f1=0.577 st3_family_macro_f1=0.620
+2026-08-14 07:14:45,013 | INFO | MainThread |   age_restricted_or_prohibited_product: 0.467
+2026-08-14 07:14:45,013 | INFO | MainThread |   direct_exhortation: 0.329
+2026-08-14 07:14:45,013 | INFO | MainThread |   hfss_food_marketing: 0.571
+2026-08-14 07:14:45,013 | INFO | MainThread |   inadequate_disclosure: 0.474
+2026-08-14 07:14:45,013 | INFO | MainThread |   insufficient_context: 0.667
+2026-08-14 07:14:45,013 | INFO | MainThread |   misleading_claim: 0.637
+2026-08-14 07:14:45,013 | INFO | MainThread |   no_flag: 0.576
+2026-08-14 07:14:45,013 | INFO | MainThread |   undisclosed_advertising: 0.899
+2026-08-14 07:14:45,013 | INFO | MainThread | === test-holdout (final check) ===
+2026-08-14 07:14:45,013 | INFO | MainThread | st3_macro_f1=0.415 st3_family_macro_f1=0.513
+2026-08-14 07:14:45,013 | INFO | MainThread |   age_restricted_or_prohibited_product: 0.229
+2026-08-14 07:14:45,014 | INFO | MainThread |   direct_exhortation: 0.318
+2026-08-14 07:14:45,014 | INFO | MainThread |   hfss_food_marketing: 0.143
+2026-08-14 07:14:45,014 | INFO | MainThread |   inadequate_disclosure: 0.390
+2026-08-14 07:14:45,014 | INFO | MainThread |   insufficient_context: 0.200
+2026-08-14 07:14:45,014 | INFO | MainThread |   misleading_claim: 0.636
+2026-08-14 07:14:45,014 | INFO | MainThread |   no_flag: 0.543
+2026-08-14 07:14:45,014 | INFO | MainThread |   undisclosed_advertising: 0.861
+2026-08-14 07:14:45,016 | INFO | MainThread | wrote test-holdout predictions to runs/submission_perlabel_20260814_071106.jsonl
+2026-08-14 07:14:45,018 | INFO | MainThread | appended results row to runs/baseline_decision_tree/results.csv

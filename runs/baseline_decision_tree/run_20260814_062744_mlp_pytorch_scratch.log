@@ -1,0 +1,60 @@
+2026-08-14 06:27:44,881 | INFO | MainThread | logging to runs/baseline_decision_tree/run_20260814_062744_mlp_pytorch_scratch.log
+2026-08-14 06:27:44,920 | INFO | MainThread | device=cuda
+2026-08-14 06:27:45,129 | INFO | MainThread | split_seed=42 train=1853 test_holdout=500 dev=504
+2026-08-14 06:28:02,312 | INFO | MainThread | pos_weight per label: {'age_restricted_or_prohibited_product': 45.31999969482422, 'direct_exhortation': 6.690000057220459, 'hfss_food_marketing': 50.0, 'inadequate_disclosure': 2.880000114440918, 'insufficient_context': 50.0, 'misleading_claim': 1.0, 'no_flag': 3.559999942779541, 'undisclosed_advertising': 5.5}
+2026-08-14 06:28:05,487 | INFO | MainThread | epoch 10: train_loss=0.8125 dev_st3_macro_f1=0.317
+2026-08-14 06:28:05,513 | INFO | MainThread | epoch 20: train_loss=0.6440 dev_st3_macro_f1=0.403
+2026-08-14 06:28:05,539 | INFO | MainThread | epoch 30: train_loss=0.5270 dev_st3_macro_f1=0.423
+2026-08-14 06:28:05,568 | INFO | MainThread | epoch 40: train_loss=0.4329 dev_st3_macro_f1=0.422
+2026-08-14 06:28:05,594 | INFO | MainThread | epoch 50: train_loss=0.3730 dev_st3_macro_f1=0.417
+2026-08-14 06:28:05,620 | INFO | MainThread | epoch 60: train_loss=0.3246 dev_st3_macro_f1=0.411
+2026-08-14 06:28:05,651 | INFO | MainThread | epoch 70: train_loss=0.2941 dev_st3_macro_f1=0.438
+2026-08-14 06:28:05,678 | INFO | MainThread | epoch 80: train_loss=0.2629 dev_st3_macro_f1=0.429
+2026-08-14 06:28:05,704 | INFO | MainThread | epoch 90: train_loss=0.2485 dev_st3_macro_f1=0.429
+2026-08-14 06:28:05,730 | INFO | MainThread | epoch 100: train_loss=0.2277 dev_st3_macro_f1=0.424
+2026-08-14 06:28:05,756 | INFO | MainThread | epoch 110: train_loss=0.2141 dev_st3_macro_f1=0.432
+2026-08-14 06:28:05,782 | INFO | MainThread | epoch 120: train_loss=0.2006 dev_st3_macro_f1=0.426
+2026-08-14 06:28:05,807 | INFO | MainThread | epoch 130: train_loss=0.1894 dev_st3_macro_f1=0.426
+2026-08-14 06:28:05,834 | INFO | MainThread | epoch 140: train_loss=0.1775 dev_st3_macro_f1=0.427
+2026-08-14 06:28:05,862 | INFO | MainThread | epoch 150: train_loss=0.1687 dev_st3_macro_f1=0.430
+2026-08-14 06:28:05,888 | INFO | MainThread | epoch 160: train_loss=0.1612 dev_st3_macro_f1=0.418
+2026-08-14 06:28:05,913 | INFO | MainThread | epoch 170: train_loss=0.1531 dev_st3_macro_f1=0.416
+2026-08-14 06:28:05,940 | INFO | MainThread | epoch 180: train_loss=0.1438 dev_st3_macro_f1=0.411
+2026-08-14 06:28:05,966 | INFO | MainThread | epoch 190: train_loss=0.1406 dev_st3_macro_f1=0.411
+2026-08-14 06:28:05,992 | INFO | MainThread | epoch 200: train_loss=0.1350 dev_st3_macro_f1=0.414
+2026-08-14 06:28:06,018 | INFO | MainThread | epoch 210: train_loss=0.1265 dev_st3_macro_f1=0.401
+2026-08-14 06:28:06,044 | INFO | MainThread | epoch 220: train_loss=0.1238 dev_st3_macro_f1=0.395
+2026-08-14 06:28:06,070 | INFO | MainThread | epoch 230: train_loss=0.1210 dev_st3_macro_f1=0.396
+2026-08-14 06:28:06,096 | INFO | MainThread | epoch 240: train_loss=0.1174 dev_st3_macro_f1=0.396
+2026-08-14 06:28:06,124 | INFO | MainThread | epoch 250: train_loss=0.1138 dev_st3_macro_f1=0.394
+2026-08-14 06:28:06,167 | INFO | MainThread | epoch 260: train_loss=0.1105 dev_st3_macro_f1=0.397
+2026-08-14 06:28:06,193 | INFO | MainThread | epoch 270: train_loss=0.1095 dev_st3_macro_f1=0.394
+2026-08-14 06:28:06,220 | INFO | MainThread | epoch 280: train_loss=0.0997 dev_st3_macro_f1=0.387
+2026-08-14 06:28:06,247 | INFO | MainThread | epoch 290: train_loss=0.0968 dev_st3_macro_f1=0.390
+2026-08-14 06:28:06,273 | INFO | MainThread | epoch 300: train_loss=0.0964 dev_st3_macro_f1=0.378
+2026-08-14 06:28:06,274 | INFO | MainThread | selected epoch=70 by dev_st3_macro_f1=0.438
+2026-08-14 06:28:06,274 | INFO | MainThread | tuned per-label thresholds: {'age_restricted_or_prohibited_product': 0.2, 'direct_exhortation': 0.25, 'hfss_food_marketing': 0.95, 'inadequate_disclosure': 0.55, 'insufficient_context': 0.35, 'misleading_claim': 0.35, 'no_flag': 0.45, 'undisclosed_advertising': 0.45}
+2026-08-14 06:28:06,314 | INFO | MainThread | === train (fit) ===
+2026-08-14 06:28:06,314 | INFO | MainThread | st3_macro_f1=0.718 st3_family_macro_f1=0.803
+2026-08-14 06:28:06,315 | INFO | MainThread | === dev (model + threshold selection) ===
+2026-08-14 06:28:06,315 | INFO | MainThread | st3_macro_f1=0.438 st3_family_macro_f1=0.536
+2026-08-14 06:28:06,315 | INFO | MainThread |   age_restricted_or_prohibited_product: 0.212
+2026-08-14 06:28:06,315 | INFO | MainThread |   direct_exhortation: 0.358
+2026-08-14 06:28:06,315 | INFO | MainThread |   hfss_food_marketing: 0.333
+2026-08-14 06:28:06,315 | INFO | MainThread |   inadequate_disclosure: 0.421
+2026-08-14 06:28:06,315 | INFO | MainThread |   insufficient_context: 0.353
+2026-08-14 06:28:06,315 | INFO | MainThread |   misleading_claim: 0.708
+2026-08-14 06:28:06,315 | INFO | MainThread |   no_flag: 0.509
+2026-08-14 06:28:06,316 | INFO | MainThread |   undisclosed_advertising: 0.607
+2026-08-14 06:28:06,316 | INFO | MainThread | === test-holdout (final check) ===
+2026-08-14 06:28:06,316 | INFO | MainThread | st3_macro_f1=0.413 st3_family_macro_f1=0.572
+2026-08-14 06:28:06,316 | INFO | MainThread |   age_restricted_or_prohibited_product: 0.328
+2026-08-14 06:28:06,316 | INFO | MainThread |   direct_exhortation: 0.290
+2026-08-14 06:28:06,316 | INFO | MainThread |   hfss_food_marketing: 0.286
+2026-08-14 06:28:06,317 | INFO | MainThread |   inadequate_disclosure: 0.426
+2026-08-14 06:28:06,317 | INFO | MainThread |   insufficient_context: 0.125
+2026-08-14 06:28:06,317 | INFO | MainThread |   misleading_claim: 0.710
+2026-08-14 06:28:06,317 | INFO | MainThread |   no_flag: 0.560
+2026-08-14 06:28:06,317 | INFO | MainThread |   undisclosed_advertising: 0.579
+2026-08-14 06:28:06,321 | INFO | MainThread | wrote test-holdout predictions to runs/submission_mlp_20260814_062744.jsonl
+2026-08-14 06:28:06,330 | INFO | MainThread | appended results row to runs/baseline_decision_tree/results.csv
