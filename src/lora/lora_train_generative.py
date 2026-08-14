@@ -151,6 +151,14 @@ def main():
                      "existing exposure, this changes how often the model sees these examples "
                      "per epoch -- a different mechanism, can be combined with either. 1 "
                      "(default) disables oversampling")
+    ap.add_argument("--st3-only", action="store_true", help="train/predict on st3 alone: the "
+                     "completion is \"{\\\"st3\\\":[...]}\" instead of the full st1/st2/st3 "
+                     "object, so every completion token trains st3 -- none are spent on "
+                     "subtasks this run isn't scoring. st1/st2 in the logged metrics are a "
+                     "fixed placeholder (\"other\"/[]), not meaningful predictions -- read "
+                     "st3_macro_f1/st3_family_macro_f1 only, and note that mean_macro_f1 and "
+                     "best-checkpoint selection both switch to st3_macro_f1 in this mode "
+                     "(mean_macro_f1 would otherwise average in the meaningless placeholder)")
     ap.add_argument("--load-in-4bit", action="store_true", help="QLoRA via bitsandbytes (must be installed separately)")
     ap.add_argument("--parallelism", choices=PARALLELISM_CHOICES, default="none", help="split the model "
                      "across GPUs (requires >=2): \"pipeline\" shards layers via device_map=\"auto\"; \"tensor\" "
@@ -265,12 +273,18 @@ def main():
         log.info(f"pos_weight st2: {st2_pos_weight}")
         log.info(f"pos_weight st3: {st3_pos_weight}")
 
+    if args.st3_only:
+        log.info("--st3-only: completion is {\"st3\":[...]} alone; st1/st2 in logged metrics "
+                 "are a fixed placeholder, read st3_macro_f1/st3_family_macro_f1 only; "
+                 "best-checkpoint selection uses st3_macro_f1 instead of mean_macro_f1")
+
     collate = GenerativeCollator(tokenizer)
     train_ds = GenerativeDataset(train_instances, tokenizer, args.context, args.max_length,
                                  system_prompt, df_text, st3_loss_weight=args.st3_loss_weight,
-                                 st2_pos_weight=st2_pos_weight, st3_pos_weight=st3_pos_weight)
+                                 st2_pos_weight=st2_pos_weight, st3_pos_weight=st3_pos_weight,
+                                 st3_only=args.st3_only)
     dev_ds = GenerativeDataset(dev_instances, tokenizer, args.context, args.max_length,
-                               system_prompt, df_text)
+                               system_prompt, df_text, st3_only=args.st3_only, include_completion=False)
     train_loader = DataLoader(train_ds, batch_size=args.batch_size, shuffle=True, collate_fn=collate)
     eval_batch_size = args.eval_batch_size or args.batch_size
     dev_loader = DataLoader(dev_ds, batch_size=eval_batch_size, shuffle=False, collate_fn=collate)
@@ -296,8 +310,10 @@ def main():
         model.train()
         tokenizer.padding_side = "right"  # loss-masked labels must line up token-for-token
         running_loss = 0.0
+        train_seq_lens = []
         for step, batch in enumerate(tqdm(train_loader, desc=f"epoch {epoch + 1}/{args.epochs}", disable=not is_main)):
             batch = to_device(batch, model.device)
+            train_seq_lens.extend(batch["attention_mask"].sum(dim=1).tolist())
             labels, loss_weight = batch["labels"], batch["loss_weight"]
             if virtual_prefix:
                 pad_labels = torch.full((labels.shape[0], virtual_prefix), -100, dtype=labels.dtype, device=labels.device)
@@ -315,9 +331,12 @@ def main():
                 scheduler.step()
                 optimizer.zero_grad()
         log.info(f"epoch {epoch + 1}: mean train loss = {running_loss / len(train_loader):.4f}")
+        log.info(f"epoch {epoch + 1}: train input length (tokens, unpadded) -- "
+                 f"min={min(train_seq_lens)} mean={sum(train_seq_lens) / len(train_seq_lens):.0f} "
+                 f"max={max(train_seq_lens)} n={len(train_seq_lens)}")
 
         tokenizer.padding_side = "left"  # batched model.generate() needs left-padding
-        ids, preds = generate_predictions(model, dev_loader, tokenizer, args.max_new_tokens)
+        ids, preds = generate_predictions(model, dev_loader, tokenizer, args.max_new_tokens, st3_only=args.st3_only, log=log)
         gold = [inst["labels"] for inst in dev_instances]
         metrics = evaluate(gold, preds)
         scalar_metrics = {k: v for k, v in metrics.items() if k != "per_label_f1"}
@@ -326,8 +345,9 @@ def main():
             log.info(f"epoch {epoch + 1} dev {tier} per-label F1: "
                      + ", ".join(f"{label}={f1:.3f}" for label, f1 in sorted(per_label.items())))
 
-        if metrics["mean_macro_f1"] > best_f1:
-            best_f1 = metrics["mean_macro_f1"]
+        selection_metric = metrics["st3_macro_f1"] if args.st3_only else metrics["mean_macro_f1"]
+        if selection_metric > best_f1:
+            best_f1 = selection_metric
             best_dev_scalar_metrics = scalar_metrics
             if is_main:  # avoid every rank racing to write the same adapter dir under --parallelism tensor
                 best_dir = os.path.join(checkpoint_dir, "best")
@@ -336,11 +356,13 @@ def main():
                     os.path.join(best_dir, "submission.jsonl"), os.path.join(best_dir, "submission_error.jsonl"),
                     ids, dev_instances, preds,
                 )
-                log.info(f"epoch {epoch + 1}: new best mean_macro_f1={best_f1:.3f}, saved to {checkpoint_dir}/best")
+                selection_name = "st3_macro_f1" if args.st3_only else "mean_macro_f1"
+                log.info(f"epoch {epoch + 1}: new best {selection_name}={best_f1:.3f}, saved to {checkpoint_dir}/best")
 
     if is_main:
         model.save_pretrained(os.path.join(checkpoint_dir, "last"))
-        log.info(f"saved final epoch adapter to {checkpoint_dir}/last (best dev mean_macro_f1={best_f1:.3f})")
+        selection_name = "st3_macro_f1" if args.st3_only else "mean_macro_f1"
+        log.info(f"saved final epoch adapter to {checkpoint_dir}/last (best dev {selection_name}={best_f1:.3f})")
         log.info("best dev metrics: " + ", ".join(f"{k}={v:.3f}" for k, v in best_dev_scalar_metrics.items()))
 
         if test_holdout_instances:
@@ -357,10 +379,12 @@ def main():
             tokenizer.padding_side = "left"
             test_loader = DataLoader(
                 GenerativeDataset(test_holdout_instances, tokenizer, args.context, args.max_length,
-                                  system_prompt, df_text),
+                                  system_prompt, df_text, st3_only=args.st3_only, include_completion=False),
                 batch_size=eval_batch_size, shuffle=False, collate_fn=collate,
             )
-            test_ids, test_preds = generate_predictions(test_model, test_loader, tokenizer, args.max_new_tokens)
+            test_ids, test_preds = generate_predictions(
+                test_model, test_loader, tokenizer, args.max_new_tokens, st3_only=args.st3_only, log=log,
+            )
             test_gold = [inst["labels"] for inst in test_holdout_instances]
             test_metrics = evaluate(test_gold, test_preds)
             test_scalar_metrics = {k: v for k, v in test_metrics.items() if k != "per_label_f1"}

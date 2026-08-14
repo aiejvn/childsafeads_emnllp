@@ -100,10 +100,11 @@ def main():
     log.info(f"system prompt: {'lean' if args.lean_prompt else 'full'} ({len(system_prompt)} chars)"
              + (f" + dialog flow from {args.df_path} ({len(df_text)} chars)" if df_text else ""))
     loader = DataLoader(
-        GenerativeDataset(instances, tokenizer, args.context, args.max_length, system_prompt, df_text),
+        GenerativeDataset(instances, tokenizer, args.context, args.max_length, system_prompt, df_text,
+                          include_completion=False),
         batch_size=args.batch_size, shuffle=False, collate_fn=GenerativeCollator(tokenizer),
     )
-    ids, predictions = generate_predictions(model, loader, tokenizer, args.max_new_tokens)
+    ids, predictions = generate_predictions(model, loader, tokenizer, args.max_new_tokens, log=log)
 
     if not is_main:  # avoid every rank racing to write the same output files under --parallelism tensor
         return
