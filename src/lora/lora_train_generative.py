@@ -52,7 +52,9 @@ from lora import (  # noqa: E402
 )
 from lora.lora_data import GenerativeCollator, GenerativeDataset  # noqa: E402
 from lora.lora_generative import generate_predictions  # noqa: E402
-from lora.lora_model import PARALLELISM_CHOICES, build_peft_model_causal, load_peft_model_causal  # noqa: E402
+from lora.lora_model import (  # noqa: E402
+    PARALLELISM_CHOICES, build_peft_model_causal, build_prompt_tuned_causal, load_peft_model_causal,
+)
 
 
 def to_device(batch: dict, device: str) -> dict:
@@ -117,6 +119,18 @@ def main():
     ap.add_argument("--lora-alpha", type=int, default=16)
     ap.add_argument("--lora-dropout", type=float, default=0.1)
     ap.add_argument("--target-modules", default="q_proj,v_proj", help="comma-separated module names to LoRA-adapt")
+    ap.add_argument("--peft-method", choices=("lora", "prompt_tuning"), default="lora", help="lora "
+                     "(default) LoRA-adapts --target-modules' weight matrices, entirely separate "
+                     "trainable parameters from the base model's own embeddings/layers. "
+                     "prompt_tuning instead freezes the whole base model and trains only "
+                     "--num-virtual-tokens continuous embedding vectors prepended to every "
+                     "input -- a different mechanism, --lora-r/--lora-alpha/--lora-dropout/"
+                     "--target-modules are ignored in this mode")
+    ap.add_argument("--num-virtual-tokens", type=int, default=20, help="prompt_tuning only: "
+                     "how many trainable virtual-token embeddings to prepend to every input")
+    ap.add_argument("--prompt-tuning-init-text", default=None, help="prompt_tuning only: seed "
+                     "the virtual tokens by tokenizing this text instead of random init (tends "
+                     "to converge faster/more reliably); omit for random init")
     ap.add_argument("--st3-loss-weight", type=float, default=1.0, help="multiply the next-token "
                      "CE loss on the completion's \"st3\":[...] span by this factor (st1/st2 "
                      "tokens are unaffected). st3 is this task's weakest, most class-imbalanced "
@@ -219,11 +233,18 @@ def main():
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
-    model = build_peft_model_causal(
-        model_path, lora_r=args.lora_r, lora_alpha=args.lora_alpha, lora_dropout=args.lora_dropout,
-        target_modules=args.target_modules.split(","), load_in_4bit=args.load_in_4bit, device=device,
-        local_files_only=True, parallelism=args.parallelism,
-    )
+    if args.peft_method == "prompt_tuning":
+        model = build_prompt_tuned_causal(
+            model_path, num_virtual_tokens=args.num_virtual_tokens,
+            prompt_tuning_init_text=args.prompt_tuning_init_text, tokenizer_path=model_path,
+            load_in_4bit=args.load_in_4bit, device=device, local_files_only=True, parallelism=args.parallelism,
+        )
+    else:
+        model = build_peft_model_causal(
+            model_path, lora_r=args.lora_r, lora_alpha=args.lora_alpha, lora_dropout=args.lora_dropout,
+            target_modules=args.target_modules.split(","), load_in_4bit=args.load_in_4bit, device=device,
+            local_files_only=True, parallelism=args.parallelism,
+        )
     if args.parallelism == "none" and not args.load_in_4bit:
         model = model.to(device)
     model.print_trainable_parameters()
@@ -265,14 +286,26 @@ def main():
     checkpoint_dir = args.checkpoint_save_path or args.output_dir
     best_f1 = -1.0
     os.makedirs(checkpoint_dir, exist_ok=True)
+    # prompt_tuning prepends num_virtual_tokens learned embeddings ahead of every input
+    # internally, so the logits this call returns are num_virtual_tokens longer than
+    # input_ids/labels -- pad labels/loss_weight to match (-100/0.0, both ignored by
+    # weighted_lm_loss's mask) rather than passing labels= and relying on peft's own
+    # internal auto-padding, which we can't route our per-token loss_weight through anyway.
+    virtual_prefix = args.num_virtual_tokens if args.peft_method == "prompt_tuning" else 0
     for epoch in range(args.epochs):
         model.train()
         tokenizer.padding_side = "right"  # loss-masked labels must line up token-for-token
         running_loss = 0.0
         for step, batch in enumerate(tqdm(train_loader, desc=f"epoch {epoch + 1}/{args.epochs}", disable=not is_main)):
             batch = to_device(batch, model.device)
+            labels, loss_weight = batch["labels"], batch["loss_weight"]
+            if virtual_prefix:
+                pad_labels = torch.full((labels.shape[0], virtual_prefix), -100, dtype=labels.dtype, device=labels.device)
+                pad_weight = torch.zeros((loss_weight.shape[0], virtual_prefix), dtype=loss_weight.dtype, device=loss_weight.device)
+                labels = torch.cat([pad_labels, labels], dim=1)
+                loss_weight = torch.cat([pad_weight, loss_weight], dim=1)
             out = model(input_ids=batch["input_ids"], attention_mask=batch["attention_mask"])
-            raw_loss = weighted_lm_loss(out.logits, batch["labels"], batch["loss_weight"])
+            raw_loss = weighted_lm_loss(out.logits, labels, loss_weight)
             loss = raw_loss / args.grad_accum_steps
             loss.backward()
             running_loss += raw_loss.item()

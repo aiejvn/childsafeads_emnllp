@@ -7,7 +7,7 @@ import sys
 from typing import Optional
 
 import torch
-from peft import LoraConfig, PeftModel, TaskType, get_peft_model
+from peft import LoraConfig, PeftModel, PromptTuningConfig, PromptTuningInit, TaskType, get_peft_model
 from transformers import AutoModelForCausalLM
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
@@ -153,6 +153,46 @@ def build_peft_model_causal(
         lora_dropout=lora_dropout,
     )
     return get_peft_model(model, lora_config)
+
+
+def build_prompt_tuned_causal(
+    base_model_name: str,
+    num_virtual_tokens: int = 20,
+    prompt_tuning_init_text: Optional[str] = None,
+    tokenizer_path: Optional[str] = None,
+    load_in_4bit: bool = False,
+    device: str = "cuda",
+    local_files_only: bool = False,
+    parallelism: str = "none",
+) -> PeftModel:
+    """Build a fresh causal LM and soft-prompt-tune it instead of LoRA-adapting it: the
+    entire base model stays frozen and only `num_virtual_tokens` continuous embedding
+    vectors, prepended to every input, are trained. A different mechanism from LoRA (no
+    weight-matrix adapters anywhere in the network) worth comparing on this task -- see
+    --peft-method in lora_train_generative.py. `prompt_tuning_init_text`, if given, seeds
+    the virtual tokens by tokenizing that text (via `tokenizer_path`, needed since this repo
+    loads tokenizers from a local dir rather than the HF hub) instead of random init, which
+    tends to converge faster/more reliably for prompt tuning than random init does.
+
+    Same gradient-checkpointing rationale as build_peft_model_causal: the frozen base still
+    needs its forward activations recomputed to backprop into the virtual token embeddings."""
+    model = _load_causal_base(
+        base_model_name, load_in_4bit, device, local_files_only=local_files_only, parallelism=parallelism,
+    )
+    model.config.use_cache = False
+    if load_in_4bit:
+        from peft import prepare_model_for_kbit_training
+        model = prepare_model_for_kbit_training(model, use_gradient_checkpointing=False)
+    model.gradient_checkpointing_enable()
+    model.enable_input_require_grads()
+    prompt_config = PromptTuningConfig(
+        task_type=TaskType.CAUSAL_LM,
+        num_virtual_tokens=num_virtual_tokens,
+        prompt_tuning_init=PromptTuningInit.TEXT if prompt_tuning_init_text else PromptTuningInit.RANDOM,
+        prompt_tuning_init_text=prompt_tuning_init_text,
+        tokenizer_name_or_path=tokenizer_path or base_model_name,
+    )
+    return get_peft_model(model, prompt_config)
 
 
 def load_peft_model_causal(
