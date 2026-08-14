@@ -35,6 +35,7 @@ import logging
 import os
 import random
 import sys
+from collections import Counter
 from datetime import datetime
 
 import torch
@@ -128,6 +129,14 @@ def main():
                      "common.train_utils.compute_pos_weight). Composes with --st3-loss-weight "
                      "(multiplicative): pos-weight corrects imbalance within st2/st3, "
                      "st3-loss-weight is an additional flat multiplier for the whole st3 field")
+    ap.add_argument("--oversample-rare-st3", type=int, default=1, help="duplicate each train "
+                     "instance this many times over if its st3 list contains a label under 5%% "
+                     "train frequency (insufficient_context/hfss_food_marketing/"
+                     "age_restricted_or_prohibited_product on this dataset). Unlike "
+                     "--pos-weight/--st3-loss-weight, which scale the loss magnitude of each "
+                     "existing exposure, this changes how often the model sees these examples "
+                     "per epoch -- a different mechanism, can be combined with either. 1 "
+                     "(default) disables oversampling")
     ap.add_argument("--load-in-4bit", action="store_true", help="QLoRA via bitsandbytes (must be installed separately)")
     ap.add_argument("--parallelism", choices=PARALLELISM_CHOICES, default="none", help="split the model "
                      "across GPUs (requires >=2): \"pipeline\" shards layers via device_map=\"auto\"; \"tensor\" "
@@ -183,6 +192,18 @@ def main():
         train_instances = rng.sample(train_instances, min(args.sample_size, len(train_instances)))
         dev_instances = rng.sample(dev_instances, min(args.sample_size, len(dev_instances)))
     log.info(f"train={len(train_instances)} dev={len(dev_instances)}")
+
+    if args.oversample_rare_st3 > 1:
+        st3_freq = Counter(flag for inst in train_instances for flag in inst["labels"]["st3"])
+        rare_st3 = {label for label, c in st3_freq.items() if c / len(train_instances) < 0.05}
+        oversampled = []
+        for inst in train_instances:
+            oversampled.append(inst)
+            if rare_st3.intersection(inst["labels"]["st3"]):
+                oversampled += [inst] * (args.oversample_rare_st3 - 1)
+        log.info(f"oversampling rare st3 labels {sorted(rare_st3)} {args.oversample_rare_st3}x: "
+                 f"train {len(train_instances)} -> {len(oversampled)}")
+        train_instances = oversampled
 
     model_path = args.model_path or os.path.join("models", args.model)
     if not os.path.isdir(model_path):
