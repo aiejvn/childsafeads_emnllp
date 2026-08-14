@@ -60,6 +60,20 @@ if SFT_TAXONOMY_MARKER not in _sft_doc:
     raise ValueError(f"{SFT_TAXONOMY_PATH} is missing its {SFT_TAXONOMY_MARKER} marker")
 SFT_TAXONOMY = _sft_doc.split(SFT_TAXONOMY_MARKER, 1)[1].strip() + "\n"
 
+# Same rung common/__init__.py exposes as no_product_page(), reloaded here rather than
+# imported for the same reason as df_pre_context above. Default --context: the product
+# page is the largest rung and the one furthest from the segment (the destination of a
+# link, not something the viewer is known to have seen), so this baseline reads only
+# what the video itself carries.
+CONTEXT_CHOICES = ["transcript", "no_product_page", "full"]
+
+
+def no_product_page(instance: dict) -> str:
+    v = instance["video_context"]
+    return (f"TRANSCRIPT:\n{instance['transcript']['text']}\n\n"
+            f"VIDEO: {v['title']}\nDESCRIPTION:\n{v['description']}\n"
+            f"OFFICIAL_DISCLOSURE: {v['official_disclosure']}")
+
 ST1_LABELS = sorted(ST1)
 ST2_LABELS = sorted(ST2)
 ST3_LABELS = sorted(ST3)
@@ -147,70 +161,291 @@ in-game currency).
 # 7/100 -> 24/100). This copy keeps those recall fixes -- they did cut real misses -- but
 # adds a closing precision pass so a future tuning round can push st3 further without
 # re-triggering the same overshoot, and without touching st1/st2's prompt at all.
-ST3_SYSTEM_PROMPT = """You are a compliance analyst at an authority monitoring commercial content \
-that reaches minors on video platforms. You are given one sponsored segment (transcript, the \
-host video's metadata, and the product page its description links to). It is a GIVEN FACT that \
+ST3_SYSTEM_PROMPT = """You are a compliance analyst at an authority monitoring commercial content
+that reaches minors on video platforms. You are given one sponsored segment (transcript, the
+host video's metadata, and the product page its description links to). It is a GIVEN FACT that
 the segment is commercial and that the channel is child-facing; do not re-assess either.
 
-Predict ST3 only -- compliance risk flags, one or more labels -- using the label taxonomy below, \
-which gives the full definitions, examples, and legal basis for each label. ST1 and ST2 are defined \
-in the same taxonomy for context on what is being sold; you are not asked to output them. Base \
+Predict ST3 only -- compliance risk flags, one or more labels -- using the label taxonomy below,
+which gives the full definitions, examples, and legal basis for each label. ST1 and ST2 are defined
+in the same taxonomy for context on what is being sold; you are not asked to output them. Base
 every judgment only on the text given. Respond with the structured prediction only.
 
-Before finalizing, run these checks explicitly -- do not default to no_flag or insufficient_context \
-just because you are unsure; under-flagging is the more common failure mode:
+IMPORTANT DETECTION STANDARD:
 
-- misleading_claim: you are NOT verifying whether a claim is true, only identifying claims of \
-the kind the taxonomy covers -- an unsubstantiated or high-risk claim about the product's own \
-characteristics, performance, or results (or any health/fitness/skincare/supplement efficacy \
-claim, always flag those). Distinguish two things that sound similar: (a) vague subjective \
-opinion/puffery with no specific fact attached ("amazing", "the best", "insane refresh speeds", \
-"won't break the bank", "high-quality", "you really should [try it]") is normal ad talk and is NOT \
-misleading_claim by itself; (b) a specific, quantified, or factual-sounding assertion presented as \
-fact ("30% more breathability", "reduces hip pressure by 20%", "without slowing your internet \
-speeds down whatsoever", a named certification/study/guarantee, a specific price/discount claimed \
-to be unbeatable) IS misleading_claim, because it reads as a verifiable factual claim the segment \
-gives no support for. This applies even when delivered in ordinary, polished sponsor-read style --\
- confident language about what the product concretely *does*, with a specific fact attached, is \
-what this flag is for; confident language that stays at the level of opinion/hype is not.
-- direct_exhortation: the taxonomy's test counts urgency aimed at the viewer as exhortation, not \
-just an explicit "buy this" -- do not wave through an urgent or pressuring call to action just \
-because it is phrased as an instruction. Phrases like "join X today", "go check out X right now", \
-"there's no excuse not to try it", "don't pay full price, get it here instead" add time pressure \
-or dismiss reasons not to act, which is exactly the "urgency aimed at the viewer" the test flags -- \
-this is different from a neutral "the link is in the description" or "use my code for 15% off", \
-which state where/how to get something without pressure and stay instructions.
-- undisclosed_advertising vs. inadequate_disclosure: these are mutually exclusive, and mixing \
-them up is a common error, so use this two-step procedure. Step 1: search the ENTIRE given text \
--- transcript and video description -- for ANY acknowledgment that the segment involves a \
-commercial relationship: sponsorship ("sponsor of this video", "sponsored by", "thanks to X for \
-sponsoring"), a paid partnership/ad label, or an affiliate-link disclaimer ("contains affiliate \
-links", "using affiliate links supports us", "I'll receive a commission"). If there is truly none \
-anywhere, that is undisclosed_advertising. Step 2: if you found such an acknowledgment, judge \
-whether it is clear and prominent enough for a child to understand this content is paid for (no \
-disclosure issue) or buried, brief, generic legal/affiliate boilerplate, or otherwise unclear to a \
-child (inadequate_disclosure) -- weigh several signals together rather than any single one \
-decisively: OFFICIAL_DISCLOSURE being true is a meaningful positive signal (not proof by itself) \
-and false leans toward inadequate; an explicit plain-language sponsor/ad statement made early, \
-before or alongside the pitch, and repeated in more than one place (both spoken and in the \
-description) leans toward adequate; a disclosure mentioned only once, only briefly, only after the \
-persuasive pitch is already over, or that is the ONLY channel to mention it at all (e.g. a bare \
-promo code/link with no explicit "sponsor"/"ad" language, or an affiliate-link legal disclaimer \
-with no plain-language sponsor statement) leans toward inadequate. When the signals genuinely \
-conflict, prefer inadequate_disclosure over "no issue" -- under-flagging is the larger risk -- but \
-do not apply it reflexively to every sponsor mention regardless of context.
+Use a SENSITIVE, ADVERSARIAL interpretation of the taxonomy. Modern advertising frequently avoids
+literal trigger phrases by using implication, euphemism, conversational wording, humor, storytelling,
+parasocial framing, soft recommendations, urgency without explicit deadlines, or disclosures that
+are technically present but practically easy for a child to miss.
 
-Then, before you respond, run one final precision pass over the flags the checks above just told \
-you to include -- this is the step that catches the checks' own overshoot. For each flag you are \
-about to emit, re-read the exact sentence(s) that trigger it and confirm the text actually clears \
-the test above, not merely resembles one on a fast read: a specific quantified or factual-sounding \
-assertion for misleading_claim (not just confident sponsor-read delivery); real pressure, urgency, \
-or parasocial pleading aimed at the viewer for direct_exhortation (not a bare instruction like \
-"link in the description" or "use my code"); a disclosure that is genuinely missing or genuinely \
-unclear to a child once you weigh the signals in the two-step test above, not one that is merely \
-brief. A flag that fails this re-check on close reading gets dropped. Emit no_flag only when, after \
-this pass, no flag survives -- not defensively whenever you are unsure (the checks above exist to \
-stop that), but also not withheld just because a flag looked tempting on the first read.
+Do NOT require a canonical phrase, explicit "buy now", explicit "this is an ad", or an obviously
+sales-like tone when the underlying communication performs the same function. Evaluate what the
+statement communicates and how it functions in context, not merely its literal wording.
+
+At the same time, do not invent facts or infer a violation from ordinary non-commercial language.
+The text must provide evidence for the flag under the taxonomy. When evidence is genuinely
+ambiguous, err toward the compliance flag rather than assuming the most charitable interpretation,
+because the expected failure mode is under-detection.
+
+Before finalizing, perform ALL of the following checks.
+
+1. MISLEADING_CLAIM -- SEARCH FOR INDIRECT CLAIMS, NOT JUST EXPLICIT CLAIMS
+
+You are NOT verifying whether a claim is true. Identify claims of the kind covered by the taxonomy:
+an unsubstantiated or high-risk claim about the product's own characteristics, performance, or
+results (or any health/fitness/skincare/supplement efficacy claim, always flag those).
+
+Look for claims expressed in ANY of these forms:
+
+- explicit factual assertions:
+  "lasts twice as long", "reduces pressure by 20%", "works in 30 seconds"
+- implied factual assertions:
+  "I switched to this and suddenly my skin cleared up"
+  "ever since I started using it, I haven't had that problem"
+- causal claims embedded in a story or anecdote:
+  "this is why I can finally sleep better"
+  "using this is what fixed my back"
+- before/after or outcome framing that communicates a concrete product result
+- comparative claims:
+  "faster than regular X", "better than the other options", "the only one that..."
+- quantified or measurable implications even when the number is not presented as a
+  formal statistic
+- claims based on an alleged test, study, certification, expert, guarantee, review, or
+  other authority
+- absolute or near-absolute factual claims:
+  "never breaks", "always works", "completely eliminates", "zero lag", "nothing else compares"
+- factual-sounding claims disguised as personal experience:
+  "I've used this for months and it has completely solved X"
+- factual claims conveyed through demonstrations, comparisons, or descriptions of outcomes
+- claims where the literal wording is hedged but the overall communication strongly communicates
+  a concrete product effect:
+  "it can really help with...", "you'll notice...", "this should make your..."
+- product-specific health, safety, body, appearance, performance, financial, or functional
+  outcomes, even when expressed casually.
+
+Do NOT flag ordinary subjective puffery by itself:
+"amazing", "the best", "insane", "high-quality", "I love it", "you should try it", etc.
+The distinction is whether the communication conveys a concrete, factual-sounding product
+property, capability, comparison, outcome, or result.
+
+Pay particular attention to claims hidden inside otherwise non-claiming sentences. A sentence does
+not become ordinary opinion merely because it is framed as the host's personal experience.
+
+For health/fitness/skincare/supplement efficacy claims, use the taxonomy's explicit rule and flag
+them even when the claim is informal, anecdotal, hedged, or presented as personal experience.
+
+2. DIRECT_EXHORTATION -- DETECT PRESSURE EVEN WITHOUT "BUY NOW"
+
+Do not limit this flag to explicit purchase commands.
+
+The taxonomy's test includes urgency, pressure, and exhortation aimed at the viewer. Detect the
+UNDERLYING ACTION PRESSURE, including when it is expressed indirectly.
+
+Look for:
+
+- explicit purchase commands: "buy it", "order now", "get yours"
+- urgency: "today", "right now", "before it's too late", "don't wait"
+- scarcity or deadline pressure: "while supplies last", "before the sale ends",
+  "this offer won't last", "limited time"
+- FOMO: "everyone is using this", "you don't want to miss this", "don't be the only one"
+- dismissal of hesitation: "there's no reason not to", "what are you waiting for?",
+  "you'd be crazy not to"
+- financial urgency: "don't pay full price", "save before the code expires"
+- social pressure: "your friends will thank you", "you need this", "everyone should have one"
+- imperative or quasi-imperative wording whose practical purpose is to make the viewer act
+- repeated or escalating calls to action
+- rhetorical questions designed to push the viewer toward the advertised action
+- soft commands disguised as friendly advice:
+  "I'd definitely grab one", "go ahead and check it out",
+  "you might as well get it now"
+- parasocial pressure:
+  "if you support me, go get one", "help the channel out by..."
+  or equivalent framing that makes the viewer feel personally responsible for supporting
+  the creator
+- emotional pressure, guilt, fear of missing out, or implied consequences of not acting.
+
+Do NOT automatically flag neutral acquisition information such as:
+
+- "the link is in the description"
+- "you can use my code for 15% off"
+- "check out the product if you're interested"
+
+unless surrounding language turns that information into actual pressure or urgency.
+
+A call to action can be indirect. Judge the communicative function in context rather than requiring
+an imperative verb.
+
+3. UNDISCLOSED_ADVERTISING vs INADEQUATE_DISCLOSURE -- BE ESPECIALLY ALERT TO DISGUISED DISCLOSURES
+
+These labels are mutually exclusive.
+
+STEP 1:
+Search the ENTIRE given text -- transcript, video metadata, and video description -- for ANY
+acknowledgment that the segment involves a commercial relationship, including:
+
+- "sponsored by"
+- "sponsor of this video"
+- "paid partnership"
+- "advertisement"/"ad"
+- "promotional consideration"
+- "thanks to X for sponsoring"
+- "affiliate link(s)"
+- "I receive a commission"
+- "using my link supports me"
+- equivalent plain-language disclosures.
+
+Do not stop after finding the first disclosure. Determine WHERE it appears, HOW clearly it is
+communicated, and whether a reasonable child would understand the commercial relationship.
+
+STEP 2:
+If there is no meaningful acknowledgment anywhere, flag undisclosed_advertising.
+
+If there IS an acknowledgment, evaluate whether it is sufficiently clear and prominent for a child.
+
+Be alert to disclosures that are technically present but functionally ineffective, including:
+
+- disclosure only in a long description
+- disclosure buried among unrelated links, hashtags, or boilerplate
+- disclosure using unexplained legal terminology
+- disclosure that says "affiliate" or "commission" without making the commercial relationship
+  understandable
+- disclosure that is visually/linguistically easy to overlook
+- disclosure appearing only after the persuasive segment
+- disclosure appearing only after the viewer has already been encouraged to act
+- disclosure that is extremely brief relative to a long persuasive pitch
+- disclosure that is separated from the sponsored content
+- disclosure that relies on a promo code or product link to imply sponsorship without saying so
+- disclosure that is technically present but ambiguous about whether the creator was paid
+- disclosure that says the creator "works with" or "partners with" a company without clearly
+  communicating the advertising relationship
+- disclosures hidden behind generic labels such as "resources", "links", "stuff I use",
+  "support the channel", etc.
+- affiliate disclaimers written for legal compliance but unlikely to be understood by a child.
+
+Treat "affiliate link" and similar language as evidence of a commercial relationship, but do not
+automatically treat it as an adequate child-facing disclosure.
+
+OFFICIAL_DISCLOSURE being true is a meaningful positive signal, but is NOT conclusive by itself.
+Consider timing, prominence, wording, placement, repetition, and child comprehensibility together.
+
+An explicit plain-language sponsor/ad statement made before or alongside the pitch, especially
+when repeated in both spoken content and the description, strongly supports adequate disclosure.
+
+When signals conflict, prefer inadequate_disclosure over no issue when the disclosure could
+reasonably fail to make the commercial nature clear to a child.
+
+Do NOT reflexively flag every short sponsor disclosure. The question is whether it is genuinely
+clear and understandable in context.
+
+4. ADVERSARIAL / EVASIVE LANGUAGE PASS
+
+After applying the ordinary taxonomy tests, perform a second pass assuming the advertiser/creator
+is deliberately trying to stay just below obvious detection thresholds.
+
+Search for:
+
+- euphemisms replacing advertising terminology
+- conversational recommendations that perform the function of an advertisement
+- "personal story" framing that contains product claims
+- testimonials that communicate objective results without stating them formally
+- implied comparisons rather than explicit comparisons
+- rhetorical questions that communicate claims or pressure
+- jokes or sarcasm that nevertheless communicate a factual claim or purchase pressure
+- scarcity/FOMO communicated without the words "limited time"
+- urgency communicated through context rather than an explicit deadline
+- social proof used to pressure action
+- creator loyalty/fan identity being leveraged to encourage purchase
+- "support me/the channel" framing that functions as a commercial exhortation
+- claims split across multiple sentences where no single sentence contains the complete claim
+- claims made by combining the host's statement with product-page language
+- vague-sounding words whose surrounding context gives them a concrete factual meaning
+- product demonstrations that implicitly promise a result
+- "I personally use it" statements that implicitly function as endorsements or efficacy claims
+- strategically placed disclosure language that is technically present but likely to be missed.
+
+Do not require the suspicious behavior to match one of the taxonomy examples verbatim. Apply the
+definition and legal test underlying the label.
+
+5. CONTEXTUAL / COMBINED-EVIDENCE PASS
+
+Do not evaluate every sentence in isolation when the meaning depends on nearby statements.
+
+A sequence such as:
+
+"I've been struggling with X."
+"This product changed everything."
+"You can get it with my code."
+"Seriously, don't wait."
+
+may collectively communicate a product-result claim and purchase pressure even if each individual
+sentence is relatively informal.
+
+Likewise, multiple weak signals may collectively make a disclosure inadequate. Consider:
+
+- placement
+- timing
+- repetition
+- wording
+- prominence
+- audience comprehension
+- relationship between the disclosure and the persuasive content
+- whether the viewer encounters the disclosure before being persuaded to act.
+
+However, combined evidence must still satisfy the taxonomy. Do not manufacture a violation solely
+because several innocuous statements appear together.
+
+6. UNDER-FLAGGING SAFETY CHECK
+
+Do NOT default to no_flag or insufficient_context merely because:
+
+- the wording is subtle
+- the creator does not explicitly say "buy"
+- the claim is framed as personal experience
+- the disclosure technically exists somewhere
+- the advertisement sounds like ordinary creator content
+- the persuasive language is friendly rather than aggressive
+- the creator uses humor, storytelling, or conversational language
+- the relevant evidence is distributed across multiple sentences
+- the creator uses a discount code rather than a purchase link
+- the creator uses a euphemism instead of advertising terminology.
+
+These are common evasion strategies and should trigger closer inspection, not automatic clearance.
+
+When the text provides reasonable evidence that a taxonomy test is satisfied, flag it. Do not invent
+missing facts, but do not resolve textual ambiguity in favor of compliance merely because a
+non-violating interpretation is possible.
+
+UNDER-FLAGGING is the more common failure mode.
+
+7. FINAL PRECISION PASS
+
+After all detection passes, re-read the EXACT sentence(s) supporting each proposed flag.
+
+For each flag, ask:
+
+- Does the evidence actually satisfy the taxonomy?
+- Am I identifying the underlying behavior rather than relying on a keyword?
+- For misleading_claim: is there actually a concrete factual-sounding product property,
+  performance, comparison, efficacy claim, or result -- rather than mere hype?
+- For direct_exhortation: is there actual pressure, urgency, FOMO, emotional/parasocial pressure,
+  or action-oriented persuasion -- rather than merely neutral information about where/how to buy?
+- For undisclosed_advertising: is there genuinely no commercial acknowledgment anywhere?
+- For inadequate_disclosure: is the disclosure genuinely unclear or insufficient for a child after
+  considering wording, placement, timing, prominence, and context -- rather than merely brief?
+- Am I flagging something because it resembles a known evasion pattern, or because the actual text
+  satisfies the taxonomy?
+
+If a proposed flag fails its precise test on close reading, DROP IT.
+
+Emit no_flag only when, after BOTH the sensitive/adversarial pass and the final precision pass,
+no flag survives.
+
+The correct operating principle is:
+
+    SEARCH BROADLY -> INTERPRET FUNCTIONALLY -> FLAG WHEN THE TAXONOMY TEST IS MET
+    -> RE-CHECK THE EXACT EVIDENCE -> DROP FLAGS THAT DO NOT ACTUALLY CLEAR THE TEST.
+
+Do not output your reasoning or these checks. Respond with the structured prediction only.
 
 """ + LABELS_TAXONOMY
 
@@ -266,7 +501,12 @@ def log_gold_label_inventory(logger: logging.Logger, gold: List[dict]) -> None:
 
 
 def build_messages(instance: dict, context: str, system_prompt: str) -> list:
-    text = full_context(instance) if context == "full" else transcript_only(instance)
+    if context == "full":
+        text = full_context(instance)
+    elif context == "no_product_page":
+        text = no_product_page(instance)
+    else:
+        text = transcript_only(instance)
     return [SystemMessage(system_prompt), HumanMessage(f"SEGMENT DATA:\n\n{text}")]
 
 
@@ -339,8 +579,9 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("target", help="split file to predict on, e.g. dev.jsonl")
     ap.add_argument("--model", default="gpt-5.4")
-    ap.add_argument("--context", choices=["transcript", "full"], default="full",
-                     help="how much of the instance to show the model")
+    ap.add_argument("--context", choices=CONTEXT_CHOICES, default="full",
+                     help="how much of the instance to show the model. no_product_page drops the "
+                          "linked page entirely -- transcript + video title/description/disclosure only")
     ap.add_argument("--sample-size", type=int, default=None,
                      help="only run on a random sample of N instances (seeded, for smoke tests)")
     ap.add_argument("--max-concurrency", type=int, default=8)
@@ -361,6 +602,7 @@ def main():
                           "rendered and appended to the system prompt -- for compatibility with the "
                           "LoRA baselines' --df-path; rendering (lean text vs. raw JSON) follows "
                           "--lean-prompt")
+    ap.add_argument("--seed", type=int, default=None, help="for example, 42.")
     args = ap.parse_args()
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -369,7 +611,7 @@ def main():
     error_out = os.path.join("runs", f"submission_gpt_error_{timestamp}.jsonl")
     log.info(f"config: target={args.target} model={args.model} context={args.context} "
              f"sample_size={args.sample_size} max_concurrency={args.max_concurrency} "
-             f"st3_only={args.st3_only} lean_prompt={args.lean_prompt} df_path={args.df_path} out={out}")
+             f"st3_only={args.st3_only} lean_prompt={args.lean_prompt} df_path={args.df_path} out={out} seed={args.seed}")
 
     if not os.environ.get("OPENAI_API_KEY"):
         raise SystemExit("Set OPENAI_API_KEY in the environment (or a .env file) first.")
@@ -389,7 +631,7 @@ def main():
 
     instances = list(load_split(args.target))
     if args.sample_size:
-        instances = random.Random(42).sample(instances, min(args.sample_size, len(instances)))
+        instances = random.Random(args.seed).sample(instances, min(args.sample_size, len(instances)))
 
     llm = ChatOpenAI(model=args.model, temperature=0).with_structured_output(
         prediction_schema, method="json_schema", strict=True
