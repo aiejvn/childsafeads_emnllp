@@ -17,9 +17,9 @@ whenever the target split carries gold "labels" (train/dev, not the withheld tes
 three tiers) and writes to submission_gpt_st3.jsonl instead of the canonical
 submission_gpt.jsonl. --lean-prompt and --df-path mirror the LoRA baselines' flags of the
 same name, for a like-for-like comparison against them. --few-shot (st3-only only) appends
-1-2 real train.jsonl examples each for direct_exhortation, inadequate_disclosure, and
-insufficient_context to the system prompt, pairing each label's definition with a live
-example.
+1-2 real train.jsonl examples each for direct_exhortation, inadequate_disclosure,
+misleading_claim, and insufficient_context to the system prompt, pairing each label's
+definition with a live example.
 """
 import argparse
 import json
@@ -60,7 +60,7 @@ TRAIN_PATH = os.path.join(os.path.dirname(__file__), "..", "public_data_dev", "t
 # --few-shot pairs each of these labels' definition with a live train.jsonl example. Definitions
 # are parsed out of the `| T1.x | \`label\` | definition | ... |` rows in LABELS_TAXONOMY rather
 # than duplicated here, so they can't drift from the taxonomy file.
-FEW_SHOT_LABELS = ("direct_exhortation", "inadequate_disclosure", "insufficient_context")
+FEW_SHOT_LABELS = ("direct_exhortation", "inadequate_disclosure", "misleading_claim", "insufficient_context")
 
 
 def parse_taxonomy_defs(taxonomy_text: str, labels) -> dict:
@@ -395,7 +395,7 @@ def build_few_shot_section(train_path: str, log: logging.Logger, n_per_label: in
             if text and len(text) <= MAX_FEW_SHOT_EXAMPLE_LEN:
                 examples["insufficient_context"].append(text)
         evidence = {ev["flag"]: ev["quote"] for ev in labels.get("st3_evidence", [])}
-        for label in ("direct_exhortation", "inadequate_disclosure"):
+        for label in ("direct_exhortation", "inadequate_disclosure", "misleading_claim"):
             if set(st3) != {label}:
                 continue
             quote = evidence.get(label)
