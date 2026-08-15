@@ -60,19 +60,14 @@ TRAIN_PATH = os.path.join(os.path.dirname(__file__), "..", "public_data_dev", "t
 # --few-shot pairs each of these labels' definition with a live train.jsonl example. Definitions
 # are parsed out of the `| T1.x | \`label\` | definition | ... |` rows in LABELS_TAXONOMY rather
 # than duplicated here, so they can't drift from the taxonomy file.
-FEW_SHOT_LABELS = ("direct_exhortation", "inadequate_disclosure", "insufficient_context",
-                    "age_restricted_or_prohibited_product", "hfss_food_marketing", "undisclosed_advertising")
+FEW_SHOT_LABELS = ("direct_exhortation", "inadequate_disclosure", "insufficient_context")
 
 # Worst-performing labels get extra exemplars beyond the --few-shot-n default. For n>1, the
 # first exemplar is always a "solo" instance (that flag is the ONLY st3 label -- see the
 # set(st3) != {label} check below); the rest come from any instance carrying the flag, solo
-# or not, since solo instances are scarce for some of these (13 for age_restricted_or_
-# prohibited_product, 9 for hfss_food_marketing, out of ~500 train instances that carry the flag).
+# or not, since solo instances are scarce for some labels.
 FEW_SHOT_N_OVERRIDES = {
     "inadequate_disclosure": 2,
-    "age_restricted_or_prohibited_product": 2,
-    "hfss_food_marketing": 2,
-    "undisclosed_advertising": 2,
 }
 
 
