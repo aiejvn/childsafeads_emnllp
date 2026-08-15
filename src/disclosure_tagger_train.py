@@ -25,7 +25,14 @@ from tqdm import tqdm
 from transformers import AutoModelForTokenClassification, AutoTokenizer, get_linear_schedule_with_warmup
 
 sys.path.insert(0, os.path.dirname(__file__))
-from disclosure_data import Collator, DisclosureSpanDataset, LABEL_LIST, has_disclosure_flag, load_split, taggable_instances
+from common.predict_utils import log_label_diagnostics  # noqa: E402
+from disclosure_data import Collator, DisclosureSpanDataset, LABEL_LIST, has_disclosure_flag, load_split, taggable_instances  # noqa: E402
+
+
+class _PrintLogger:
+    """Adapts `print` to the `.info()` interface `log_label_diagnostics` expects, since
+    this script logs via plain `print` rather than the `logging` module used elsewhere."""
+    info = staticmethod(print)
 
 
 def to_device(batch: dict, device: str) -> dict:
@@ -46,6 +53,7 @@ def evaluate_tagger(model, loader, device, instances_by_id: dict) -> dict:
     tp = fp = fn = 0
     flagged_hit = flagged_total = 0
     clean_fp = clean_total = 0
+    gold_tags, pred_tags = [], []
     for batch in loader:
         gpu_batch = to_device(batch, device)
         logits = model(input_ids=gpu_batch["input_ids"], attention_mask=gpu_batch["attention_mask"]).logits
@@ -60,6 +68,8 @@ def evaluate_tagger(model, loader, device, instances_by_id: dict) -> dict:
             tp += int((p_disc & g_disc).sum())
             fp += int((p_disc & ~g_disc).sum())
             fn += int((~p_disc & g_disc).sum())
+            gold_tags.extend([LABEL_LIST[i]] for i in g.tolist())
+            pred_tags.extend([LABEL_LIST[i]] for i in p.tolist())
 
             inst = instances_by_id[iid]
             has_pred = bool(p_disc.any())
@@ -72,6 +82,7 @@ def evaluate_tagger(model, loader, device, instances_by_id: dict) -> dict:
     precision = tp / (tp + fp) if (tp + fp) else 0.0
     recall = tp / (tp + fn) if (tp + fn) else 0.0
     f1 = 2 * precision * recall / (precision + recall + 1e-6) if (precision + recall) else 0.0
+    log_label_diagnostics(_PrintLogger(), "disclosure_tag", gold_tags, pred_tags)
     return {
         "token_precision": precision,
         "token_recall": recall,

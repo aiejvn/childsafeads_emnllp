@@ -26,7 +26,7 @@ from transformers import AutoTokenizer, get_linear_schedule_with_warmup
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))  # so `import last_layer`/`import common` resolve
 from common.classification_data import Collator, ClassificationDataset  # noqa: E402
-from common.predict_utils import save_thresholds, tune_and_decode  # noqa: E402
+from common.predict_utils import log_prediction_diagnostics, save_thresholds, tune_and_decode  # noqa: E402
 from common.train_utils import compute_pos_weight, to_device  # noqa: E402
 from last_layer import CONTEXT_CHOICES, ST1_LABELS, ST2_LABELS, ST3_LABELS, evaluate, load_split, setup_logging  # noqa: E402
 from last_layer.last_layer_model import build_frozen_model, count_trainable_parameters, save_frozen_model  # noqa: E402
@@ -139,8 +139,10 @@ def main():
         )
         gold = [inst["labels"] for inst in dev_instances]
         metrics = evaluate(gold, preds)
-        log.info(f"epoch {epoch + 1} dev metrics (tuned thresholds): " + ", ".join(f"{k}={v:.3f}" for k, v in metrics.items()))
-        wandb.log({"epoch": epoch + 1, "train_loss": train_loss, **{f"dev_{k}": v for k, v in metrics.items()}})
+        scalar_metrics = {k: v for k, v in metrics.items() if k != "per_label_f1"}
+        log.info(f"epoch {epoch + 1} dev metrics (tuned thresholds): " + ", ".join(f"{k}={v:.3f}" for k, v in scalar_metrics.items()))
+        log_prediction_diagnostics(log, gold, preds)
+        wandb.log({"epoch": epoch + 1, "train_loss": train_loss, **{f"dev_{k}": v for k, v in scalar_metrics.items()}})
 
         if metrics["mean_macro_f1"] > best_f1:
             best_f1 = metrics["mean_macro_f1"]

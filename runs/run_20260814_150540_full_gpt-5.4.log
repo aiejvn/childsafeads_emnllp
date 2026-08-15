@@ -1,0 +1,16 @@
+2026-08-14 15:05:40,539 | INFO | MainThread | logging to runs/run_20260814_150540_full_gpt-5.4.log
+2026-08-14 15:05:40,539 | INFO | MainThread | config: target=public_data_dev/dev.jsonl model=gpt-5.4 context=full sample_size=100 max_concurrency=8 st3_only=True lean_prompt=True df_path=emnllp-dialog-flow-dialog-flow.json out=runs/submission_gpt_20260814_150540.jsonl seed=42
+2026-08-14 15:05:40,539 | INFO | MainThread | appending stripped dialog flow from emnllp-dialog-flow-dialog-flow.json (4654 chars) to the system prompt
+2026-08-14 15:05:40,539 | INFO | MainThread | system prompt: lean st3-only (6354 chars)
+2026-08-14 15:05:56,035 | INFO | MainThread | wrote 100 predictions to runs/submission_gpt_20260814_150540.jsonl
+2026-08-14 15:05:56,035 | INFO | MainThread | copied predictions to submission_gpt_st3.jsonl (canonical submission file)
+2026-08-14 15:05:56,035 | INFO | MainThread | wrote 89 misclassified instance(s) to runs/submission_gpt_error_20260814_150540.jsonl
+2026-08-14 15:05:56,035 | INFO | MainThread | === Distinct gold labels observed, by tier ===
+2026-08-14 15:05:56,035 | INFO | MainThread | [ST1 - commercial type]     ['digital_content_or_services', 'none', 'physical_goods', 'physical_services']
+2026-08-14 15:05:56,035 | INFO | MainThread | [ST2 - product category]    ['apps', 'creator_community', 'education', 'fashion', 'financial', 'food', 'gambling', 'gambling_adjacent', 'hardware_electronics', 'health', 'other', 'toys']
+2026-08-14 15:05:56,035 | INFO | MainThread | [ST3 - compliance flags]    ['age_restricted_or_prohibited_product', 'direct_exhortation', 'hfss_food_marketing', 'inadequate_disclosure', 'insufficient_context', 'misleading_claim', 'no_flag', 'undisclosed_advertising']
+2026-08-14 15:05:56,036 | INFO | MainThread | Evaluation:
+2026-08-14 15:05:56,036 | INFO | MainThread |   st3_macro_f1: 0.373
+2026-08-14 15:05:56,036 | INFO | MainThread |   st3_family_macro_f1: 0.500
+2026-08-14 15:05:56,036 | INFO | MainThread |   st3 per-label F1: age_restricted_or_prohibited_product=0.400, direct_exhortation=0.314, hfss_food_marketing=0.667, inadequate_disclosure=0.182, insufficient_context=0.000, misleading_claim=0.689, no_flag=0.077, undisclosed_advertising=0.655
+2026-08-14 15:05:56,036 | INFO | MainThread |   st3_family per-label F1: content=0.784, disclosure=0.649, housekeeping=0.067, product=0.500

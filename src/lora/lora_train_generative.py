@@ -44,7 +44,7 @@ from transformers import AutoTokenizer, get_linear_schedule_with_warmup
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))  # so `import lora` resolves src/lora as a package
 from common.dialog_flow import df_pre_context  # noqa: E402
-from common.predict_utils import write_submission  # noqa: E402
+from common.predict_utils import log_prediction_diagnostics, write_submission  # noqa: E402
 from lora import CONTEXT_CHOICES, SFT_TAXONOMY, SYSTEM_PROMPT, evaluate, load_split, setup_logging  # noqa: E402
 from lora.lora_data import GenerativeCollator, GenerativeDataset  # noqa: E402
 from lora.lora_generative import generate_predictions  # noqa: E402
@@ -254,6 +254,7 @@ def main():
         for tier, per_label in metrics["per_label_f1"].items():
             log.info(f"epoch {epoch + 1} dev {tier} per-label F1: "
                      + ", ".join(f"{label}={f1:.3f}" for label, f1 in sorted(per_label.items())))
+        log_prediction_diagnostics(log, gold, preds)
 
         if metrics["mean_macro_f1"] > best_f1:
             best_f1 = metrics["mean_macro_f1"]
@@ -297,6 +298,7 @@ def main():
             for tier, per_label in test_metrics["per_label_f1"].items():
                 log.info(f"{tier} per-label F1: "
                         + ", ".join(f"{label}={f1:.3f}" for label, f1 in sorted(per_label.items())))
+            log_prediction_diagnostics(log, test_gold, test_preds)
             write_submission(
                 os.path.join(best_dir, "test_submission.jsonl"),
                 os.path.join(best_dir, "test_submission_error.jsonl"),

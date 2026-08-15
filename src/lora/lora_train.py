@@ -25,7 +25,9 @@ from transformers import AutoTokenizer, get_linear_schedule_with_warmup
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))  # so `import lora` resolves src/lora as a package
 from common.dialog_flow import df_pre_context  # noqa: E402
-from common.predict_utils import save_thresholds, tune_and_decode, write_submission  # noqa: E402
+from common.predict_utils import (  # noqa: E402
+    log_prediction_diagnostics, save_thresholds, tune_and_decode, write_submission,
+)
 from common.train_utils import compute_pos_weight, to_device  # noqa: E402
 from lora import CONTEXT_CHOICES, ST1_LABELS, ST2_LABELS, ST3_LABELS, evaluate, setup_logging  # noqa: E402
 from lora.lora_data import Collator, ClassificationDataset, load_split  # noqa: E402
@@ -242,6 +244,7 @@ def main():
         for tier, per_label in metrics["per_label_f1"].items():
             log.info(f"epoch {epoch + 1} dev {tier} per-label F1: "
                      + ", ".join(f"{label}={f1:.3f}" for label, f1 in sorted(per_label.items())))
+        log_prediction_diagnostics(log, gold, preds)
         wandb.log({
             "epoch": epoch + 1, "train_loss": train_loss,
             **{f"dev_{k}": v for k, v in scalar_metrics.items()},

@@ -8,6 +8,7 @@ Usage:
     python baseline_gpt.py ../public_data_dev/dev.jsonl
     python baseline_gpt.py ../public_data_dev/dev.jsonl --sample-size 20  # smoke test
     python baseline_gpt.py ../public_data_dev/dev.jsonl --st3-only        # ST3 only, its own tuned prompt
+    python baseline_gpt.py ../public_data_dev/dev.jsonl --st3-only --few-shot  # + live train.jsonl examples
     python baseline_gpt.py ../public_data_dev/dev.jsonl --lean-prompt --df-path ../emnllp-dialog-flow-dialog-flow.json
 
 Prints macro-F1 for st1/st2/st3, the family-level st3 macro-F1, and their mean,
@@ -15,7 +16,10 @@ whenever the target split carries gold "labels" (train/dev, not the withheld tes
 --st3-only restricts prediction and scoring to st3 (no mean_macro_f1, since it blends all
 three tiers) and writes to submission_gpt_st3.jsonl instead of the canonical
 submission_gpt.jsonl. --lean-prompt and --df-path mirror the LoRA baselines' flags of the
-same name, for a like-for-like comparison against them.
+same name, for a like-for-like comparison against them. --few-shot (st3-only only) appends
+1-2 real train.jsonl examples each for direct_exhortation, inadequate_disclosure, and
+insufficient_context to the system prompt, pairing each label's definition with a live
+example.
 """
 import argparse
 import json
@@ -24,6 +28,7 @@ import os
 import random
 import shutil
 import sys
+from collections import Counter
 from datetime import datetime
 from typing import List, Literal
 
@@ -49,6 +54,29 @@ LABELS_TAXONOMY_PATH = os.path.join(
 )
 with open(LABELS_TAXONOMY_PATH, encoding="utf-8") as _f:
     LABELS_TAXONOMY = _f.read()
+
+TRAIN_PATH = os.path.join(os.path.dirname(__file__), "..", "public_data_dev", "train.jsonl")
+
+# --few-shot pairs each of these labels' definition with a live train.jsonl example. Definitions
+# are parsed out of the `| T1.x | \`label\` | definition | ... |` rows in LABELS_TAXONOMY rather
+# than duplicated here, so they can't drift from the taxonomy file.
+FEW_SHOT_LABELS = ("direct_exhortation", "inadequate_disclosure", "insufficient_context")
+
+
+def parse_taxonomy_defs(taxonomy_text: str, labels) -> dict:
+    """Pull {label: definition} for `labels` out of LABELS_TAXONOMY's `| T1.x | \`label\` | def | ... |` rows."""
+    defs = {}
+    for line in taxonomy_text.splitlines():
+        if not line.startswith("| T1."):
+            continue
+        cols = [c.strip() for c in line.strip("|").split("|")]
+        label = cols[1].strip("`")
+        if label in labels:
+            defs[label] = cols[2]
+    missing = set(labels) - set(defs)
+    if missing:
+        raise ValueError(f"couldn't find taxonomy definitions for {missing} in {LABELS_TAXONOMY_PATH}")
+    return defs
 
 # Same file common/__init__.py exposes as SFT_TAXONOMY, reloaded here rather than
 # imported for the same reason as df_pre_context above.
@@ -154,300 +182,168 @@ in-game currency).
 """ + LABELS_TAXONOMY
 
 # A dedicated copy for --st3-only, rather than reusing SYSTEM_PROMPT with st1/st2 ignored.
-# The first tuning pass (see runs/prompt_tuning/) targeted st3 by editing the shared prompt
-# above and regressed st3_macro_f1 0.444 -> 0.314: the recall fixes below (misleading_claim
-# scope, direct_exhortation urgency, the disclosure two-step) worked individually, but
-# stacked together they overshot into over-flagging clean content (no_flag misses rose
-# 7/100 -> 24/100). This copy keeps those recall fixes -- they did cut real misses -- but
-# adds a closing precision pass so a future tuning round can push st3 further without
-# re-triggering the same overshoot, and without touching st1/st2's prompt at all.
-ST3_SYSTEM_PROMPT = """You are a compliance analyst at an authority monitoring commercial content
-that reaches minors on video platforms. You are given one sponsored segment (transcript, the
-host video's metadata, and the product page its description links to). It is a GIVEN FACT that
-the segment is commercial and that the channel is child-facing; do not re-assess either.
-
-Predict ST3 only -- compliance risk flags, one or more labels -- using the label taxonomy below,
-which gives the full definitions, examples, and legal basis for each label. ST1 and ST2 are defined
-in the same taxonomy for context on what is being sold; you are not asked to output them. Base
-every judgment only on the text given. Respond with the structured prediction only.
-
-IMPORTANT DETECTION STANDARD:
-
-Use a SENSITIVE, ADVERSARIAL interpretation of the taxonomy. Modern advertising frequently avoids
-literal trigger phrases by using implication, euphemism, conversational wording, humor, storytelling,
-parasocial framing, soft recommendations, urgency without explicit deadlines, or disclosures that
-are technically present but practically easy for a child to miss.
-
-Do NOT require a canonical phrase, explicit "buy now", explicit "this is an ad", or an obviously
-sales-like tone when the underlying communication performs the same function. Evaluate what the
-statement communicates and how it functions in context, not merely its literal wording.
-
-At the same time, do not invent facts or infer a violation from ordinary non-commercial language.
-The text must provide evidence for the flag under the taxonomy. When evidence is genuinely
-ambiguous, err toward the compliance flag rather than assuming the most charitable interpretation,
-because the expected failure mode is under-detection.
-
-Before finalizing, perform ALL of the following checks.
-
-1. MISLEADING_CLAIM -- SEARCH FOR INDIRECT CLAIMS, NOT JUST EXPLICIT CLAIMS
-
-You are NOT verifying whether a claim is true. Identify claims of the kind covered by the taxonomy:
-an unsubstantiated or high-risk claim about the product's own characteristics, performance, or
-results (or any health/fitness/skincare/supplement efficacy claim, always flag those).
-
-Look for claims expressed in ANY of these forms:
-
-- explicit factual assertions:
-  "lasts twice as long", "reduces pressure by 20%", "works in 30 seconds"
-- implied factual assertions:
-  "I switched to this and suddenly my skin cleared up"
-  "ever since I started using it, I haven't had that problem"
-- causal claims embedded in a story or anecdote:
-  "this is why I can finally sleep better"
-  "using this is what fixed my back"
-- before/after or outcome framing that communicates a concrete product result
-- comparative claims:
-  "faster than regular X", "better than the other options", "the only one that..."
-- quantified or measurable implications even when the number is not presented as a
-  formal statistic
-- claims based on an alleged test, study, certification, expert, guarantee, review, or
-  other authority
-- absolute or near-absolute factual claims:
-  "never breaks", "always works", "completely eliminates", "zero lag", "nothing else compares"
-- factual-sounding claims disguised as personal experience:
-  "I've used this for months and it has completely solved X"
-- factual claims conveyed through demonstrations, comparisons, or descriptions of outcomes
-- claims where the literal wording is hedged but the overall communication strongly communicates
-  a concrete product effect:
-  "it can really help with...", "you'll notice...", "this should make your..."
-- product-specific health, safety, body, appearance, performance, financial, or functional
-  outcomes, even when expressed casually.
-
-Do NOT flag ordinary subjective puffery by itself:
-"amazing", "the best", "insane", "high-quality", "I love it", "you should try it", etc.
-The distinction is whether the communication conveys a concrete, factual-sounding product
-property, capability, comparison, outcome, or result.
-
-Pay particular attention to claims hidden inside otherwise non-claiming sentences. A sentence does
-not become ordinary opinion merely because it is framed as the host's personal experience.
-
-For health/fitness/skincare/supplement efficacy claims, use the taxonomy's explicit rule and flag
-them even when the claim is informal, anecdotal, hedged, or presented as personal experience.
-
-2. DIRECT_EXHORTATION -- DETECT PRESSURE EVEN WITHOUT "BUY NOW"
-
-Do not limit this flag to explicit purchase commands.
-
-The taxonomy's test includes urgency, pressure, and exhortation aimed at the viewer. Detect the
-UNDERLYING ACTION PRESSURE, including when it is expressed indirectly.
-
-Look for:
-
-- explicit purchase commands: "buy it", "order now", "get yours"
-- urgency: "today", "right now", "before it's too late", "don't wait"
-- scarcity or deadline pressure: "while supplies last", "before the sale ends",
-  "this offer won't last", "limited time"
-- FOMO: "everyone is using this", "you don't want to miss this", "don't be the only one"
-- dismissal of hesitation: "there's no reason not to", "what are you waiting for?",
-  "you'd be crazy not to"
-- financial urgency: "don't pay full price", "save before the code expires"
-- social pressure: "your friends will thank you", "you need this", "everyone should have one"
-- imperative or quasi-imperative wording whose practical purpose is to make the viewer act
-- repeated or escalating calls to action
-- rhetorical questions designed to push the viewer toward the advertised action
-- soft commands disguised as friendly advice:
-  "I'd definitely grab one", "go ahead and check it out",
-  "you might as well get it now"
-- parasocial pressure:
-  "if you support me, go get one", "help the channel out by..."
-  or equivalent framing that makes the viewer feel personally responsible for supporting
-  the creator
-- emotional pressure, guilt, fear of missing out, or implied consequences of not acting.
-
-Do NOT automatically flag neutral acquisition information such as:
-
-- "the link is in the description"
-- "you can use my code for 15% off"
-- "check out the product if you're interested"
-
-unless surrounding language turns that information into actual pressure or urgency.
-
-A call to action can be indirect. Judge the communicative function in context rather than requiring
-an imperative verb.
-
-3. UNDISCLOSED_ADVERTISING vs INADEQUATE_DISCLOSURE -- BE ESPECIALLY ALERT TO DISGUISED DISCLOSURES
-
-These labels are mutually exclusive.
-
-STEP 1:
-Search the ENTIRE given text -- transcript, video metadata, and video description -- for ANY
-acknowledgment that the segment involves a commercial relationship, including:
-
-- "sponsored by"
-- "sponsor of this video"
-- "paid partnership"
-- "advertisement"/"ad"
-- "promotional consideration"
-- "thanks to X for sponsoring"
-- "affiliate link(s)"
-- "I receive a commission"
-- "using my link supports me"
-- equivalent plain-language disclosures.
-
-Do not stop after finding the first disclosure. Determine WHERE it appears, HOW clearly it is
-communicated, and whether a reasonable child would understand the commercial relationship.
-
-STEP 2:
-If there is no meaningful acknowledgment anywhere, flag undisclosed_advertising.
-
-If there IS an acknowledgment, evaluate whether it is sufficiently clear and prominent for a child.
-
-Be alert to disclosures that are technically present but functionally ineffective, including:
-
-- disclosure only in a long description
-- disclosure buried among unrelated links, hashtags, or boilerplate
-- disclosure using unexplained legal terminology
-- disclosure that says "affiliate" or "commission" without making the commercial relationship
-  understandable
-- disclosure that is visually/linguistically easy to overlook
-- disclosure appearing only after the persuasive segment
-- disclosure appearing only after the viewer has already been encouraged to act
-- disclosure that is extremely brief relative to a long persuasive pitch
-- disclosure that is separated from the sponsored content
-- disclosure that relies on a promo code or product link to imply sponsorship without saying so
-- disclosure that is technically present but ambiguous about whether the creator was paid
-- disclosure that says the creator "works with" or "partners with" a company without clearly
-  communicating the advertising relationship
-- disclosures hidden behind generic labels such as "resources", "links", "stuff I use",
-  "support the channel", etc.
-- affiliate disclaimers written for legal compliance but unlikely to be understood by a child.
-
-Treat "affiliate link" and similar language as evidence of a commercial relationship, but do not
-automatically treat it as an adequate child-facing disclosure.
-
-OFFICIAL_DISCLOSURE being true is a meaningful positive signal, but is NOT conclusive by itself.
-Consider timing, prominence, wording, placement, repetition, and child comprehensibility together.
-
-An explicit plain-language sponsor/ad statement made before or alongside the pitch, especially
-when repeated in both spoken content and the description, strongly supports adequate disclosure.
-
-When signals conflict, prefer inadequate_disclosure over no issue when the disclosure could
-reasonably fail to make the commercial nature clear to a child.
-
-Do NOT reflexively flag every short sponsor disclosure. The question is whether it is genuinely
-clear and understandable in context.
-
-4. ADVERSARIAL / EVASIVE LANGUAGE PASS
-
-After applying the ordinary taxonomy tests, perform a second pass assuming the advertiser/creator
-is deliberately trying to stay just below obvious detection thresholds.
-
-Search for:
-
-- euphemisms replacing advertising terminology
-- conversational recommendations that perform the function of an advertisement
-- "personal story" framing that contains product claims
-- testimonials that communicate objective results without stating them formally
-- implied comparisons rather than explicit comparisons
-- rhetorical questions that communicate claims or pressure
-- jokes or sarcasm that nevertheless communicate a factual claim or purchase pressure
-- scarcity/FOMO communicated without the words "limited time"
-- urgency communicated through context rather than an explicit deadline
-- social proof used to pressure action
-- creator loyalty/fan identity being leveraged to encourage purchase
-- "support me/the channel" framing that functions as a commercial exhortation
-- claims split across multiple sentences where no single sentence contains the complete claim
-- claims made by combining the host's statement with product-page language
-- vague-sounding words whose surrounding context gives them a concrete factual meaning
-- product demonstrations that implicitly promise a result
-- "I personally use it" statements that implicitly function as endorsements or efficacy claims
-- strategically placed disclosure language that is technically present but likely to be missed.
-
-Do not require the suspicious behavior to match one of the taxonomy examples verbatim. Apply the
-definition and legal test underlying the label.
-
-5. CONTEXTUAL / COMBINED-EVIDENCE PASS
-
-Do not evaluate every sentence in isolation when the meaning depends on nearby statements.
-
-A sequence such as:
-
-"I've been struggling with X."
-"This product changed everything."
-"You can get it with my code."
-"Seriously, don't wait."
-
-may collectively communicate a product-result claim and purchase pressure even if each individual
-sentence is relatively informal.
-
-Likewise, multiple weak signals may collectively make a disclosure inadequate. Consider:
-
-- placement
-- timing
-- repetition
-- wording
-- prominence
-- audience comprehension
-- relationship between the disclosure and the persuasive content
-- whether the viewer encounters the disclosure before being persuaded to act.
-
-However, combined evidence must still satisfy the taxonomy. Do not manufacture a violation solely
-because several innocuous statements appear together.
-
-6. UNDER-FLAGGING SAFETY CHECK
-
-Do NOT default to no_flag or insufficient_context merely because:
-
-- the wording is subtle
-- the creator does not explicitly say "buy"
-- the claim is framed as personal experience
-- the disclosure technically exists somewhere
-- the advertisement sounds like ordinary creator content
-- the persuasive language is friendly rather than aggressive
-- the creator uses humor, storytelling, or conversational language
-- the relevant evidence is distributed across multiple sentences
-- the creator uses a discount code rather than a purchase link
-- the creator uses a euphemism instead of advertising terminology.
-
-These are common evasion strategies and should trigger closer inspection, not automatic clearance.
-
-When the text provides reasonable evidence that a taxonomy test is satisfied, flag it. Do not invent
-missing facts, but do not resolve textual ambiguity in favor of compliance merely because a
-non-violating interpretation is possible.
-
-UNDER-FLAGGING is the more common failure mode.
-
-7. FINAL PRECISION PASS
-
-After all detection passes, re-read the EXACT sentence(s) supporting each proposed flag.
-
-For each flag, ask:
-
-- Does the evidence actually satisfy the taxonomy?
-- Am I identifying the underlying behavior rather than relying on a keyword?
-- For misleading_claim: is there actually a concrete factual-sounding product property,
-  performance, comparison, efficacy claim, or result -- rather than mere hype?
-- For direct_exhortation: is there actual pressure, urgency, FOMO, emotional/parasocial pressure,
-  or action-oriented persuasion -- rather than merely neutral information about where/how to buy?
-- For undisclosed_advertising: is there genuinely no commercial acknowledgment anywhere?
-- For inadequate_disclosure: is the disclosure genuinely unclear or insufficient for a child after
-  considering wording, placement, timing, prominence, and context -- rather than merely brief?
-- Am I flagging something because it resembles a known evasion pattern, or because the actual text
-  satisfies the taxonomy?
-
-If a proposed flag fails its precise test on close reading, DROP IT.
-
-Emit no_flag only when, after BOTH the sensitive/adversarial pass and the final precision pass,
-no flag survives.
-
-The correct operating principle is:
-
-    SEARCH BROADLY -> INTERPRET FUNCTIONALLY -> FLAG WHEN THE TAXONOMY TEST IS MET
-    -> RE-CHECK THE EXACT EVIDENCE -> DROP FLAGS THAT DO NOT ACTUALLY CLEAR THE TEST.
-
-Do not output your reasoning or these checks. Respond with the structured prediction only.
-
-""" + LABELS_TAXONOMY
+ST3_SYSTEM_PROMPT = """You are a compliance analyst monitoring commercial content that reaches minors on video platforms.
+
+You are given one sponsored segment: its transcript, video metadata, and the product-page description
+linked from the video.
+
+It is GIVEN that:
+- the channel is child-facing;
+- the segment is commercial.
+
+Do not reassess either fact.
+
+## TASK
+
+Predict ONLY these four ST3 labels:
+
+- `misleading_claim` (T1.4)
+- `age_restricted_or_prohibited_product` (T1.5)
+- `hfss_food_marketing` (T1.6)
+- `undisclosed_advertising` (T1.1)
+
+Ignore all other taxonomy categories, including `inadequate_disclosure`,
+`direct_exhortation`, Tier 2 flags, and `undisclosed_synthetic_content`.
+
+Multiple labels may apply.
+
+Base judgments only on the supplied material. Do not verify claims against the outside world
+and do not invent missing facts.
+
+## DETECTION STANDARD
+
+Use a HIGH-RECALL, ADVERSARIAL reading. Modern advertising may deliberately avoid obvious
+trigger phrases by disguising claims as personal experiences, testimonials, demonstrations,
+storytelling, humor, recommendations, lifestyle content, or casual creator speech.
+
+Look for the underlying meaning, not just keywords.
+
+In particular, search for:
+- factual claims hidden inside anecdotes or testimonials;
+- outcomes implied by demonstrations or before/after framing;
+- claims split across multiple sentences;
+- comparisons or price claims expressed indirectly;
+- health/fitness/skincare/supplement claims framed as personal experience;
+- age-restricted products marketed through euphemisms or lifestyle branding;
+- HFSS products marketed through gaming, sports, entertainment, or youth culture;
+- sponsorship disclosures hidden in descriptions or metadata.
+
+Do not flag merely because something sounds promotional. The evidence must satisfy the
+specific category test.
+
+## T1.4 — misleading_claim
+
+Flag unsubstantiated or high-risk claims about a product's characteristics, performance,
+results, or price.
+
+You are identifying claims of this type, NOT determining whether they are true.
+
+Flag concrete factual-sounding claims whether they are:
+- explicit or implied;
+- quantified or qualitative;
+- comparative;
+- presented as personal experience/testimonial;
+- communicated through a demonstration;
+- about price, savings, guarantees, certifications, or performance.
+
+Examples of the underlying type:
+"lasts twice as long", "reduces pressure by 20%", "cheapest option",
+"this fixed my acne", "this helps me lose weight", "better than X".
+
+Health, weight, fitness, skincare, and supplement efficacy claims directed at children
+are ALWAYS in scope.
+
+Do NOT flag ordinary subjective puffery alone:
+"amazing", "the best", "insane", "high-quality", "I love it", etc.
+unless surrounding context gives it a concrete factual meaning.
+
+## T1.5 — age_restricted_or_prohibited_product
+
+Flag when the promoted product/service itself is clearly age-gated or prohibited, including:
+
+- alcohol;
+- tobacco/nicotine/vaping;
+- gambling/betting/casinos;
+- weapons/firearms;
+- similar clearly age-restricted products.
+
+Identify the actual promoted product using the transcript, metadata, and product description.
+
+Do not flag incidental mentions, mature themes, or unrelated products appearing alongside
+an age-restricted item.
+
+Be alert to euphemistic branding that disguises what the product actually is.
+
+## T1.6 — hfss_food_marketing
+
+Flag CLEAR marketing of food high in fat, salt, or sugar.
+
+Clear examples include:
+- energy drinks;
+- confectionery/candy/chocolate;
+- sugary soft drinks when clearly identifiable;
+- fast food such as burgers, fries, or comparable products.
+
+Use HIGH PRECISION here. Do not perform speculative nutrient profiling or flag borderline
+foods merely because they could contain substantial fat, salt, or sugar.
+
+The HFSS product must be what is being promoted, not merely something incidentally consumed
+or shown.
+
+## T1.1 — undisclosed_advertising
+
+Flag if the commercial nature of the segment is NOT identified anywhere available to the viewer:
+
+- spoken content;
+- video description;
+- supplied metadata;
+- platform paid-promotion label.
+
+Search ALL of these before deciding.
+
+Disclosures include clear statements such as:
+- "sponsored by X";
+- "this video is sponsored";
+- "paid partnership";
+- "advertisement"/"ad";
+- "affiliate links";
+- "I receive a commission";
+- equivalent language clearly identifying a commercial relationship.
+
+A product link, promo code, "check it out", "my links", or shopping URL is NOT by itself
+a disclosure.
+
+IMPORTANT: `inadequate_disclosure` is OUT OF SCOPE. If a disclosure exists but is buried,
+brief, jargon-heavy, or otherwise inadequate, do NOT convert it into another label.
+For this task, the only question is whether the commercial nature is identified at all:
+
+NO disclosure anywhere -> `undisclosed_advertising`
+ANY meaningful disclosure -> no `undisclosed_advertising`
+
+## FINAL ADVERSARIAL PASS
+
+Before finalizing, assume the advertiser may be deliberately staying just below obvious
+detection thresholds.
+
+Re-check for:
+- claims disguised as opinions or anecdotes;
+- implied product outcomes;
+- euphemistic restricted products;
+- obvious HFSS products disguised by lifestyle/entertainment branding;
+- disclosures hidden outside the spoken sponsor segment.
+
+Then perform a precision check on every proposed flag:
+
+- Does the exact evidence satisfy the category?
+- Am I flagging the underlying behavior rather than a keyword?
+- For `misleading_claim`, is there a concrete factual/product claim rather than puffery?
+- For `age_restricted_or_prohibited_product`, is the restricted product actually being promoted?
+- For `hfss_food_marketing`, is this clearly HFSS rather than borderline?
+- For `undisclosed_advertising`, did I search the entire supplied disclosure material?
+
+Drop flags that fail the precise test.
+
+Respond with the structured prediction ONLY."""
 
 
 class Prediction(BaseModel):
@@ -466,6 +362,51 @@ def sanitize_st3(flags: List[str]) -> List[str]:
     if standalone and len(flags) > 1:
         return [standalone[0]]
     return flags or ["insufficient_context"]
+
+
+MAX_FEW_SHOT_EXAMPLE_LEN = 300  # skip, don't truncate -- a chopped quote/excerpt reads as garbled
+
+
+def build_few_shot_section(train_path: str, log: logging.Logger, n_per_label: int = 1) -> str:
+    """n_per_label live examples per FEW_SHOT_LABELS, pulled from train.jsonl gold labels. Most
+    labels use the quote in labels.st3_evidence that earned the flag; insufficient_context has
+    no evidence quote (there's nothing to point at), so it uses a transcript excerpt instead.
+    Candidates longer than MAX_FEW_SHOT_EXAMPLE_LEN are skipped rather than truncated, so every
+    example shown is a complete, unmutilated quote/excerpt."""
+    defs = parse_taxonomy_defs(LABELS_TAXONOMY, FEW_SHOT_LABELS)
+    examples = {label: [] for label in FEW_SHOT_LABELS}
+    for inst in load_split(train_path):
+        if all(len(v) >= n_per_label for v in examples.values()):
+            break
+        labels = inst.get("labels")
+        if not labels:
+            continue
+        st3 = labels.get("st3", [])
+        if "insufficient_context" in st3 and len(examples["insufficient_context"]) < n_per_label:
+            text = transcript_only(inst).strip()
+            if text and len(text) <= MAX_FEW_SHOT_EXAMPLE_LEN:
+                examples["insufficient_context"].append(text)
+        evidence = {ev["flag"]: ev["quote"] for ev in labels.get("st3_evidence", [])}
+        for label in ("direct_exhortation", "inadequate_disclosure"):
+            quote = evidence.get(label)
+            if quote and len(quote) <= MAX_FEW_SHOT_EXAMPLE_LEN and len(examples[label]) < n_per_label:
+                examples[label].append(quote)
+
+    missing = [label for label, exs in examples.items() if not exs]
+    if missing:
+        raise ValueError(f"found no train.jsonl examples for {missing} in {train_path}")
+
+    log.info("few-shot examples collected: " +
+             ", ".join(f"{label}={len(exs)}" for label, exs in examples.items()))
+
+    sections = ["## FEW-SHOT EXAMPLES\n\nLive examples from the training data, pairing each "
+                "label's definition with real evidence that earned it."]
+    for label in FEW_SHOT_LABELS:
+        kind = "transcript excerpt" if label == "insufficient_context" else "evidence quote"
+        lines = [f"### `{label}`", f"Definition: {defs[label]}"]
+        lines += [f'Example {i} ({kind}): "{ex}"' for i, ex in enumerate(examples[label], 1)]
+        sections.append("\n".join(lines))
+    return "\n\n".join(sections)
 
 
 def setup_logging(log_dir: str, method: str, model: str, timestamp: str) -> logging.Logger:
@@ -498,6 +439,47 @@ def log_gold_label_inventory(logger: logging.Logger, gold: List[dict]) -> None:
     logger.info(f"[ST1 - commercial type]     {sorted(st1_seen)}")
     logger.info(f"[ST2 - product category]    {sorted(st2_seen)}")
     logger.info(f"[ST3 - compliance flags]    {sorted(st3_seen)}")
+
+
+# Dedicated copies of common/predict_utils.py's log_label_diagnostics/log_prediction_diagnostics
+# (used by the LoRA/last_layer baselines) rather than importing them -- common/__init__.py does
+# `from baseline_gpt import ...`, so importing back from common here would be circular.
+def log_label_diagnostics(logger: logging.Logger, tier: str, gold_labels: list, pred_labels: list) -> None:
+    """Logs `tier`'s label distribution -- how often each label appears in gold vs. how often
+    the model predicts it, overall -- and the gold-label x predicted-label cross-product
+    counts: the co-occurrence of every (gold, pred) label pair within the same instance,
+    tallied over `zip(gold_labels, pred_labels)`. Surfaces systematic confusions (e.g. an
+    inadequate_disclosure gold flag consistently landing next to an undisclosed_advertising
+    prediction) and under/over-flagging bias that per-label F1 alone doesn't show.
+    `gold_labels`/`pred_labels` are parallel lists, one label collection (a list, even a
+    singleton one for a single-label tier) per instance."""
+    gold_counts = Counter(f for flags in gold_labels for f in flags)
+    pred_counts = Counter(f for flags in pred_labels for f in flags)
+    labels = sorted(set(gold_counts) | set(pred_counts))
+    logger.info(f"[{tier}] label distribution (gold / pred):")
+    for label in labels:
+        logger.info(f"  {label}: gold={gold_counts[label]}, pred={pred_counts[label]}")
+
+    cross = Counter()
+    for g_flags, p_flags in zip(gold_labels, pred_labels):
+        for g in g_flags:
+            for p in p_flags:
+                cross[(g, p)] += 1
+    logger.info(f"[{tier}] gold x pred cross-product counts (gold -> pred: count):")
+    for (g, p), count in sorted(cross.items(), key=lambda kv: (-kv[1], kv[0])):
+        logger.info(f"  {g} -> {p}: {count}")
+
+
+def log_prediction_diagnostics(logger: logging.Logger, gold: list, pred: list,
+                                tiers: tuple = ("st1", "st2", "st3")) -> None:
+    """st1/st2/st3-shaped wrapper around `log_label_diagnostics`: `gold`/`pred` are the
+    same {"st1": str, "st2": [...], "st3": [...]} dicts `evaluate()` uses. `tiers`
+    restricts the diagnostics to the tiers `pred` actually carries (e.g. --st3-only)."""
+    logger.info("=== Prediction diagnostics ===")
+    for tier in tiers:
+        gold_labels = [[g["st1"]] for g in gold] if tier == "st1" else [g[tier] for g in gold]
+        pred_labels = [[p["st1"]] for p in pred] if tier == "st1" else [p[tier] for p in pred]
+        log_label_diagnostics(logger, tier, gold_labels, pred_labels)
 
 
 def build_messages(instance: dict, context: str, system_prompt: str) -> list:
@@ -602,8 +584,18 @@ def main():
                           "rendered and appended to the system prompt -- for compatibility with the "
                           "LoRA baselines' --df-path; rendering (lean text vs. raw JSON) follows "
                           "--lean-prompt")
+    ap.add_argument("--few-shot", action="store_true",
+                     help="st3-only only: append a FEW-SHOT EXAMPLES section to the system prompt "
+                          "-- for direct_exhortation, inadequate_disclosure, and insufficient_context, "
+                          "--few-shot-n live train.jsonl example(s) each, pairing the label's "
+                          "taxonomy definition with real evidence that earned it")
+    ap.add_argument("--few-shot-n", type=int, default=1,
+                     help="live train.jsonl examples per label to include when --few-shot is set")
     ap.add_argument("--seed", type=int, default=None, help="for example, 42.")
     args = ap.parse_args()
+
+    if args.few_shot and not args.st3_only:
+        raise SystemExit("--few-shot only applies to --st3-only")
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     log = setup_logging("runs", args.context, args.model, timestamp)
@@ -611,7 +603,8 @@ def main():
     error_out = os.path.join("runs", f"submission_gpt_error_{timestamp}.jsonl")
     log.info(f"config: target={args.target} model={args.model} context={args.context} "
              f"sample_size={args.sample_size} max_concurrency={args.max_concurrency} "
-             f"st3_only={args.st3_only} lean_prompt={args.lean_prompt} df_path={args.df_path} out={out} seed={args.seed}")
+             f"st3_only={args.st3_only} lean_prompt={args.lean_prompt} df_path={args.df_path} "
+             f"few_shot={args.few_shot} few_shot_n={args.few_shot_n} out={out} seed={args.seed}")
 
     if not os.environ.get("OPENAI_API_KEY"):
         raise SystemExit("Set OPENAI_API_KEY in the environment (or a .env file) first.")
@@ -620,6 +613,10 @@ def main():
     prediction_schema = ST3Prediction if args.st3_only else Prediction
 
     base_prompt = SFT_TAXONOMY if args.lean_prompt else (ST3_SYSTEM_PROMPT if args.st3_only else SYSTEM_PROMPT)
+    if args.few_shot:
+        few_shot_text = build_few_shot_section(TRAIN_PATH, log, n_per_label=args.few_shot_n)
+        log.info(f"appending few-shot examples ({len(few_shot_text)} chars) to the system prompt")
+        base_prompt = f"{base_prompt}\n\n{few_shot_text}"
     df_text = None
     if args.df_path:
         df_text = df_pre_context(args.df_path, lean=args.lean_prompt)
@@ -627,7 +624,8 @@ def main():
         log.info(f"appending {form} from {args.df_path} ({len(df_text)} chars) to the system prompt")
     system_prompt = f"{base_prompt}\n\n{df_text}" if df_text else base_prompt
     log.info(f"system prompt: {'lean' if args.lean_prompt else 'full'}"
-             f"{' st3-only' if args.st3_only else ''} ({len(system_prompt)} chars)")
+             f"{' st3-only' if args.st3_only else ''}{' few-shot' if args.few_shot else ''} "
+             f"({len(system_prompt)} chars)")
 
     instances = list(load_split(args.target))
     if args.sample_size:
@@ -686,6 +684,7 @@ def main():
             log.info(f"  {k}: {v:.3f}")
         for tier, per_label in metrics["per_label_f1"].items():
             log.info(f"  {tier} per-label F1: " + ", ".join(f"{l}={f:.3f}" for l, f in sorted(per_label.items())))
+        log_prediction_diagnostics(log, gold, predictions, tiers=tiers)
     else:
         log.info("target has no gold labels (or a partial mismatch) -- skipping evaluation")
 
