@@ -112,11 +112,13 @@ def main():
                      "loss forward pass (logits.float() over the full sequence x vocab) is far more "
                      "memory-hungry than generate()'s one-token-at-a-time decode, so eval can usually run "
                      "at a much larger batch size than training without risking OOM")
-    ap.add_argument("--final-eval-only", action="store_true", help="skip the per-epoch dev "
-                     "generate()/evaluate() pass on every epoch except the last -- for runs "
-                     "with more epochs than usual where per-epoch eval cost dominates and "
-                     "per-epoch best-checkpoint selection isn't needed. The last epoch is still "
-                     "evaluated and saved to <checkpoint-dir>/best exactly as normal")
+    ap.add_argument("--eval-every", type=int, default=1, help="run the dev generate()/evaluate() "
+                     "pass every N epochs instead of every epoch -- for runs with more epochs "
+                     "than usual where per-epoch eval cost dominates and per-epoch best-checkpoint "
+                     "selection at that granularity isn't needed. The last epoch is always "
+                     "evaluated/checkpointed regardless of N, so a best checkpoint always exists. "
+                     "1 (default) reproduces the original every-epoch behavior; pass --epochs to "
+                     "eval only once, at the end")
     ap.add_argument("--grad-accum-steps", type=int, default=4)
     ap.add_argument("--lr", type=float, default=2e-4)
     ap.add_argument("--warmup-ratio", type=float, default=0.06)
@@ -357,12 +359,16 @@ def main():
                  f"min={min(train_seq_lens)} mean={sum(train_seq_lens) / len(train_seq_lens):.0f} "
                  f"max={max(train_seq_lens)} n={len(train_seq_lens)}")
 
-        if args.final_eval_only and epoch + 1 < args.epochs:
-            continue  # per-epoch dev eval skipped; only the last epoch is evaluated/checkpointed
+        if (epoch + 1) % args.eval_every != 0 and epoch + 1 < args.epochs:
+            continue  # dev eval skipped this epoch per --eval-every; last epoch always runs it
 
         tokenizer.padding_side = "left"  # batched model.generate() needs left-padding
         ids, preds = generate_predictions(model, dev_loader, tokenizer, args.max_new_tokens,
                                           st3_only=args.st3_only, st12_only=args.st12_only, log=log)
+        torch.cuda.empty_cache()  # generate()'s KV-cache/activation memory is cached by the
+        # allocator, not returned to the driver on its own -- release it now so a concurrent
+        # process on this GPU can use it, and so the next epoch's training resumes from the
+        # same VRAM baseline rather than accumulating eval-time high-water marks
         gold = [inst["labels"] for inst in dev_instances]
         metrics = evaluate(gold, preds)
         scalar_metrics = {k: v for k, v in metrics.items() if k != "per_label_f1"}
@@ -420,6 +426,8 @@ def main():
                 test_model, test_loader, tokenizer, args.max_new_tokens,
                 st3_only=args.st3_only, st12_only=args.st12_only, log=log,
             )
+            del test_model  # separate model instance from the training `model`, both briefly
+            torch.cuda.empty_cache()  # resident together -- free it as soon as its one pass is done
             test_gold = [inst["labels"] for inst in test_holdout_instances]
             test_metrics = evaluate(test_gold, test_preds)
             test_scalar_metrics = {k: v for k, v in test_metrics.items() if k != "per_label_f1"}
