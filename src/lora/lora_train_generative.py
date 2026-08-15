@@ -112,6 +112,11 @@ def main():
                      "loss forward pass (logits.float() over the full sequence x vocab) is far more "
                      "memory-hungry than generate()'s one-token-at-a-time decode, so eval can usually run "
                      "at a much larger batch size than training without risking OOM")
+    ap.add_argument("--final-eval-only", action="store_true", help="skip the per-epoch dev "
+                     "generate()/evaluate() pass on every epoch except the last -- for runs "
+                     "with more epochs than usual where per-epoch eval cost dominates and "
+                     "per-epoch best-checkpoint selection isn't needed. The last epoch is still "
+                     "evaluated and saved to <checkpoint-dir>/best exactly as normal")
     ap.add_argument("--grad-accum-steps", type=int, default=4)
     ap.add_argument("--lr", type=float, default=2e-4)
     ap.add_argument("--warmup-ratio", type=float, default=0.06)
@@ -159,6 +164,15 @@ def main():
                      "st3_macro_f1/st3_family_macro_f1 only, and note that mean_macro_f1 and "
                      "best-checkpoint selection both switch to st3_macro_f1 in this mode "
                      "(mean_macro_f1 would otherwise average in the meaningless placeholder)")
+    ap.add_argument("--st12-only", action="store_true", help="mirror of --st3-only: train/predict "
+                     "on st1+st2 alone, dropping st3 entirely from the completion "
+                     "(\"{\\\"st1\\\":...,\\\"st2\\\":[...]}\") so every completion token trains "
+                     "st1/st2 -- none are spent on st3, which this run isn't scoring. st3 in the "
+                     "logged metrics is a fixed placeholder (sanitize_st3([]), i.e. "
+                     "[\"insufficient_context\"]), not a meaningful prediction -- read "
+                     "st1_macro_f1/st2_macro_f1 only; best-checkpoint selection switches to "
+                     "mean(st1_macro_f1, st2_macro_f1) in this mode. Mutually exclusive with "
+                     "--st3-only")
     ap.add_argument("--load-in-4bit", action="store_true", help="QLoRA via bitsandbytes (must be installed separately)")
     ap.add_argument("--parallelism", choices=PARALLELISM_CHOICES, default="none", help="split the model "
                      "across GPUs (requires >=2): \"pipeline\" shards layers via device_map=\"auto\"; \"tensor\" "
@@ -183,6 +197,8 @@ def main():
                      "the best/last adapter checkpoints (<checkpoint-save-path>/best, "
                      "<checkpoint-save-path>/last); defaults to --output-dir")
     args = ap.parse_args()
+    if args.st3_only and args.st12_only:
+        ap.error("--st3-only and --st12-only are mutually exclusive")
 
     torch.manual_seed(args.seed)
     device = args.device or ("cuda" if torch.cuda.is_available() else "cpu")
@@ -277,14 +293,20 @@ def main():
         log.info("--st3-only: completion is {\"st3\":[...]} alone; st1/st2 in logged metrics "
                  "are a fixed placeholder, read st3_macro_f1/st3_family_macro_f1 only; "
                  "best-checkpoint selection uses st3_macro_f1 instead of mean_macro_f1")
+    if args.st12_only:
+        log.info("--st12-only: completion is {\"st1\":...,\"st2\":[...]} alone; st3 in logged "
+                 "metrics is a fixed placeholder, read st1_macro_f1/st2_macro_f1 only; "
+                 "best-checkpoint selection uses mean(st1_macro_f1, st2_macro_f1) instead of "
+                 "mean_macro_f1")
 
     collate = GenerativeCollator(tokenizer)
     train_ds = GenerativeDataset(train_instances, tokenizer, args.context, args.max_length,
                                  system_prompt, df_text, st3_loss_weight=args.st3_loss_weight,
                                  st2_pos_weight=st2_pos_weight, st3_pos_weight=st3_pos_weight,
-                                 st3_only=args.st3_only)
+                                 st3_only=args.st3_only, st12_only=args.st12_only)
     dev_ds = GenerativeDataset(dev_instances, tokenizer, args.context, args.max_length,
-                               system_prompt, df_text, st3_only=args.st3_only, include_completion=False)
+                               system_prompt, df_text, st3_only=args.st3_only,
+                               st12_only=args.st12_only, include_completion=False)
     train_loader = DataLoader(train_ds, batch_size=args.batch_size, shuffle=True, collate_fn=collate)
     eval_batch_size = args.eval_batch_size or args.batch_size
     dev_loader = DataLoader(dev_ds, batch_size=eval_batch_size, shuffle=False, collate_fn=collate)
@@ -335,8 +357,12 @@ def main():
                  f"min={min(train_seq_lens)} mean={sum(train_seq_lens) / len(train_seq_lens):.0f} "
                  f"max={max(train_seq_lens)} n={len(train_seq_lens)}")
 
+        if args.final_eval_only and epoch + 1 < args.epochs:
+            continue  # per-epoch dev eval skipped; only the last epoch is evaluated/checkpointed
+
         tokenizer.padding_side = "left"  # batched model.generate() needs left-padding
-        ids, preds = generate_predictions(model, dev_loader, tokenizer, args.max_new_tokens, st3_only=args.st3_only, log=log)
+        ids, preds = generate_predictions(model, dev_loader, tokenizer, args.max_new_tokens,
+                                          st3_only=args.st3_only, st12_only=args.st12_only, log=log)
         gold = [inst["labels"] for inst in dev_instances]
         metrics = evaluate(gold, preds)
         scalar_metrics = {k: v for k, v in metrics.items() if k != "per_label_f1"}
@@ -345,7 +371,12 @@ def main():
             log.info(f"epoch {epoch + 1} dev {tier} per-label F1: "
                      + ", ".join(f"{label}={f1:.3f}" for label, f1 in sorted(per_label.items())))
 
-        selection_metric = metrics["st3_macro_f1"] if args.st3_only else metrics["mean_macro_f1"]
+        if args.st3_only:
+            selection_metric = metrics["st3_macro_f1"]
+        elif args.st12_only:
+            selection_metric = (metrics["st1_macro_f1"] + metrics["st2_macro_f1"]) / 2
+        else:
+            selection_metric = metrics["mean_macro_f1"]
         if selection_metric > best_f1:
             best_f1 = selection_metric
             best_dev_scalar_metrics = scalar_metrics
@@ -356,12 +387,14 @@ def main():
                     os.path.join(best_dir, "submission.jsonl"), os.path.join(best_dir, "submission_error.jsonl"),
                     ids, dev_instances, preds,
                 )
-                selection_name = "st3_macro_f1" if args.st3_only else "mean_macro_f1"
+                selection_name = "st3_macro_f1" if args.st3_only else (
+                    "mean(st1,st2)_macro_f1" if args.st12_only else "mean_macro_f1")
                 log.info(f"epoch {epoch + 1}: new best {selection_name}={best_f1:.3f}, saved to {checkpoint_dir}/best")
 
     if is_main:
         model.save_pretrained(os.path.join(checkpoint_dir, "last"))
-        selection_name = "st3_macro_f1" if args.st3_only else "mean_macro_f1"
+        selection_name = "st3_macro_f1" if args.st3_only else (
+            "mean(st1,st2)_macro_f1" if args.st12_only else "mean_macro_f1")
         log.info(f"saved final epoch adapter to {checkpoint_dir}/last (best dev {selection_name}={best_f1:.3f})")
         log.info("best dev metrics: " + ", ".join(f"{k}={v:.3f}" for k, v in best_dev_scalar_metrics.items()))
 
@@ -379,11 +412,13 @@ def main():
             tokenizer.padding_side = "left"
             test_loader = DataLoader(
                 GenerativeDataset(test_holdout_instances, tokenizer, args.context, args.max_length,
-                                  system_prompt, df_text, st3_only=args.st3_only, include_completion=False),
+                                  system_prompt, df_text, st3_only=args.st3_only,
+                                  st12_only=args.st12_only, include_completion=False),
                 batch_size=eval_batch_size, shuffle=False, collate_fn=collate,
             )
             test_ids, test_preds = generate_predictions(
-                test_model, test_loader, tokenizer, args.max_new_tokens, st3_only=args.st3_only, log=log,
+                test_model, test_loader, tokenizer, args.max_new_tokens,
+                st3_only=args.st3_only, st12_only=args.st12_only, log=log,
             )
             test_gold = [inst["labels"] for inst in test_holdout_instances]
             test_metrics = evaluate(test_gold, test_preds)

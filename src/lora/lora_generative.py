@@ -17,7 +17,7 @@ import torch
 from pydantic import BaseModel, ValidationError
 from tqdm import tqdm
 
-from . import ST3_LABELS, Prediction, sanitize_st3  # noqa: F401
+from . import ST1_LABELS, ST2_LABELS, ST3_LABELS, Prediction, sanitize_st3  # noqa: F401
 
 MAX_ATTEMPTS = 3
 _JSON_RE = re.compile(r"\{.*\}", re.DOTALL)
@@ -31,14 +31,24 @@ class St3OnlyPrediction(BaseModel):
     st3: List[Literal[tuple(ST3_LABELS)]]
 
 
-def parse_completion(text: str, st3_only: bool = False) -> dict | None:
+class St12OnlyPrediction(BaseModel):
+    """Schema for --st12-only mode's completion, the mirror image of St3OnlyPrediction:
+    drops st3 from the JSON entirely (see format_completion_chunks's st12_only branch in
+    lora_data.py) so every completion token trains st1/st2."""
+    st1: Literal[tuple(ST1_LABELS)]
+    st2: List[Literal[tuple(ST2_LABELS)]]
+
+
+def parse_completion(text: str, st3_only: bool = False, st12_only: bool = False) -> dict | None:
     """Extract+validate a JSON object from a freeform completion against the Prediction
-    schema (or St3OnlyPrediction, in --st3-only mode). Returns None (rather than a fallback
-    dict) so the caller can tell a parse failure apart from a genuine prediction and decide
-    whether to retry. In --st3-only mode st1/st2 are filled with a fixed placeholder
-    ("other"/[]) -- common.evaluate() always scores all three subtasks, and write_submission
-    needs a complete prediction dict, but those two values are never trained/meaningful here;
-    only st3_macro_f1/st3_family_macro_f1 should be read from the result."""
+    schema (or St3OnlyPrediction/St12OnlyPrediction, in --st3-only/--st12-only mode).
+    Returns None (rather than a fallback dict) so the caller can tell a parse failure apart
+    from a genuine prediction and decide whether to retry. In --st3-only mode st1/st2 are
+    filled with a fixed placeholder ("other"/[]); in --st12-only mode st3 is filled with a
+    fixed placeholder (sanitize_st3([]), i.e. ["insufficient_context"]) -- common.evaluate()
+    always scores all three subtasks, and write_submission needs a complete prediction dict,
+    but the placeholder tier is never trained/meaningful in that mode; only the tiers that
+    mode actually trains should be read from the result."""
     match = _JSON_RE.search(text)
     if not match:
         return None
@@ -46,6 +56,9 @@ def parse_completion(text: str, st3_only: bool = False) -> dict | None:
         if st3_only:
             pred = St3OnlyPrediction.model_validate_json(match.group(0))
             return {"st1": "other", "st2": [], "st3": sanitize_st3(list(pred.st3))}
+        if st12_only:
+            pred = St12OnlyPrediction.model_validate_json(match.group(0))
+            return {"st1": pred.st1, "st2": list(pred.st2), "st3": sanitize_st3([])}
         pred = Prediction.model_validate_json(match.group(0))
     except ValidationError:
         return None
@@ -61,13 +74,14 @@ def _to_device(batch: dict, device: str) -> dict:
 
 
 @torch.no_grad()
-def generate_predictions(model, loader, tokenizer, max_new_tokens: int, st3_only: bool = False, log=None) -> tuple:
+def generate_predictions(model, loader, tokenizer, max_new_tokens: int, st3_only: bool = False,
+                         st12_only: bool = False, log=None) -> tuple:
     """Batched freeform generation over `loader`. Requires `loader`'s collator to have
     left-padded input_ids/attention_mask (set tokenizer.padding_side = "left" before building
     it) so every sequence's prompt ends at the same position and `out[:, prompt_len:]` is
-    exactly the new tokens for the whole batch. `st3_only` must match how the model was
-    trained (see GenerativeDataset's st3_only) -- it only changes which schema completions
-    are parsed against, not generation itself.
+    exactly the new tokens for the whole batch. `st3_only`/`st12_only` must match how the
+    model was trained (see GenerativeDataset's st3_only/st12_only) -- they only change which
+    schema completions are parsed against, not generation itself.
 
     Items that fail to parse are regenerated (sampled, sub-batched to just the failing rows)
     up to MAX_ATTEMPTS times; anything still unparseable after that falls back to a default
@@ -105,7 +119,8 @@ def generate_predictions(model, loader, tokenizer, max_new_tokens: int, st3_only
             )
             still_pending = []
             for row_idx, gen_row in zip(pending, out[:, prompt_len:]):
-                pred = parse_completion(tokenizer.decode(gen_row, skip_special_tokens=True), st3_only=st3_only)
+                pred = parse_completion(tokenizer.decode(gen_row, skip_special_tokens=True),
+                                        st3_only=st3_only, st12_only=st12_only)
                 if pred is None:
                     still_pending.append(row_idx)
                 else:
