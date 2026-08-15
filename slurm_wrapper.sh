@@ -46,7 +46,7 @@ cat > "$SLURM_SCRIPT" <<EOF
 #SBATCH --job-name=$JOB_NAME
 #SBATCH --output=$LOG
 #SBATCH --ntasks=1
-#SBATCH --time=4:00:00
+#SBATCH --time=10:00:00
 #SBATCH --mem=40gb
 #SBATCH --cpus-per-task=10
 
