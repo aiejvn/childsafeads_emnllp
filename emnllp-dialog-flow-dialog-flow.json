@@ -63,7 +63,7 @@
         "label": "Assessability",
         "config": {
           "question": "Is the segment assessable enough to classify?",
-          "instructions": "Judge whether the segment contains enough context to support a reliable classification, and pick the outcome that matches. Do not consider destination-page issues or other out-of-scope context.",
+          "instructions": "The task is to determine whether the segment contains enough context to support a reliable classification. If the segment is too short, too vague, or too ambiguous to evaluate, treat the result as insufficient context. Otherwise, the segment can be assessed for commercial type, product categories, and compliance flags. Do not consider destination-page issues or other out-of-scope context.",
           "annotations": [],
           "dataType": "custom",
           "customEnumValues": [
