@@ -83,7 +83,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("train", help="training split, e.g. public_data_dev/train.jsonl")
     ap.add_argument("dev", help="dev split for per-epoch evaluation, e.g. public_data_dev/dev.jsonl")
-    ap.add_argument("--model", default="Qwen/Qwen3.5-4B")
+    ap.add_argument("--model", default="Qwen/Qwen3-4B")
     ap.add_argument("--model-path", default=None, help="load the model/tokenizer from this local "
                      "directory instead of models/{--model}; --model is still used for logging/checkpoint "
                      "naming")
@@ -408,6 +408,9 @@ def main():
             best_dir = os.path.join(checkpoint_dir, "best")
             log.info(f"reloading best-dev checkpoint from {best_dir} for the test-holdout pass "
                      f"(generalization check, not used for model selection)")
+            del model  # the training model is done with; freeing it before loading a second full
+            torch.cuda.empty_cache()  # model instance matters most on larger base models, where
+            # two coexisting copies (~8GB+ each for a 4B model) can OOM even though either alone fits
             test_model = load_peft_model_causal(
                 model_path, best_dir, load_in_4bit=args.load_in_4bit, device=device,
                 local_files_only=True, parallelism=args.parallelism,
