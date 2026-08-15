@@ -48,8 +48,7 @@ from common.dialog_flow import df_pre_context  # noqa: E402
 from common.predict_utils import log_prediction_diagnostics, write_submission  # noqa: E402
 from common.train_utils import compute_pos_weight  # noqa: E402
 from lora import (  # noqa: E402
-    CONTEXT_CHOICES, SFT_TAXONOMY, ST2_LABELS, ST3_LABELS, SYSTEM_PROMPT, SFT_TAXONOMY, SYSTEM_PROMPT \ 
-    evaluate, load_split, setup_logging,
+    CONTEXT_CHOICES, SFT_TAXONOMY, ST2_LABELS, ST3_LABELS, SYSTEM_PROMPT, SFT_TAXONOMY, SYSTEM_PROMPT, evaluate, load_split, setup_logging,
 )
 from lora.lora_data import GenerativeCollator, GenerativeDataset  # noqa: E402
 from lora.lora_generative import generate_predictions  # noqa: E402
