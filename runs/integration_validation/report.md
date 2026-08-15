@@ -99,6 +99,37 @@ gold=2 on `batch.jsonl`). This is the opposite of the prior tuning run's outcome
 regression, only visible at n=100 scale) — here the combined result held up cleanly at n=60-62
 across two independently-drawn batches.
 
+## Full dev-set confirmation (n=504, the trustworthy number)
+
+The two batches above (n=60-62) were promising but explicitly flagged as not yet the "trustworthy
+number" per `runs/prompt_tuning/PLAN.md`'s discipline. Ran before/after on the entire dev set
+(504 instances, not a sample) to settle it: before = `git show HEAD^:src/baseline_gpt.py` swapped
+in temporarily, after = this commit (`e98b1e4`), both scored against every gold label in
+`public_data_dev/dev.jsonl`.
+
+| label | before F1 | after F1 | delta |
+|---|---|---|---|
+| **st3_macro_f1** | 0.380 | **0.572** | **+0.192** |
+| **st3_family_macro_f1** | 0.605 | **0.693** | **+0.088** |
+| direct_exhortation | 0.000 | 0.351 | +0.351 |
+| inadequate_disclosure | 0.000 | 0.444 | +0.444 |
+| insufficient_context | 0.000 | 0.421 | +0.421 |
+| no_flag | 0.255 | 0.500 | +0.245 |
+| hfss_food_marketing | 0.462 | 0.615 | +0.153 |
+| undisclosed_advertising | 0.693 | 0.710 | +0.017 |
+| misleading_claim | 0.759 | 0.773 | +0.014 |
+| age_restricted_or_prohibited_product | 0.875 | 0.765 | -0.110 |
+
+Confirms the smaller-batch numbers decisively: st3_macro_f1 +0.192, st3_family_macro_f1 +0.088,
+every previously-`0.000` label now meaningfully positive. One regression:
+`age_restricted_or_prohibited_product` (a section no implementation agent touched) went from 2
+to 5 false positives out of 504 instances. Checked directly: the false-positive instances differ
+between the two runs rather than showing a consistent new failure pattern, consistent with
+`gpt-5.4`'s known temp=0 non-determinism (already noted independently by two implementation
+agents) rather than a systematic interaction effect from the new rubric sections — none of which
+mention this label. Not chased further given the scale of the win elsewhere; worth a rerun to
+confirm it's noise if this label's score matters for a future pass.
+
 ## Caveats
 
 - `gpt-5.4` at `temperature=0` is not fully deterministic run-to-run; individual per-label F1 on
@@ -108,9 +139,7 @@ across two independently-drawn batches.
 - `--few-shot` (existing infra, now unblocked for `direct_exhortation`/`inadequate_disclosure`/
   `insufficient_context` since the prompt no longer tells the model to ignore them) was tested by
   individual branches and found not to help at this prompt structure — left off by default.
-- Scale-up follow-up not attempted here (out of scope for this pass): a true `n=100`+
-  confirmation run, matching the discipline of the original `runs/prompt_tuning/PLAN.md`, before
-  fully trusting these numbers at competition scale.
+- Full dev-set (n=504) confirmation now included above -- this is the trustworthy number.
 
 ## Source branches (implementation detail, isolated worktrees)
 
