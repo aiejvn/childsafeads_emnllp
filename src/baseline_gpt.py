@@ -26,6 +26,7 @@ import json
 import logging
 import os
 import random
+import re
 import shutil
 import sys
 from collections import Counter
@@ -207,17 +208,22 @@ Do not reassess either fact.
 
 ## TASK
 
-Predict ONLY these four ST3 labels:
+Predict any of these eight ST3 labels that apply:
 
 - `misleading_claim` (T1.4)
 - `age_restricted_or_prohibited_product` (T1.5)
 - `hfss_food_marketing` (T1.6)
 - `undisclosed_advertising` (T1.1)
+- `inadequate_disclosure` (T1.2)
+- `direct_exhortation` (T1.3)
+- `insufficient_context` (T1.9)
+- `no_flag` (T1.8)
 
-Ignore all other taxonomy categories, including `inadequate_disclosure`,
-`direct_exhortation`, Tier 2 flags, and `undisclosed_synthetic_content`.
+Ignore Tier 2 flags and `undisclosed_synthetic_content` -- not covered in this release.
 
-Multiple labels may apply.
+Multiple labels may apply, EXCEPT `no_flag` and `insufficient_context`: each of those two is
+exclusive of every other label -- if either applies, it is the ONLY label you predict for the
+instance.
 
 Base judgments only on the supplied material. Do not verify claims against the outside world
 and do not invent missing facts.
@@ -269,6 +275,16 @@ Do NOT flag ordinary subjective puffery alone:
 "amazing", "the best", "insane", "high-quality", "I love it", etc.
 unless surrounding context gives it a concrete factual meaning.
 
+Do NOT flag routine transactional/promotional facts that carry no claim about the product's own
+performance, quality, or results. A discount percentage, promo code, or plain price mention that
+is simply being offered ("15% off your order", "use code X for 5% off", "get 25% off your first
+month") is an ordinary commercial term, not a claim requiring substantiation -- UNLESS it is
+framed as an unbeatable or guaranteed deal ("the cheapest anywhere", "guaranteed lowest price"),
+which IS the kind of price claim this flag covers. Likewise, a plain count or spec the product
+straightforwardly has ("300 characters to collect", "10-hour battery", "13+ to use this app") is
+NOT misleading_claim by itself, unless it is also presented as evidence of superior performance or
+an outcome the segment gives no support for.
+
 ## T1.5 — age_restricted_or_prohibited_product
 
 Flag when the promoted product/service itself is clearly age-gated or prohibited, including:
@@ -302,35 +318,176 @@ foods merely because they could contain substantial fat, salt, or sugar.
 The HFSS product must be what is being promoted, not merely something incidentally consumed
 or shown.
 
-## T1.1 — undisclosed_advertising
+## T1.1 / T1.2 — undisclosed_advertising vs. inadequate_disclosure
 
-Flag if the commercial nature of the segment is NOT identified anywhere available to the viewer:
+These two labels are MUTUALLY EXCLUSIVE (taxonomy rule 2): an instance gets at most one of
+them, never both. Decide with the two-step procedure below rather than judging each in
+isolation.
 
-- spoken content;
-- video description;
-- supplied metadata;
-- platform paid-promotion label.
+### Step 1 — Clarity of Compensation: is it disclosed ANYWHERE, in any form?
 
-Search ALL of these before deciding.
+Search the ENTIRE given text -- spoken transcript AND video description AND supplied
+metadata/platform label -- for any acknowledgment that this segment involves a commercial
+relationship:
+- "sponsored by X", "this video is sponsored", "paid partnership", "advertisement"/"ad";
+- "affiliate links", "I receive a commission", "using my code supports the channel";
+- equivalent language clearly identifying a commercial relationship, spoken OR written.
 
-Disclosures include clear statements such as:
-- "sponsored by X";
-- "this video is sponsored";
-- "paid partnership";
-- "advertisement"/"ad";
-- "affiliate links";
-- "I receive a commission";
-- equivalent language clearly identifying a commercial relationship.
+A bare product link, promo code, "check it out", "my links", or shopping URL is NOT a
+disclosure by itself -- none of these say anything about payment.
 
-A product link, promo code, "check it out", "my links", or shopping URL is NOT by itself
-a disclosure.
+IMPORTANT: `OFFICIAL_DISCLOSURE: true` in the supplied metadata is ITSELF a qualifying
+acknowledgment -- it represents the platform's own paid-promotion label, one of the disclosure
+channels the taxonomy recognizes, even when neither the transcript nor the description contains
+an explicit sponsor/ad phrase. Treat `OFFICIAL_DISCLOSURE: true` alone as sufficient to pass
+Step 1 and move to Step 2 -- do NOT conclude `undisclosed_advertising` just because you can't
+find matching textual language, when the platform label itself says the relationship is
+disclosed.
 
-IMPORTANT: `inadequate_disclosure` is OUT OF SCOPE. If a disclosure exists but is buried,
-brief, jargon-heavy, or otherwise inadequate, do NOT convert it into another label.
-For this task, the only question is whether the commercial nature is identified at all:
+- If NO such acknowledgment exists ANYWHERE (transcript, description, metadata, or the platform
+  label) ->
+  `undisclosed_advertising`. Stop; do not also apply Step 2.
+- If SOME such acknowledgment exists somewhere -> compensation is disclosed; move to Step 2
+  to judge whether it's disclosed adequately. Do NOT flag `undisclosed_advertising` once any
+  acknowledgment exists, even a weak one -- weak-but-present disclosures are
+  `inadequate_disclosure`'s job, not `undisclosed_advertising`'s.
 
-NO disclosure anywhere -> `undisclosed_advertising`
-ANY meaningful disclosure -> no `undisclosed_advertising`
+### Step 2 — Clarity of Relationship/Position: would a child viewer actually encounter it?
+
+Compensation is disclosed somewhere (Step 1 passed). Now judge whether its POSITION and
+DELIVERY put it where a child watching/listening would actually notice and understand it --
+not just where it technically exists in the text. Weigh these signals together; no single one
+is decisive on its own:
+
+Leans ADEQUATE (no disclosure flag):
+- spoken aloud in the video, not only written;
+- appears early -- before or alongside the pitch -- not only after it's already over;
+- plain language ("this video is sponsored by X") rather than only legal/affiliate boilerplate;
+- reinforced in more than one place (both spoken and in the description).
+
+Leans INADEQUATE (`inadequate_disclosure`):
+- disclosure language appears ONLY in the written description, never spoken -- about half of
+  real inadequate_disclosure cases are exactly this: a viewer who only watches/listens would
+  never encounter it at all;
+- the ONLY spoken/written mention comes only AFTER the persuasive pitch has already finished
+  (e.g. tacked on at the very end, once the sell is over) -- lateness, not mention count, is
+  the signal;
+- the ONLY disclosure channel present is generic affiliate-link legal boilerplate ("as an
+  Amazon Associate I earn from qualifying purchases") with no plain-language sponsor/ad
+  statement anywhere;
+- OFFICIAL_DISCLOSURE is a meaningful but non-decisive signal: `false` leans toward inadequate,
+  `true` leans toward adequate, but `true` does NOT settle it by itself -- plenty of
+  `OFFICIAL_DISCLOSURE: true` instances still have a disclosure buried, written-only, or
+  boilerplate-only in the actual text, and that text is what you're grading.
+
+If the disclosure clears this bar -> no disclosure flag on this dimension. If it doesn't ->
+`inadequate_disclosure`.
+
+IMPORTANT -- a single mention is NOT by itself a defect. A disclosure spoken once, early,
+in plain language ("today's episode is sponsored by X") is ADEQUATE even if it is never
+repeated and even if the description doesn't also mention it. Do not apply
+`inadequate_disclosure` reflexively to every sponsor mention, and do not penalize a
+disclosure merely for occurring only once -- judge WHERE and HOW clearly that one mention
+lands, not how many times it repeats. The flag is for disclosures a child would plausibly
+miss or fail to understand (buried, late, written-only, or boilerplate-only), not for every
+commercial acknowledgment that exists.
+
+Worked example -- ADEQUATE, do NOT flag: transcript opens "oh today's episode is sponsored
+by expressvpn, your online activity shouldn't be public, protect it now at expressvpn.com"
+before the segment moves on to unrelated content. This is spoken, is the very first thing
+said, and names the sponsor in plain language -- that is adequate on its own. The fact that
+it is short, said only once, and not the focus of the rest of the segment does NOT make it
+inadequate. Only flag `inadequate_disclosure` here if this sentence were ABSENT from the
+transcript and the sponsorship appeared only in the written description.
+
+Worked example -- INADEQUATE, DO flag: the transcript never mentions any commercial
+relationship; the only disclosure is a hashtag ("#ad") or a legal boilerplate line ("as an
+Amazon Associate I earn from qualifying purchases") sitting in the written description below
+several other unrelated links. A viewer who only watches/listens encounters no disclosure at
+all -- that is `inadequate_disclosure`, not `undisclosed_advertising` (Step 1 passed because
+the written acknowledgment exists somewhere), and not adequate (Step 2 fails because it's
+written-only and easy to miss).
+
+## T1.3 — direct_exhortation
+
+Flag a direct appeal to the viewer to buy the product (or to get a parent/adult to buy it),
+but only when the delivery carries real pressure beyond a bare instruction. Work through this
+checklist in order:
+
+(a) Is there a purchase-directed imperative or appeal anywhere at all (buy, get, order, ask for,
+download, use this code, go to the link, etc.)? If there is none, this does NOT apply -- stop
+here.
+
+(b) If yes, is it a bare transactional instruction with no added pressure -- it only states
+where/how to obtain the product, or that a discount exists ("download the app from the link
+below", "click the link in the description", "use my code for 15% off", "go give it a try")?
+If so, this does NOT count, even though it is phrased as an imperative.
+
+(c) Does the delivery add pressure on top of the instruction -- a parasocial appeal ("if you
+love us, please download it"), pleading or repetition, urgency aimed squarely at the viewer, or
+child-directed hyped/pressuring register? If so, COUNT it, even though the surface form is an
+instruction.
+
+(d) If the wording is genuinely ambiguous between (b) and (c) -- you cannot tell whether it's a
+plain instruction or a pressuring appeal -- do NOT flag it. The taxonomy's own rule for this
+boundary is to not flag ambiguous cases.
+
+The test is the pressure placed on the viewer to make the purchase happen, not the mere presence
+of an imperative verb or a link/code. Ordinary, unadorned sponsor-read CTA phrasing ("check it
+out", "grab yours", "link in the description", "use code X at checkout") is common in almost
+every sponsored segment and is NOT enough by itself -- most segments that contain a CTA at all
+still do not carry this flag. Reserve it for CTAs that carry real added pressure per (c), not for
+CTA presence in general.
+
+Do not require literal child-directed phrasing like "ask your parents" to flag this -- that exact
+wording is rare in real positives. Judge the register/pressure of the appeal itself, whoever it
+is nominally addressed to.
+
+## T1.9 — insufficient_context
+
+Flag when the segment is too short or ambiguous to assess. In practice this means BOTH of the
+following are true:
+
+- the transcript carries essentially no real speech/ad content -- empty, or only filler such as
+  "[Music]", "[Applause]", or a few short interjections; AND
+- the video description is ALSO not specifically promotional -- generic channel boilerplate,
+  unrelated content, social/merch links -- rather than an explicit sponsor statement, promo
+  code, or "X% off" style pitch.
+
+If the transcript is empty/filler-only but the description clearly promotes a specific product
+(an explicit sponsor mention, promo code, or discount pitch), that is NOT insufficient_context --
+judge the visible commercial content normally (e.g. `undisclosed_advertising`) using the
+description as your evidence, even though the spoken transcript itself is silent.
+
+`insufficient_context` is exclusive of every other flag: if it applies, it is the ONLY label for
+this segment.
+
+This is a rare, structural pattern (near-empty segment), not a hedge for uncertainty -- do not
+reach for it just because you are unsure how to judge a segment that actually has real
+transcript or description content to work with.
+
+## T1.8 — no_flag
+
+After working through every check above, if NONE of them triggered, you must explicitly conclude
+the segment is compliant and predict `st3: ["no_flag"]`. Treat "none of the checks above apply"
+as a specific, positive finding you state on purpose -- not a default you land on by leaving st3
+empty, and not something you skip because nothing else seemed worth flagging.
+
+Before emitting `no_flag`, re-confirm `undisclosed_advertising` specifically by name, in addition
+to the other checks: `no_flag` requires that you can point to actual disclosure language
+somewhere in the supplied material (transcript, description, or metadata) -- a plain link, promo
+code, or "free trial" mention is NOT disclosure language. If you cannot point to it, the correct
+label is `undisclosed_advertising`, not `no_flag`, regardless of how clean everything else about
+the segment looks.
+
+`no_flag` is exclusive of every other label above: if it applies, predict it alone.
+
+A mild, non-decisive prior: content in the `education` and `apps` categories tends to skew
+compliant, while `health`, `food`, and gambling-adjacent categories tend to skew toward
+violations. Do not use this as a shortcut or a reason to skip a check -- judge every segment on
+the specific evidence in its own text. A "usually clean" category can still contain a real
+violation, and a "usually risky" category can still be genuinely clean; the checks above, not the
+category, decide the outcome.
 
 ## FINAL ADVERSARIAL PASS
 
@@ -348,10 +505,23 @@ Then perform a precision check on every proposed flag:
 
 - Does the exact evidence satisfy the category?
 - Am I flagging the underlying behavior rather than a keyword?
-- For `misleading_claim`, is there a concrete factual/product claim rather than puffery?
+- For `misleading_claim`, is there a concrete factual/product claim rather than puffery, or a
+  routine promo code/discount/price mention with no performance claim attached?
 - For `age_restricted_or_prohibited_product`, is the restricted product actually being promoted?
 - For `hfss_food_marketing`, is this clearly HFSS rather than borderline?
-- For `undisclosed_advertising`, did I search the entire supplied disclosure material?
+- For `undisclosed_advertising`, did I search the entire supplied disclosure material, and
+  confirm there is truly NO acknowledgment anywhere (not even a weak one)?
+- For `inadequate_disclosure`, did I confirm Step 1 passed first (some acknowledgment exists),
+  and is the inadequacy genuinely about position/clarity (written-only, late, single-mention,
+  boilerplate-only) rather than just "a sponsor mention exists so I flagged it"?
+- Did I apply at most one of `undisclosed_advertising` / `inadequate_disclosure`, never both?
+- For `direct_exhortation`, is there real appeal-level pressure on the viewer (parasocial,
+  pleading, urgency, hyped register), not just an imperative verb or a bare "link/code below"
+  instruction? If it's only a plain CTA, drop the flag.
+- For `insufficient_context`, are BOTH the transcript and the description actually thin -- not
+  just one of them?
+- If no flag survives this pass, did I explicitly predict `no_flag` rather than leaving st3
+  empty?
 
 Drop flags that fail the precise test.
 
@@ -368,12 +538,102 @@ class ST3Prediction(BaseModel):
     st3: List[Literal[tuple(ST3_LABELS)]] = Field(description="One or more compliance risk flags")
 
 
-def sanitize_st3(flags: List[str]) -> List[str]:
-    """Enforce the 'no_flag'/'insufficient_context' stand-alone rule."""
+# insufficient_context (T1.9) calibration -- see runs/impl_insufficient_context/ for the source
+# agent's derivation. Direct inspection of every train+dev gold insufficient_context row (22
+# total, a very rare label) shows it's a near-deterministic structural pattern, not a semantic
+# judgment call: the transcript segment is degenerate ([Music]/[Applause]/filler words/empty)
+# *and* the video description isn't specifically promotional (no explicit sponsor/promo-code
+# language) -- matching the taxonomy's own framing ("too short or ambiguous to assess") and
+# st3_findings.md's context-rung note that this label needs BOTH the transcript and description
+# to be thin. Transcript length alone is necessary but not sufficient: of the 72 train+dev rows
+# with a near-empty transcript, only 14 are actually gold insufficient_context -- the rest carry
+# a real violation flag, and the description is what discriminates them (sponsor/promo-code
+# language is absent from 100% of a 15-row train sample of genuine insufficient_context rows, vs.
+# present in ~31% of the "thin transcript but really a different flag" rows). Requiring both
+# raises standalone train+dev precision/recall/F1 from best-transcript-alone (P=0.194, R=0.636,
+# F1=0.298 at this same length threshold) to P=0.350, R=0.636, F1=0.452 -- the best of several
+# transcript-length x description-filter combinations tried empirically.
+THIN_TRANSCRIPT_MAX_LEN = 35  # chars of "real" transcript content remaining after stripping noise
+_THIN_BRACKET_RE = re.compile(r"\[[^\]]*\]|\*[^*]*\*")  # [Music]/[Applause]/*outro* tokens
+_THIN_FILLER_WORD_RE = re.compile(
+    r"\b(um|uh|oh|so|do|hey|okay|ok|bye|yes|no|good|well|hmm|foreign|people)\b", re.I
+)
+_THIN_PROMO_RE = re.compile(
+    r"sponsor|partnered? with|paid partnership|#ad\b|% ?off|promo ?code|discount ?code|"
+    r"use code|coupon",
+    re.I,
+)
+
+
+def _transcript_content_len(text: str) -> int:
+    """What's left of a transcript after stripping bracketed noise tokens and a short list of
+    English filler words. Near-zero for the degenerate windows insufficient_context's gold rows
+    are drawn from; substantial for real speech (including non-Latin-script transcripts, which
+    this counts by character length rather than English word-splitting)."""
+    stripped = _THIN_BRACKET_RE.sub(" ", text)
+    stripped = _THIN_FILLER_WORD_RE.sub(" ", stripped)
+    return len(re.sub(r"\s+", " ", stripped).strip())
+
+
+def is_thin_segment(instance: dict) -> bool:
+    """True when the transcript is near-empty/filler-only AND the video description carries no
+    explicit sponsor/promo-code language -- the empirical pattern behind insufficient_context
+    (see the calibration note above THIN_TRANSCRIPT_MAX_LEN). Deliberately requires both: an
+    empty transcript paired with a promo-heavy description ("sponsored by X, code Y for 15%
+    off") usually means a real violation flag applies and the description alone carries enough
+    evidence to judge it, not that the segment is unassessable.
+    This heuristic is intentionally imperfect (standalone F1 ~0.45 against train+dev gold) --
+    it's meant to correct a specific, confirmed model failure (see sanitize_st3), not to be a
+    complete classifier on its own; a handful of genuine insufficient_context rows have either a
+    longer transcript than this threshold or promo-style language in an unrelated, boilerplate
+    channel-wide description block, and this function will not catch those."""
+    transcript_text = instance["transcript"]["text"]
+    if _transcript_content_len(transcript_text) > THIN_TRANSCRIPT_MAX_LEN:
+        return False
+    description = instance["video_context"]["description"]
+    return not _THIN_PROMO_RE.search(description)
+
+
+def sanitize_st3(flags: List[str], instance: dict = None, use_thin_override: bool = False) -> List[str]:
+    """Enforce the 'no_flag'/'insufficient_context' stand-alone rule.
+
+    Empty-list default is `no_flag`, not `insufficient_context`: empirically no_flag
+    (529/2353 = 22.5% of train) outnumbers insufficient_context (15/2353 = 0.6%) roughly 35:1, so
+    no_flag is the far more probable read of "the model didn't pick anything" even with zero
+    other signal. ST3_SYSTEM_PROMPT's own TASK section requires no_flag to be emitted explicitly
+    whenever no other check fires, so a genuinely empty list from that prompt is a compliance
+    slip against an instruction pointing at no_flag, not a sign of thin content.
+
+    `use_thin_override` (only set True on the --st3-only path -- see main(), since
+    ST3_SYSTEM_PROMPT and is_thin_segment()'s calibration are both scoped to st3-only prediction;
+    the joint st1/st2/st3 SYSTEM_PROMPT path is untouched by this override) additionally applies
+    the is_thin_segment() deterministic backstop:
+
+    insufficient_context turns out not to be something the model reliably self-reports: on a
+    held-out validation batch, GPT predicted a real violation flag -- never insufficient_context,
+    and never an empty list -- on every single genuine insufficient_context instance, apparently
+    driven by promotional links elsewhere in the description even when the transcript segment
+    itself carried no real content. A prompt-only fix (asking nicely) doesn't reach that;
+    is_thin_segment() is a cheap, deterministic backstop:
+
+    - if the segment is thin, insufficient_context wins outright, regardless of what the LLM
+      predicted (the "force" direction -- this is what actually fixes the failure above);
+    - if the segment is NOT thin, insufficient_context is stripped from the LLM's output even if
+      it predicted it (the "suppress" direction, for the rarer case of the model guessing this
+      label on a segment that isn't actually thin)."""
+    if use_thin_override:
+        if is_thin_segment(instance):
+            return ["insufficient_context"]
+        flags = [f for f in flags if f != "insufficient_context"]
+        standalone = [f for f in flags if f == "no_flag"]
+        if standalone and len(flags) > 1:
+            return [standalone[0]]
+        return flags or ["no_flag"]
+
     standalone = [f for f in flags if f in ("no_flag", "insufficient_context")]
     if standalone and len(flags) > 1:
         return [standalone[0]]
-    return flags or ["insufficient_context"]
+    return flags or ["no_flag"]
 
 
 MAX_FEW_SHOT_EXAMPLE_LEN = 300  # skip, don't truncate -- a chopped quote/excerpt reads as garbled
@@ -679,7 +939,7 @@ def main():
                 pred = {"st3": [f"error:{result}"]} if args.st3_only \
                     else {"st1": "other", "st2": [], "st3": [f"error:{result}"]}
             elif args.st3_only:
-                pred = {"st3": sanitize_st3(result.st3)}
+                pred = {"st3": sanitize_st3(result.st3, inst, use_thin_override=True)}
             else:
                 pred = {"st1": result.st1, "st2": result.st2, "st3": sanitize_st3(result.st3)}
             predictions.append(pred)
