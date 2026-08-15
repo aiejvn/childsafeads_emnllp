@@ -60,7 +60,20 @@ TRAIN_PATH = os.path.join(os.path.dirname(__file__), "..", "public_data_dev", "t
 # --few-shot pairs each of these labels' definition with a live train.jsonl example. Definitions
 # are parsed out of the `| T1.x | \`label\` | definition | ... |` rows in LABELS_TAXONOMY rather
 # than duplicated here, so they can't drift from the taxonomy file.
-FEW_SHOT_LABELS = ("direct_exhortation", "inadequate_disclosure", "insufficient_context")
+FEW_SHOT_LABELS = ("direct_exhortation", "inadequate_disclosure", "insufficient_context",
+                    "age_restricted_or_prohibited_product", "hfss_food_marketing", "undisclosed_advertising")
+
+# Worst-performing labels get extra exemplars beyond the --few-shot-n default. For n>1, the
+# first exemplar is always a "solo" instance (that flag is the ONLY st3 label -- see the
+# set(st3) != {label} check below); the rest come from any instance carrying the flag, solo
+# or not, since solo instances are scarce for some of these (13 for age_restricted_or_
+# prohibited_product, 9 for hfss_food_marketing, out of ~500 train instances that carry the flag).
+FEW_SHOT_N_OVERRIDES = {
+    "inadequate_disclosure": 2,
+    "age_restricted_or_prohibited_product": 2,
+    "hfss_food_marketing": 2,
+    "undisclosed_advertising": 2,
+}
 
 
 def parse_taxonomy_defs(taxonomy_text: str, labels) -> dict:
@@ -373,34 +386,45 @@ MAX_FEW_SHOT_EXAMPLE_LEN = 300  # skip, don't truncate -- a chopped quote/excerp
 
 
 def build_few_shot_section(train_path: str, log: logging.Logger, n_per_label: int = 1) -> str:
-    """n_per_label live examples per FEW_SHOT_LABELS, pulled from train.jsonl gold labels. Most
-    labels use the quote in labels.st3_evidence that earned the flag; insufficient_context has
-    no evidence quote (there's nothing to point at), so it uses a transcript excerpt instead.
-    For direct_exhortation and inadequate_disclosure specifically, only instances where that flag
-    is the SOLE st3 label are eligible -- a quote pulled from an instance that also carries other
-    flags shows the model a mixed case, not a clean exemplar of the boundary the flag is testing.
+    """n_per_label live examples per FEW_SHOT_LABELS (overridable per label via
+    FEW_SHOT_N_OVERRIDES), pulled from train.jsonl gold labels. Most labels use the quote in
+    labels.st3_evidence that earned the flag; insufficient_context has no evidence quote
+    (there's nothing to point at), so it uses a transcript excerpt instead.
+    For the evidence-quote labels, the FIRST exemplar collected is always a "solo" instance --
+    that flag is the SOLE st3 label on it, so it's a clean example of the boundary the flag is
+    testing rather than a mixed case. Once a label has its solo exemplar, further slots (for
+    labels with n>1) accept a quote from any instance carrying the flag, solo or not, since solo
+    instances are scarce for some labels.
     Candidates longer than MAX_FEW_SHOT_EXAMPLE_LEN are skipped rather than truncated, so every
     example shown is a complete, unmutilated quote/excerpt."""
     defs = parse_taxonomy_defs(LABELS_TAXONOMY, FEW_SHOT_LABELS)
+    target_n = {label: FEW_SHOT_N_OVERRIDES.get(label, n_per_label) for label in FEW_SHOT_LABELS}
+    evidence_labels = tuple(label for label in FEW_SHOT_LABELS if label != "insufficient_context")
     examples = {label: [] for label in FEW_SHOT_LABELS}
+    has_solo = {label: False for label in evidence_labels}
     for inst in load_split(train_path):
-        if all(len(v) >= n_per_label for v in examples.values()):
+        if all(len(v) >= target_n[label] for label, v in examples.items()):
             break
         labels = inst.get("labels")
         if not labels:
             continue
         st3 = labels.get("st3", [])
-        if "insufficient_context" in st3 and len(examples["insufficient_context"]) < n_per_label:
+        if "insufficient_context" in st3 and len(examples["insufficient_context"]) < target_n["insufficient_context"]:
             text = transcript_only(inst).strip()
             if text and len(text) <= MAX_FEW_SHOT_EXAMPLE_LEN:
                 examples["insufficient_context"].append(text)
         evidence = {ev["flag"]: ev["quote"] for ev in labels.get("st3_evidence", [])}
-        for label in ("direct_exhortation", "inadequate_disclosure"):
-            if set(st3) != {label}:
+        for label in evidence_labels:
+            if len(examples[label]) >= target_n[label]:
                 continue
             quote = evidence.get(label)
-            if quote and len(quote) <= MAX_FEW_SHOT_EXAMPLE_LEN and len(examples[label]) < n_per_label:
-                examples[label].append(quote)
+            if not quote or len(quote) > MAX_FEW_SHOT_EXAMPLE_LEN:
+                continue
+            is_solo = set(st3) == {label}
+            if not is_solo and not has_solo[label]:
+                continue  # keep looking for a solo exemplar before accepting a mixed one
+            examples[label].append(quote)
+            has_solo[label] = has_solo[label] or is_solo
 
     missing = [label for label, exs in examples.items() if not exs]
     if missing:
