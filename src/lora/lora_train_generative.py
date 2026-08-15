@@ -35,6 +35,7 @@ import logging
 import os
 import random
 import sys
+from collections import Counter
 from datetime import datetime
 
 import torch
@@ -45,10 +46,16 @@ from transformers import AutoTokenizer, get_linear_schedule_with_warmup
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))  # so `import lora` resolves src/lora as a package
 from common.dialog_flow import df_pre_context  # noqa: E402
 from common.predict_utils import log_prediction_diagnostics, write_submission  # noqa: E402
-from lora import CONTEXT_CHOICES, SFT_TAXONOMY, SYSTEM_PROMPT, evaluate, load_split, setup_logging  # noqa: E402
+from common.train_utils import compute_pos_weight  # noqa: E402
+from lora import (  # noqa: E402
+    CONTEXT_CHOICES, SFT_TAXONOMY, ST2_LABELS, ST3_LABELS, SYSTEM_PROMPT, SFT_TAXONOMY, SYSTEM_PROMPT \ 
+    evaluate, load_split, setup_logging,
+)
 from lora.lora_data import GenerativeCollator, GenerativeDataset  # noqa: E402
 from lora.lora_generative import generate_predictions  # noqa: E402
-from lora.lora_model import PARALLELISM_CHOICES, build_peft_model_causal, load_peft_model_causal  # noqa: E402
+from lora.lora_model import (  # noqa: E402
+    PARALLELISM_CHOICES, build_peft_model_causal, build_prompt_tuned_causal, load_peft_model_causal,
+)
 
 
 def to_device(batch: dict, device: str) -> dict:
@@ -107,6 +114,13 @@ def main():
                      "loss forward pass (logits.float() over the full sequence x vocab) is far more "
                      "memory-hungry than generate()'s one-token-at-a-time decode, so eval can usually run "
                      "at a much larger batch size than training without risking OOM")
+    ap.add_argument("--eval-every", type=int, default=1, help="run the dev generate()/evaluate() "
+                     "pass every N epochs instead of every epoch -- for runs with more epochs "
+                     "than usual where per-epoch eval cost dominates and per-epoch best-checkpoint "
+                     "selection at that granularity isn't needed. The last epoch is always "
+                     "evaluated/checkpointed regardless of N, so a best checkpoint always exists. "
+                     "1 (default) reproduces the original every-epoch behavior; pass --epochs to "
+                     "eval only once, at the end")
     ap.add_argument("--grad-accum-steps", type=int, default=4)
     ap.add_argument("--lr", type=float, default=2e-4)
     ap.add_argument("--warmup-ratio", type=float, default=0.06)
@@ -114,11 +128,55 @@ def main():
     ap.add_argument("--lora-alpha", type=int, default=16)
     ap.add_argument("--lora-dropout", type=float, default=0.1)
     ap.add_argument("--target-modules", default="q_proj,v_proj", help="comma-separated module names to LoRA-adapt")
+    ap.add_argument("--peft-method", choices=("lora", "prompt_tuning"), default="lora", help="lora "
+                     "(default) LoRA-adapts --target-modules' weight matrices, entirely separate "
+                     "trainable parameters from the base model's own embeddings/layers. "
+                     "prompt_tuning instead freezes the whole base model and trains only "
+                     "--num-virtual-tokens continuous embedding vectors prepended to every "
+                     "input -- a different mechanism, --lora-r/--lora-alpha/--lora-dropout/"
+                     "--target-modules are ignored in this mode")
+    ap.add_argument("--num-virtual-tokens", type=int, default=20, help="prompt_tuning only: "
+                     "how many trainable virtual-token embeddings to prepend to every input")
+    ap.add_argument("--prompt-tuning-init-text", default=None, help="prompt_tuning only: seed "
+                     "the virtual tokens by tokenizing this text instead of random init (tends "
+                     "to converge faster/more reliably); omit for random init")
     ap.add_argument("--st3-loss-weight", type=float, default=1.0, help="multiply the next-token "
                      "CE loss on the completion's \"st3\":[...] span by this factor (st1/st2 "
                      "tokens are unaffected). st3 is this task's weakest, most class-imbalanced "
                      "subtask (insufficient_context/hfss_food_marketing/age_restricted are all "
                      "under 3%% of train); default 1.0 reproduces the unweighted loss exactly")
+    ap.add_argument("--pos-weight", action="store_true", help="reweight each st2/st3 label's "
+                     "own completion-token span by its inverse train-set frequency (same "
+                     "neg/pos-per-label computation as lora_train.py's --pos-weight for the "
+                     "encoder/BCE path, adapted here to per-token CE weighting -- see "
+                     "common.train_utils.compute_pos_weight). Composes with --st3-loss-weight "
+                     "(multiplicative): pos-weight corrects imbalance within st2/st3, "
+                     "st3-loss-weight is an additional flat multiplier for the whole st3 field")
+    ap.add_argument("--oversample-rare-st3", type=int, default=1, help="duplicate each train "
+                     "instance this many times over if its st3 list contains a label under 5%% "
+                     "train frequency (insufficient_context/hfss_food_marketing/"
+                     "age_restricted_or_prohibited_product on this dataset). Unlike "
+                     "--pos-weight/--st3-loss-weight, which scale the loss magnitude of each "
+                     "existing exposure, this changes how often the model sees these examples "
+                     "per epoch -- a different mechanism, can be combined with either. 1 "
+                     "(default) disables oversampling")
+    ap.add_argument("--st3-only", action="store_true", help="train/predict on st3 alone: the "
+                     "completion is \"{\\\"st3\\\":[...]}\" instead of the full st1/st2/st3 "
+                     "object, so every completion token trains st3 -- none are spent on "
+                     "subtasks this run isn't scoring. st1/st2 in the logged metrics are a "
+                     "fixed placeholder (\"other\"/[]), not meaningful predictions -- read "
+                     "st3_macro_f1/st3_family_macro_f1 only, and note that mean_macro_f1 and "
+                     "best-checkpoint selection both switch to st3_macro_f1 in this mode "
+                     "(mean_macro_f1 would otherwise average in the meaningless placeholder)")
+    ap.add_argument("--st12-only", action="store_true", help="mirror of --st3-only: train/predict "
+                     "on st1+st2 alone, dropping st3 entirely from the completion "
+                     "(\"{\\\"st1\\\":...,\\\"st2\\\":[...]}\") so every completion token trains "
+                     "st1/st2 -- none are spent on st3, which this run isn't scoring. st3 in the "
+                     "logged metrics is a fixed placeholder (sanitize_st3([]), i.e. "
+                     "[\"insufficient_context\"]), not a meaningful prediction -- read "
+                     "st1_macro_f1/st2_macro_f1 only; best-checkpoint selection switches to "
+                     "mean(st1_macro_f1, st2_macro_f1) in this mode. Mutually exclusive with "
+                     "--st3-only")
     ap.add_argument("--load-in-4bit", action="store_true", help="QLoRA via bitsandbytes (must be installed separately)")
     ap.add_argument("--parallelism", choices=PARALLELISM_CHOICES, default="none", help="split the model "
                      "across GPUs (requires >=2): \"pipeline\" shards layers via device_map=\"auto\"; \"tensor\" "
@@ -143,6 +201,8 @@ def main():
                      "the best/last adapter checkpoints (<checkpoint-save-path>/best, "
                      "<checkpoint-save-path>/last); defaults to --output-dir")
     args = ap.parse_args()
+    if args.st3_only and args.st12_only:
+        ap.error("--st3-only and --st12-only are mutually exclusive")
 
     torch.manual_seed(args.seed)
     device = args.device or ("cuda" if torch.cuda.is_available() else "cpu")
@@ -175,6 +235,18 @@ def main():
         dev_instances = rng.sample(dev_instances, min(args.sample_size, len(dev_instances)))
     log.info(f"train={len(train_instances)} dev={len(dev_instances)}")
 
+    if args.oversample_rare_st3 > 1:
+        st3_freq = Counter(flag for inst in train_instances for flag in inst["labels"]["st3"])
+        rare_st3 = {label for label, c in st3_freq.items() if c / len(train_instances) < 0.05}
+        oversampled = []
+        for inst in train_instances:
+            oversampled.append(inst)
+            if rare_st3.intersection(inst["labels"]["st3"]):
+                oversampled += [inst] * (args.oversample_rare_st3 - 1)
+        log.info(f"oversampling rare st3 labels {sorted(rare_st3)} {args.oversample_rare_st3}x: "
+                 f"train {len(train_instances)} -> {len(oversampled)}")
+        train_instances = oversampled
+
     model_path = args.model_path or os.path.join("models", args.model)
     if not os.path.isdir(model_path):
         raise FileNotFoundError(
@@ -189,11 +261,18 @@ def main():
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
-    model = build_peft_model_causal(
-        model_path, lora_r=args.lora_r, lora_alpha=args.lora_alpha, lora_dropout=args.lora_dropout,
-        target_modules=args.target_modules.split(","), load_in_4bit=args.load_in_4bit, device=device,
-        local_files_only=True, parallelism=args.parallelism,
-    )
+    if args.peft_method == "prompt_tuning":
+        model = build_prompt_tuned_causal(
+            model_path, num_virtual_tokens=args.num_virtual_tokens,
+            prompt_tuning_init_text=args.prompt_tuning_init_text, tokenizer_path=model_path,
+            load_in_4bit=args.load_in_4bit, device=device, local_files_only=True, parallelism=args.parallelism,
+        )
+    else:
+        model = build_peft_model_causal(
+            model_path, lora_r=args.lora_r, lora_alpha=args.lora_alpha, lora_dropout=args.lora_dropout,
+            target_modules=args.target_modules.split(","), load_in_4bit=args.load_in_4bit, device=device,
+            local_files_only=True, parallelism=args.parallelism,
+        )
     if args.parallelism == "none" and not args.load_in_4bit:
         model = model.to(device)
     model.print_trainable_parameters()
@@ -207,11 +286,31 @@ def main():
     log.info(f"system prompt: {'lean' if args.lean_prompt else 'full'} ({len(system_prompt)} chars)"
              + (f" + dialog flow from {args.df_path} ({len(df_text)} chars)" if df_text else ""))
 
+    st2_pos_weight = st3_pos_weight = None
+    if args.pos_weight:
+        st2_pos_weight = dict(zip(ST2_LABELS, compute_pos_weight(train_instances, "st2", ST2_LABELS).tolist()))
+        st3_pos_weight = dict(zip(ST3_LABELS, compute_pos_weight(train_instances, "st3", ST3_LABELS).tolist()))
+        log.info(f"pos_weight st2: {st2_pos_weight}")
+        log.info(f"pos_weight st3: {st3_pos_weight}")
+
+    if args.st3_only:
+        log.info("--st3-only: completion is {\"st3\":[...]} alone; st1/st2 in logged metrics "
+                 "are a fixed placeholder, read st3_macro_f1/st3_family_macro_f1 only; "
+                 "best-checkpoint selection uses st3_macro_f1 instead of mean_macro_f1")
+    if args.st12_only:
+        log.info("--st12-only: completion is {\"st1\":...,\"st2\":[...]} alone; st3 in logged "
+                 "metrics is a fixed placeholder, read st1_macro_f1/st2_macro_f1 only; "
+                 "best-checkpoint selection uses mean(st1_macro_f1, st2_macro_f1) instead of "
+                 "mean_macro_f1")
+
     collate = GenerativeCollator(tokenizer)
     train_ds = GenerativeDataset(train_instances, tokenizer, args.context, args.max_length,
-                                 system_prompt, df_text, st3_loss_weight=args.st3_loss_weight)
+                                 system_prompt, df_text, st3_loss_weight=args.st3_loss_weight,
+                                 st2_pos_weight=st2_pos_weight, st3_pos_weight=st3_pos_weight,
+                                 st3_only=args.st3_only, st12_only=args.st12_only)
     dev_ds = GenerativeDataset(dev_instances, tokenizer, args.context, args.max_length,
-                               system_prompt, df_text)
+                               system_prompt, df_text, st3_only=args.st3_only,
+                               st12_only=args.st12_only, include_completion=False)
     train_loader = DataLoader(train_ds, batch_size=args.batch_size, shuffle=True, collate_fn=collate)
     eval_batch_size = args.eval_batch_size or args.batch_size
     dev_loader = DataLoader(dev_ds, batch_size=eval_batch_size, shuffle=False, collate_fn=collate)
@@ -227,14 +326,28 @@ def main():
     checkpoint_dir = args.checkpoint_save_path or args.output_dir
     best_f1 = -1.0
     os.makedirs(checkpoint_dir, exist_ok=True)
+    # prompt_tuning prepends num_virtual_tokens learned embeddings ahead of every input
+    # internally, so the logits this call returns are num_virtual_tokens longer than
+    # input_ids/labels -- pad labels/loss_weight to match (-100/0.0, both ignored by
+    # weighted_lm_loss's mask) rather than passing labels= and relying on peft's own
+    # internal auto-padding, which we can't route our per-token loss_weight through anyway.
+    virtual_prefix = args.num_virtual_tokens if args.peft_method == "prompt_tuning" else 0
     for epoch in range(args.epochs):
         model.train()
         tokenizer.padding_side = "right"  # loss-masked labels must line up token-for-token
         running_loss = 0.0
+        train_seq_lens = []
         for step, batch in enumerate(tqdm(train_loader, desc=f"epoch {epoch + 1}/{args.epochs}", disable=not is_main)):
             batch = to_device(batch, model.device)
+            train_seq_lens.extend(batch["attention_mask"].sum(dim=1).tolist())
+            labels, loss_weight = batch["labels"], batch["loss_weight"]
+            if virtual_prefix:
+                pad_labels = torch.full((labels.shape[0], virtual_prefix), -100, dtype=labels.dtype, device=labels.device)
+                pad_weight = torch.zeros((loss_weight.shape[0], virtual_prefix), dtype=loss_weight.dtype, device=loss_weight.device)
+                labels = torch.cat([pad_labels, labels], dim=1)
+                loss_weight = torch.cat([pad_weight, loss_weight], dim=1)
             out = model(input_ids=batch["input_ids"], attention_mask=batch["attention_mask"])
-            raw_loss = weighted_lm_loss(out.logits, batch["labels"], batch["loss_weight"])
+            raw_loss = weighted_lm_loss(out.logits, labels, loss_weight)
             loss = raw_loss / args.grad_accum_steps
             loss.backward()
             running_loss += raw_loss.item()
@@ -244,9 +357,20 @@ def main():
                 scheduler.step()
                 optimizer.zero_grad()
         log.info(f"epoch {epoch + 1}: mean train loss = {running_loss / len(train_loader):.4f}")
+        log.info(f"epoch {epoch + 1}: train input length (tokens, unpadded) -- "
+                 f"min={min(train_seq_lens)} mean={sum(train_seq_lens) / len(train_seq_lens):.0f} "
+                 f"max={max(train_seq_lens)} n={len(train_seq_lens)}")
+
+        if (epoch + 1) % args.eval_every != 0 and epoch + 1 < args.epochs:
+            continue  # dev eval skipped this epoch per --eval-every; last epoch always runs it
 
         tokenizer.padding_side = "left"  # batched model.generate() needs left-padding
-        ids, preds = generate_predictions(model, dev_loader, tokenizer, args.max_new_tokens)
+        ids, preds = generate_predictions(model, dev_loader, tokenizer, args.max_new_tokens,
+                                          st3_only=args.st3_only, st12_only=args.st12_only, log=log)
+        torch.cuda.empty_cache()  # generate()'s KV-cache/activation memory is cached by the
+        # allocator, not returned to the driver on its own -- release it now so a concurrent
+        # process on this GPU can use it, and so the next epoch's training resumes from the
+        # same VRAM baseline rather than accumulating eval-time high-water marks
         gold = [inst["labels"] for inst in dev_instances]
         metrics = evaluate(gold, preds)
         scalar_metrics = {k: v for k, v in metrics.items() if k != "per_label_f1"}
@@ -256,8 +380,14 @@ def main():
                      + ", ".join(f"{label}={f1:.3f}" for label, f1 in sorted(per_label.items())))
         log_prediction_diagnostics(log, gold, preds)
 
-        if metrics["mean_macro_f1"] > best_f1:
-            best_f1 = metrics["mean_macro_f1"]
+        if args.st3_only:
+            selection_metric = metrics["st3_macro_f1"]
+        elif args.st12_only:
+            selection_metric = (metrics["st1_macro_f1"] + metrics["st2_macro_f1"]) / 2
+        else:
+            selection_metric = metrics["mean_macro_f1"]
+        if selection_metric > best_f1:
+            best_f1 = selection_metric
             best_dev_scalar_metrics = scalar_metrics
             if is_main:  # avoid every rank racing to write the same adapter dir under --parallelism tensor
                 best_dir = os.path.join(checkpoint_dir, "best")
@@ -266,11 +396,15 @@ def main():
                     os.path.join(best_dir, "submission.jsonl"), os.path.join(best_dir, "submission_error.jsonl"),
                     ids, dev_instances, preds,
                 )
-                log.info(f"epoch {epoch + 1}: new best mean_macro_f1={best_f1:.3f}, saved to {checkpoint_dir}/best")
+                selection_name = "st3_macro_f1" if args.st3_only else (
+                    "mean(st1,st2)_macro_f1" if args.st12_only else "mean_macro_f1")
+                log.info(f"epoch {epoch + 1}: new best {selection_name}={best_f1:.3f}, saved to {checkpoint_dir}/best")
 
     if is_main:
         model.save_pretrained(os.path.join(checkpoint_dir, "last"))
-        log.info(f"saved final epoch adapter to {checkpoint_dir}/last (best dev mean_macro_f1={best_f1:.3f})")
+        selection_name = "st3_macro_f1" if args.st3_only else (
+            "mean(st1,st2)_macro_f1" if args.st12_only else "mean_macro_f1")
+        log.info(f"saved final epoch adapter to {checkpoint_dir}/last (best dev {selection_name}={best_f1:.3f})")
         log.info("best dev metrics: " + ", ".join(f"{k}={v:.3f}" for k, v in best_dev_scalar_metrics.items()))
 
         if test_holdout_instances:
@@ -287,10 +421,16 @@ def main():
             tokenizer.padding_side = "left"
             test_loader = DataLoader(
                 GenerativeDataset(test_holdout_instances, tokenizer, args.context, args.max_length,
-                                  system_prompt, df_text),
+                                  system_prompt, df_text, st3_only=args.st3_only,
+                                  st12_only=args.st12_only, include_completion=False),
                 batch_size=eval_batch_size, shuffle=False, collate_fn=collate,
             )
-            test_ids, test_preds = generate_predictions(test_model, test_loader, tokenizer, args.max_new_tokens)
+            test_ids, test_preds = generate_predictions(
+                test_model, test_loader, tokenizer, args.max_new_tokens,
+                st3_only=args.st3_only, st12_only=args.st12_only, log=log,
+            )
+            del test_model  # separate model instance from the training `model`, both briefly
+            torch.cuda.empty_cache()  # resident together -- free it as soon as its one pass is done
             test_gold = [inst["labels"] for inst in test_holdout_instances]
             test_metrics = evaluate(test_gold, test_preds)
             test_scalar_metrics = {k: v for k, v in test_metrics.items() if k != "per_label_f1"}

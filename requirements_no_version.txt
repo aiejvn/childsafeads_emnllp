@@ -110,6 +110,8 @@ requests-toolbelt
 rich
 rpds-py
 safetensors
+scikit-learn
+scipy
 sentry-sdk
 setuptools
 shellingham
@@ -117,6 +119,7 @@ six
 sniffio
 sortedcontainers
 sympy
+xgboost
 tenacity
 tiktoken
 tokenizers

@@ -28,18 +28,58 @@ _SEGMENT_PLACEHOLDER = "\x00SEGMENT_TEXT\x00"  # never occurs in real transcript
 def format_completion(labels: dict) -> str:
     """Gold st1/st2/st3 rendered as JSON matching baseline_gpt.py's `Prediction` schema --
     this is the text the causal LM is trained to generate."""
-    prefix, st3_part = format_completion_parts(labels)
-    return prefix + st3_part
+    return "".join(text for text, _ in format_completion_chunks(labels))
 
 
-def format_completion_parts(labels: dict) -> tuple:
-    """Same rendering as format_completion, split right before the "st3" key so callers
-    (GenerativeDataset) can tokenize the st3 span separately and weight its loss
-    differently -- see --st3-loss-weight in lora_train_generative.py. Concatenating the
-    two strings reproduces format_completion's output exactly."""
-    prefix = json.dumps({"st1": labels["st1"], "st2": sorted(labels["st2"])}, separators=(",", ":"))[:-1] + ","
-    st3_part = json.dumps({"st3": sorted(labels["st3"])}, separators=(",", ":"))[1:]
-    return prefix, st3_part
+def _quoted_label_chunks(labels_sorted: list, weights: dict) -> list:
+    """[(text, weight), ...] for a JSON array of quoted label strings (no brackets --
+    the caller supplies those), e.g. ["a","b"] -> [('"a"', w_a), (',', 1.0), ('"b"', w_b)]."""
+    chunks = []
+    for i, label in enumerate(labels_sorted):
+        if i > 0:
+            chunks.append((",", 1.0))
+        chunks.append((json.dumps(label), weights.get(label, 1.0)))
+    return chunks
+
+
+def format_completion_chunks(
+    labels: dict, st2_weights: dict = None, st3_weights: dict = None, st3_only: bool = False,
+    st12_only: bool = False,
+) -> list:
+    """Same rendering as format_completion, split into (text, weight) chunks whose
+    concatenated text reproduces format_completion(labels) exactly. Each st2/st3 label's
+    own quoted-string token span carries that label's weight (`weights.get(label, 1.0)`);
+    st1 and all JSON punctuation stay at weight 1.0. `st2_weights`/`st3_weights` are
+    {label: weight} dicts -- e.g. inverse-train-frequency from --pos-weight, or a flat
+    per-field multiplier like --st3-loss-weight. Used by GenerativeDataset to build a
+    per-token loss_weight array for a custom weighted cross-entropy (see
+    lora_train_generative.py's weighted_lm_loss).
+
+    `st3_only` drops st1/st2 from the completion entirely -- `{"st3":[...]}` instead of
+    the full three-key object -- so every completion token trains st3 specifically (see
+    --st3-only in lora_train_generative.py). Pairs with lora_generative.py's
+    St3OnlyPrediction, which parses this shorter schema back out at decode time.
+
+    `st12_only` is the mirror image: drops st3, leaving `{"st1":...,"st2":[...]}`, so
+    every completion token trains st1/st2 (see --st12-only). Mutually exclusive with
+    st3_only. Pairs with lora_generative.py's St12OnlyPrediction."""
+    st2_weights, st3_weights = st2_weights or {}, st3_weights or {}
+    if st3_only:
+        chunks = [('{"st3":[', 1.0)]
+        chunks += _quoted_label_chunks(sorted(labels["st3"]), st3_weights)
+        chunks.append(("]}", 1.0))
+        return chunks
+    if st12_only:
+        chunks = [(json.dumps({"st1": labels["st1"]}, separators=(",", ":"))[:-1] + ',"st2":[', 1.0)]
+        chunks += _quoted_label_chunks(sorted(labels["st2"]), st2_weights)
+        chunks.append(("]}", 1.0))
+        return chunks
+    chunks = [(json.dumps({"st1": labels["st1"]}, separators=(",", ":"))[:-1] + ',"st2":[', 1.0)]
+    chunks += _quoted_label_chunks(sorted(labels["st2"]), st2_weights)
+    chunks.append(('],"st3":[', 1.0))
+    chunks += _quoted_label_chunks(sorted(labels["st3"]), st3_weights)
+    chunks.append(("]}", 1.0))
+    return chunks
 
 
 class GenerativeDataset(Dataset):
@@ -63,12 +103,32 @@ class GenerativeDataset(Dataset):
     """
 
     def __init__(self, instances: list, tokenizer, context: str = "full", max_length: int = 4096,
-                 system_prompt: str = SYSTEM_PROMPT, df_text: str = None, st3_loss_weight: float = 1.0):
+                 system_prompt: str = SYSTEM_PROMPT, df_text: str = None, st3_loss_weight: float = 1.0,
+                 st2_pos_weight: dict = None, st3_pos_weight: dict = None, st3_only: bool = False,
+                 st12_only: bool = False, include_completion: bool = True):
         self.instances = instances
         self.tokenizer = tokenizer
+        self.st3_only = st3_only
+        self.st12_only = st12_only
+        # Whether to append the gold completion to input_ids. True for training (the
+        # completion IS the supervision signal). Must be False for anything headed into
+        # model.generate() -- dev/test instances carry gold "labels" too (needed for
+        # scoring, fetched separately from the raw instance dicts, never from this
+        # dataset's per-item "labels" tensor), so `if labels:` alone can't tell training
+        # and generation-time use apart. Getting this wrong means generate() is handed a
+        # prompt with the correct answer already written into it, and "predicts" a
+        # continuation *after* its own gold answer -- inflated, invalid eval numbers.
+        self.include_completion = include_completion
         self.context = context
         self.max_length = max_length
         self.st3_loss_weight = st3_loss_weight
+        self.st2_pos_weight = st2_pos_weight or {}
+        # st3_loss_weight (a flat --st3-loss-weight multiplier) and st3_pos_weight (per-label
+        # inverse-frequency from --pos-weight) compose multiplicatively: pos_weight corrects
+        # for imbalance *within* st3, st3_loss_weight expresses that the whole st3 subtask
+        # matters more than st1/st2 -- independent, both apply if both are set.
+        self.st3_pos_weight = {k: v * st3_loss_weight for k, v in (st3_pos_weight or {}).items()}
+        self.default_st3_weight = st3_loss_weight
         # df_text joins the system message rather than going in front of the per-instance
         # text the way ClassificationDataset prepends it. It is identical for every
         # instance, so it belongs with the rest of the fixed scaffolding: tokenized once
@@ -117,24 +177,26 @@ class GenerativeDataset(Dataset):
 
         item = {"instanceID": inst["instanceID"]}
         labels = inst.get("labels")
-        if labels:
-            # st3 tokenized separately from the st1/st2 prefix (same splice-and-concatenate
-            # approach as prefix_ids/suffix_ids above) so its tokens can carry a different
-            # loss weight -- st3 is this task's weakest, most-imbalanced subtask, see
-            # --st3-loss-weight.
-            prefix_str, st3_str = format_completion_parts(labels)
-            prefix_completion_ids = self.tokenizer(prefix_str, add_special_tokens=False)["input_ids"]
-            st3_completion_ids = self.tokenizer(st3_str, add_special_tokens=False)["input_ids"]
-            eos_ids = [self.tokenizer.eos_token_id]
-            completion_ids = prefix_completion_ids + st3_completion_ids + eos_ids
+        if labels and self.include_completion:
+            # Each st2/st3 label's own quoted-string token span is tokenized separately
+            # (same splice-and-concatenate approach as prefix_ids/suffix_ids above) so it
+            # can carry its own loss weight -- inverse-train-frequency per label
+            # (--pos-weight) and/or a flat st3-wide multiplier (--st3-loss-weight).
+            st2_weights = {l: self.st2_pos_weight.get(l, 1.0) for l in labels["st2"]}
+            st3_weights = {l: self.st3_pos_weight.get(l, self.default_st3_weight) for l in labels["st3"]}
+            chunks = format_completion_chunks(labels, st2_weights, st3_weights, st3_only=self.st3_only,
+                                              st12_only=self.st12_only)
+            completion_ids, weight_per_tok = [], []
+            for text, weight in chunks:
+                ids = self.tokenizer(text, add_special_tokens=False)["input_ids"]
+                completion_ids += ids
+                weight_per_tok += [weight] * len(ids)
+            completion_ids.append(self.tokenizer.eos_token_id)
+            weight_per_tok.append(1.0)
             item["input_ids"] = prompt_ids + completion_ids
             item["attention_mask"] = [1] * len(item["input_ids"])
             item["labels"] = [-100] * len(prompt_ids) + completion_ids
-            item["loss_weight"] = (
-                [1.0] * (len(prompt_ids) + len(prefix_completion_ids))
-                + [self.st3_loss_weight] * len(st3_completion_ids)
-                + [1.0] * len(eos_ids)
-            )
+            item["loss_weight"] = [1.0] * len(prompt_ids) + weight_per_tok
         else:
             item["input_ids"] = prompt_ids
             item["attention_mask"] = [1] * len(prompt_ids)

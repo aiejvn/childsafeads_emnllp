@@ -1,0 +1,39 @@
+2026-08-14 06:14:26,346 | INFO | MainThread | logging to runs/baseline_decision_tree/run_20260814_061426_decision_tree_sklearn.log
+2026-08-14 06:14:26,634 | INFO | MainThread | split_seed=42 train=1853 test_holdout=500 dev=504
+2026-08-14 06:14:39,660 | INFO | MainThread | engineered 28 structural features: ['age_restricted__adult_sex_toys', 'age_restricted__alcohol', 'age_restricted__betting_gambling', 'age_restricted__energy_caffeine', 'age_restricted__other_restricted', 'age_restricted__skin_gambling', 'age_restricted__thc_cbd', 'age_restricted__vaping_nicotine', 'description_has_disclosure_lang', 'disclosure_only_in_description', 'disclosure_relative_position', 'guarantee_promise_hit', 'has_product_page', 'hfss__candy_subscription_brand', 'hfss__energy_drink_brand', 'hfss__misc_candy_soda', 'imperative_verb_count', 'imperative_verb_density', 'imperative_zero', 'numeric_comparative_claim_hit', 'official_disclosure_false', 'official_disclosure_missing', 'official_disclosure_true', 'superlative_hit', 'transcript_char_len', 'transcript_has_disclosure_lang', 'transcript_near_empty', 'transcript_word_len']
+2026-08-14 06:14:47,493 | INFO | MainThread |   grid estimator=tree params={'max_depth': 4, 'min_samples_leaf': 1, 'n_estimators': None} -> dev_st3_macro_f1=0.365
+2026-08-14 06:14:47,834 | INFO | MainThread |   grid estimator=tree params={'max_depth': 4, 'min_samples_leaf': 2, 'n_estimators': None} -> dev_st3_macro_f1=0.363
+2026-08-14 06:14:48,191 | INFO | MainThread |   grid estimator=tree params={'max_depth': 4, 'min_samples_leaf': 5, 'n_estimators': None} -> dev_st3_macro_f1=0.361
+2026-08-14 06:14:48,619 | INFO | MainThread |   grid estimator=tree params={'max_depth': 6, 'min_samples_leaf': 1, 'n_estimators': None} -> dev_st3_macro_f1=0.389
+2026-08-14 06:14:49,043 | INFO | MainThread |   grid estimator=tree params={'max_depth': 6, 'min_samples_leaf': 2, 'n_estimators': None} -> dev_st3_macro_f1=0.391
+2026-08-14 06:14:49,463 | INFO | MainThread |   grid estimator=tree params={'max_depth': 6, 'min_samples_leaf': 5, 'n_estimators': None} -> dev_st3_macro_f1=0.368
+2026-08-14 06:14:49,972 | INFO | MainThread |   grid estimator=tree params={'max_depth': 8, 'min_samples_leaf': 1, 'n_estimators': None} -> dev_st3_macro_f1=0.386
+2026-08-14 06:14:50,492 | INFO | MainThread |   grid estimator=tree params={'max_depth': 8, 'min_samples_leaf': 2, 'n_estimators': None} -> dev_st3_macro_f1=0.387
+2026-08-14 06:14:50,961 | INFO | MainThread |   grid estimator=tree params={'max_depth': 8, 'min_samples_leaf': 5, 'n_estimators': None} -> dev_st3_macro_f1=0.391
+2026-08-14 06:14:51,521 | INFO | MainThread |   grid estimator=tree params={'max_depth': 10, 'min_samples_leaf': 1, 'n_estimators': None} -> dev_st3_macro_f1=0.370
+2026-08-14 06:14:52,062 | INFO | MainThread |   grid estimator=tree params={'max_depth': 10, 'min_samples_leaf': 2, 'n_estimators': None} -> dev_st3_macro_f1=0.378
+2026-08-14 06:14:52,597 | INFO | MainThread |   grid estimator=tree params={'max_depth': 10, 'min_samples_leaf': 5, 'n_estimators': None} -> dev_st3_macro_f1=0.388
+2026-08-14 06:14:53,217 | INFO | MainThread |   grid estimator=tree params={'max_depth': 15, 'min_samples_leaf': 1, 'n_estimators': None} -> dev_st3_macro_f1=0.348
+2026-08-14 06:14:53,893 | INFO | MainThread |   grid estimator=tree params={'max_depth': 15, 'min_samples_leaf': 2, 'n_estimators': None} -> dev_st3_macro_f1=0.346
+2026-08-14 06:14:54,503 | INFO | MainThread |   grid estimator=tree params={'max_depth': 15, 'min_samples_leaf': 5, 'n_estimators': None} -> dev_st3_macro_f1=0.374
+2026-08-14 06:14:55,342 | INFO | MainThread |   grid estimator=tree params={'max_depth': None, 'min_samples_leaf': 1, 'n_estimators': None} -> dev_st3_macro_f1=0.304
+2026-08-14 06:14:56,122 | INFO | MainThread |   grid estimator=tree params={'max_depth': None, 'min_samples_leaf': 2, 'n_estimators': None} -> dev_st3_macro_f1=0.323
+2026-08-14 06:14:56,664 | INFO | MainThread |   grid estimator=tree params={'max_depth': None, 'min_samples_leaf': 5, 'n_estimators': None} -> dev_st3_macro_f1=0.363
+2026-08-14 06:15:02,529 | INFO | MainThread |   grid estimator=forest params={'max_depth': None, 'min_samples_leaf': 1, 'n_estimators': 200} -> dev_st3_macro_f1=0.479
+2026-08-14 06:15:16,915 | INFO | MainThread |   grid estimator=forest params={'max_depth': None, 'min_samples_leaf': 1, 'n_estimators': 500} -> dev_st3_macro_f1=0.495
+2026-08-14 06:15:22,387 | INFO | MainThread |   grid estimator=forest params={'max_depth': None, 'min_samples_leaf': 2, 'n_estimators': 200} -> dev_st3_macro_f1=0.512
+2026-08-14 06:15:36,071 | INFO | MainThread |   grid estimator=forest params={'max_depth': None, 'min_samples_leaf': 2, 'n_estimators': 500} -> dev_st3_macro_f1=0.459
+2026-08-14 06:15:40,673 | INFO | MainThread |   grid estimator=forest params={'max_depth': None, 'min_samples_leaf': 5, 'n_estimators': 200} -> dev_st3_macro_f1=0.475
+2026-08-14 06:15:51,411 | INFO | MainThread |   grid estimator=forest params={'max_depth': None, 'min_samples_leaf': 5, 'n_estimators': 500} -> dev_st3_macro_f1=0.478
+2026-08-14 06:15:55,070 | INFO | MainThread |   grid estimator=forest params={'max_depth': 10, 'min_samples_leaf': 1, 'n_estimators': 200} -> dev_st3_macro_f1=0.477
+2026-08-14 06:16:04,062 | INFO | MainThread |   grid estimator=forest params={'max_depth': 10, 'min_samples_leaf': 1, 'n_estimators': 500} -> dev_st3_macro_f1=0.476
+2026-08-14 06:16:07,596 | INFO | MainThread |   grid estimator=forest params={'max_depth': 10, 'min_samples_leaf': 2, 'n_estimators': 200} -> dev_st3_macro_f1=0.485
+2026-08-14 06:16:16,482 | INFO | MainThread |   grid estimator=forest params={'max_depth': 10, 'min_samples_leaf': 2, 'n_estimators': 500} -> dev_st3_macro_f1=0.473
+2026-08-14 06:16:19,994 | INFO | MainThread |   grid estimator=forest params={'max_depth': 10, 'min_samples_leaf': 5, 'n_estimators': 200} -> dev_st3_macro_f1=0.503
+2026-08-14 06:16:27,947 | INFO | MainThread |   grid estimator=forest params={'max_depth': 10, 'min_samples_leaf': 5, 'n_estimators': 500} -> dev_st3_macro_f1=0.438
+2026-08-14 06:16:33,285 | INFO | MainThread |   grid estimator=forest params={'max_depth': 20, 'min_samples_leaf': 1, 'n_estimators': 200} -> dev_st3_macro_f1=0.446
+2026-08-14 06:16:46,241 | INFO | MainThread |   grid estimator=forest params={'max_depth': 20, 'min_samples_leaf': 1, 'n_estimators': 500} -> dev_st3_macro_f1=0.478
+2026-08-14 06:16:51,207 | INFO | MainThread |   grid estimator=forest params={'max_depth': 20, 'min_samples_leaf': 2, 'n_estimators': 200} -> dev_st3_macro_f1=0.488
+2026-08-14 06:17:03,477 | INFO | MainThread |   grid estimator=forest params={'max_depth': 20, 'min_samples_leaf': 2, 'n_estimators': 500} -> dev_st3_macro_f1=0.470
+2026-08-14 06:17:07,608 | INFO | MainThread |   grid estimator=forest params={'max_depth': 20, 'min_samples_leaf': 5, 'n_estimators': 200} -> dev_st3_macro_f1=0.469
+2026-08-14 06:17:18,458 | INFO | MainThread |   grid estimator=forest params={'max_depth': 20, 'min_samples_leaf': 5, 'n_estimators': 500} -> dev_st3_macro_f1=0.447
