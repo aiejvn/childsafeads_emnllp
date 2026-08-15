@@ -392,13 +392,13 @@ lands, not how many times it repeats. The flag is for disclosures a child would 
 miss or fail to understand (buried, late, written-only, or boilerplate-only), not for every
 commercial acknowledgment that exists.
 
-Worked example -- ADEQUATE, do NOT flag: transcript opens "oh today's episode is sponsored
-by expressvpn, your online activity shouldn't be public, protect it now at expressvpn.com"
-before the segment moves on to unrelated content. This is spoken, is the very first thing
-said, and names the sponsor in plain language -- that is adequate on its own. The fact that
-it is short, said only once, and not the focus of the rest of the segment does NOT make it
-inadequate. Only flag `inadequate_disclosure` here if this sentence were ABSENT from the
-transcript and the sponsorship appeared only in the written description.
+Worked example -- ADEQUATE, do NOT flag: transcript opens "hey everyone, quick shoutout -- this
+video is sponsored by a company called Glowpeak, they make portable phone chargers" before the
+segment moves on to unrelated content. This is spoken, is the very first thing said, and names
+the sponsor in plain language -- that is adequate on its own. The fact that it is short, said
+only once, and not the focus of the rest of the segment does NOT make it inadequate. Only flag
+`inadequate_disclosure` here if this sentence were ABSENT from the transcript and the
+sponsorship appeared only in the written description.
 
 Worked example -- INADEQUATE, DO flag: the transcript never mentions any commercial
 relationship; the only disclosure is a hashtag ("#ad") or a legal boilerplate line ("as an
