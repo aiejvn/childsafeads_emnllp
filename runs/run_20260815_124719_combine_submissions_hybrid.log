@@ -1,0 +1,28 @@
+2026-08-15 12:47:19,271 | INFO | MainThread | logging to runs/run_20260815_124719_combine_submissions_hybrid.log
+2026-08-15 12:47:19,271 | INFO | MainThread | sources: st1<-submission_gpt.jsonl  st2<-submission_gpt.jsonl  st3<-submission_gpt_st3.jsonl
+2026-08-15 12:47:19,271 | INFO | MainThread | loaded 100 predictions from submission_gpt_st3.jsonl
+2026-08-15 12:47:19,273 | INFO | MainThread | loaded 504 predictions from submission_gpt.jsonl
+2026-08-15 12:47:19,277 | INFO | MainThread | wrote 100 merged predictions to /tmp/submission_hybrid_test.jsonl
+2026-08-15 12:47:19,299 | INFO | MainThread | === combined submission ===
+2026-08-15 12:47:19,299 | INFO | MainThread | Evaluation:
+2026-08-15 12:47:19,299 | INFO | MainThread |   st1_macro_f1: 0.821
+2026-08-15 12:47:19,299 | INFO | MainThread |   st2_macro_f1: 0.709
+2026-08-15 12:47:19,299 | INFO | MainThread |   st3_macro_f1: 0.223
+2026-08-15 12:47:19,299 | INFO | MainThread |   st3_family_macro_f1: 0.338
+2026-08-15 12:47:19,299 | INFO | MainThread |   mean_macro_f1: 0.584
+2026-08-15 12:47:19,299 | INFO | MainThread |   st1 per-label F1: digital_content_or_services=0.935, none=0.750, physical_goods=0.932, physical_services=0.667
+2026-08-15 12:47:19,299 | INFO | MainThread |   st2 per-label F1: apps=0.848, creator_community=0.667, education=0.800, fashion=0.429, financial=0.000, food=0.880, gambling=1.000, gambling_adjacent=1.000, hardware_electronics=0.703, health=0.737, other=0.647, toys=0.800
+2026-08-15 12:47:19,299 | INFO | MainThread |   st3 per-label F1: age_restricted_or_prohibited_product=0.000, direct_exhortation=0.389, hfss_food_marketing=0.000, inadequate_disclosure=0.095, insufficient_context=0.250, misleading_claim=0.462, no_flag=0.360, undisclosed_advertising=0.231
+2026-08-15 12:47:19,299 | INFO | MainThread |   st3_family per-label F1: content=0.505, disclosure=0.382, housekeeping=0.463, product=0.000
+2026-08-15 12:47:19,299 | INFO | MainThread | === solo (as scored on ('st3',)): submission_gpt_st3.jsonl ===
+2026-08-15 12:47:19,299 | INFO | MainThread | Evaluation:
+2026-08-15 12:47:19,299 | INFO | MainThread |   st3_macro_f1: 0.223
+2026-08-15 12:47:19,299 | INFO | MainThread |   st3_family_macro_f1: 0.338
+2026-08-15 12:47:19,299 | INFO | MainThread |   st3 per-label F1: age_restricted_or_prohibited_product=0.000, direct_exhortation=0.389, hfss_food_marketing=0.000, inadequate_disclosure=0.095, insufficient_context=0.250, misleading_claim=0.462, no_flag=0.360, undisclosed_advertising=0.231
+2026-08-15 12:47:19,299 | INFO | MainThread |   st3_family per-label F1: content=0.505, disclosure=0.382, housekeeping=0.463, product=0.000
+2026-08-15 12:47:19,300 | INFO | MainThread | === solo (as scored on ('st1', 'st2')): submission_gpt.jsonl ===
+2026-08-15 12:47:19,300 | INFO | MainThread | Evaluation:
+2026-08-15 12:47:19,300 | INFO | MainThread |   st1_macro_f1: 0.821
+2026-08-15 12:47:19,300 | INFO | MainThread |   st2_macro_f1: 0.709
+2026-08-15 12:47:19,300 | INFO | MainThread |   st1 per-label F1: digital_content_or_services=0.935, none=0.750, physical_goods=0.932, physical_services=0.667
+2026-08-15 12:47:19,300 | INFO | MainThread |   st2 per-label F1: apps=0.848, creator_community=0.667, education=0.800, fashion=0.429, financial=0.000, food=0.880, gambling=1.000, gambling_adjacent=1.000, hardware_electronics=0.703, health=0.737, other=0.647, toys=0.800
