@@ -62,13 +62,12 @@ TRAIN_PATH = os.path.join(os.path.dirname(__file__), "..", "public_data_dev", "t
 # than duplicated here, so they can't drift from the taxonomy file.
 FEW_SHOT_LABELS = ("direct_exhortation", "inadequate_disclosure", "insufficient_context")
 
-# Worst-performing labels get extra exemplars beyond the --few-shot-n default. For n>1, the
-# first exemplar is always a "solo" instance (that flag is the ONLY st3 label -- see the
-# set(st3) != {label} check below); the rest come from any instance carrying the flag, solo
-# or not, since solo instances are scarce for some labels.
-FEW_SHOT_N_OVERRIDES = {
-    "inadequate_disclosure": 2,
-}
+# Per-label overrides of --few-shot-n (empty by default -- see FEW_SHOT_N_OVERRIDES usage in
+# build_few_shot_section). Tried giving the worst-performing labels n=2 here (exp10, exp11);
+# both regressed st3_macro_f1 on a 3-run average, and even inadequate_disclosure -- the label
+# being targeted -- got worse, not better. Left empty; kept the override mechanism since it's
+# correct and cheap to re-enable if a future prompt structure responds differently.
+FEW_SHOT_N_OVERRIDES = {}
 
 
 def parse_taxonomy_defs(taxonomy_text: str, labels) -> dict:
