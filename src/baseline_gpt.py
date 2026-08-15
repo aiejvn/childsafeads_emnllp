@@ -129,8 +129,11 @@ or more labels), and ST3 (compliance risk flags, one or more labels) -- using th
 below, which gives the full definitions, examples, and legal basis for each label. Base every \
 judgment only on the text given. Respond with the structured prediction only.
 
-Before finalizing ST3, run these checks explicitly -- do not default to no_flag or \
-insufficient_context just because you are unsure; under-flagging is the more common failure mode:
+Before finalizing ST3, run these checks explicitly. Two failure modes are equally live: missing \
+a real concern (do not default to no_flag or insufficient_context just because you are unsure) \
+and inventing one the text doesn't support (do not pad out flags to be safe, or apply a check \
+reflexively once you've decided the segment is commercial). Work through each check below on the \
+specific evidence in front of you:
 
 - misleading_claim: you are NOT verifying whether a claim is true, only identifying claims of \
 the kind the taxonomy covers -- an unsubstantiated or high-risk claim about the product's own \
@@ -145,13 +148,14 @@ to be unbeatable) IS misleading_claim, because it reads as a verifiable factual 
 gives no support for. This applies even when delivered in ordinary, polished sponsor-read style --\
  confident language about what the product concretely *does*, with a specific fact attached, is \
 what this flag is for; confident language that stays at the level of opinion/hype is not.
-- direct_exhortation: the taxonomy's test counts urgency aimed at the viewer as exhortation, not \
-just an explicit "buy this" -- do not wave through an urgent or pressuring call to action just \
-because it is phrased as an instruction. Phrases like "join X today", "go check out X right now", \
-"there's no excuse not to try it", "don't pay full price, get it here instead" add time pressure \
-or dismiss reasons not to act, which is exactly the "urgency aimed at the viewer" the test flags -- \
-this is different from a neutral "the link is in the description" or "use my code for 15% off", \
-which state where/how to get something without pressure and stay instructions.
+- direct_exhortation: apply the taxonomy's own three-part test below (Counts as exhortation / \
+Does not count / Boundary) in full, not just its permissive half. Urgency or pressure aimed at \
+the viewer counts even when phrased as an instruction -- "join X today", "there's no excuse not \
+to try it", "don't pay full price, get it here instead" add time pressure or dismiss reasons not \
+to act. But a neutral instruction that only states where/how to get something, with no pressure, \
+stays an instruction -- "the link is in the description", "use my code for 15% off", "go give it \
+a try" -- and where the wording is genuinely ambiguous between the two, the taxonomy's own rule \
+is to not flag it.
 - undisclosed_advertising vs. inadequate_disclosure: these are mutually exclusive, and mixing \
 them up is a common error, so use this two-step procedure. Step 1: search the ENTIRE given text \
 -- transcript and video description -- for ANY acknowledgment that the segment involves a \
@@ -169,8 +173,9 @@ description) leans toward adequate; a disclosure mentioned only once, only brief
 persuasive pitch is already over, or that is the ONLY channel to mention it at all (e.g. a bare \
 promo code/link with no explicit "sponsor"/"ad" language, or an affiliate-link legal disclaimer \
 with no plain-language sponsor statement) leans toward inadequate. When the signals genuinely \
-conflict, prefer inadequate_disclosure over "no issue" -- under-flagging is the larger risk -- but \
-do not apply it reflexively to every sponsor mention regardless of context.
+conflict, weigh the totality of them rather than defaulting to either outcome -- do not apply \
+inadequate_disclosure reflexively to every sponsor mention regardless of context, and do not wave \
+one through just because some disclosure language appears somewhere in the text.
 
 For ST1, when a service is delivered through an app or website but performed by a human \
 professional (e.g. a therapist, coach, stylist, tutor giving live instruction), classify it as \
@@ -371,6 +376,9 @@ def build_few_shot_section(train_path: str, log: logging.Logger, n_per_label: in
     """n_per_label live examples per FEW_SHOT_LABELS, pulled from train.jsonl gold labels. Most
     labels use the quote in labels.st3_evidence that earned the flag; insufficient_context has
     no evidence quote (there's nothing to point at), so it uses a transcript excerpt instead.
+    For direct_exhortation and inadequate_disclosure specifically, only instances where that flag
+    is the SOLE st3 label are eligible -- a quote pulled from an instance that also carries other
+    flags shows the model a mixed case, not a clean exemplar of the boundary the flag is testing.
     Candidates longer than MAX_FEW_SHOT_EXAMPLE_LEN are skipped rather than truncated, so every
     example shown is a complete, unmutilated quote/excerpt."""
     defs = parse_taxonomy_defs(LABELS_TAXONOMY, FEW_SHOT_LABELS)
@@ -388,6 +396,8 @@ def build_few_shot_section(train_path: str, log: logging.Logger, n_per_label: in
                 examples["insufficient_context"].append(text)
         evidence = {ev["flag"]: ev["quote"] for ev in labels.get("st3_evidence", [])}
         for label in ("direct_exhortation", "inadequate_disclosure"):
+            if set(st3) != {label}:
+                continue
             quote = evidence.get(label)
             if quote and len(quote) <= MAX_FEW_SHOT_EXAMPLE_LEN and len(examples[label]) < n_per_label:
                 examples[label].append(quote)
