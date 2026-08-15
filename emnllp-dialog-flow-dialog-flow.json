@@ -63,7 +63,7 @@
         "label": "Assessability",
         "config": {
           "question": "Is the segment assessable enough to classify?",
-          "instructions": "The task is to determine whether the segment contains enough context to support a reliable classification. If the segment is too short, too vague, or too ambiguous to evaluate, treat the result as insufficient context. Otherwise, the segment can be assessed for commercial type, product categories, and compliance flags. Do not consider destination-page issues or other out-of-scope context.",
+          "instructions": "The task is to determine whether the segment contains enough context to support a reliable classification. This is a high bar: insufficient_context is for segments that are near-empty or cut off, giving too little material to identify any compliance signal at all (for example, a few seconds of music with no speech, or a blank description with no transcript). If there is enough text to make a judgment call on disclosure, exhortation, or claims -- even a close judgment call -- the segment is assessable; a difficult or uncertain classification is not the same as insufficient context, so do not reach for insufficient_context as a way to avoid a hard call. Otherwise, the segment can be assessed for commercial type, product categories, and compliance flags. Do not consider destination-page issues or other out-of-scope context.",
           "annotations": [],
           "dataType": "custom",
           "customEnumValues": [
