@@ -46,7 +46,7 @@ def parse_taxonomy_defs(taxonomy_text: str, labels) -> dict:
     missing = set(labels) - set(defs)
     if missing:
         raise ValueError(f"couldn't find taxonomy definitions for {missing} in {LABELS_TAXONOMY_PATH}")
-
+    return defs
 
 # Same file common/__init__.py exposes as SFT_TAXONOMY, reloaded here rather than
 # imported for the same reason as df_pre_context above.
