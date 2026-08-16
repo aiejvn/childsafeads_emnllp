@@ -1,0 +1,11 @@
+2026-08-16 19:25:37,851 | INFO | MainThread | logging to runs/run_20260816_192537_lora_train_generative_Qwen_Qwen3-0.6B.log
+2026-08-16 19:25:37,851 | INFO | MainThread | config: {'train': 'public_data_dev/train.jsonl', 'dev': 'public_data_dev/dev.jsonl', 'model': 'Qwen/Qwen3-0.6B', 'model_path': None, 'context': 'full', 'lean_prompt': True, 'df_path': 'emnllp-dialog-flow-dialog-flow.json', 'max_length': 4096, 'epochs': 10, 'batch_size': 1, 'eval_batch_size': 8, 'eval_every': 10, 'grad_accum_steps': 4, 'lr': 0.0002, 'warmup_ratio': 0.06, 'lora_r': 8, 'lora_alpha': 16, 'lora_dropout': 0.1, 'target_modules': 'q_proj,v_proj', 'peft_method': 'lora', 'num_virtual_tokens': 20, 'prompt_tuning_init_text': None, 'st3_loss_weight': 1.0, 'pos_weight': False, 'oversample_rare_st3': 1, 'st3_only': False, 'st12_only': False, 'st1_only': True, 'no_gradient_checkpointing': True, 'load_in_4bit': False, 'parallelism': 'none', 'max_new_tokens': 128, 'sample_size': None, 'test_holdout': 500, 'split_seed': None, 'seed': 42, 'device': None, 'output_dir': 'runs/lora-qwen-st1-10epoch', 'checkpoint_save_path': None} device=cuda
+2026-08-16 19:25:37,982 | INFO | MainThread | train/test-holdout split (fresh random split every run unless --split-seed is pinned): split_seed=1282421605 train=1853 test_holdout=500
+2026-08-16 19:25:37,982 | INFO | MainThread | train=1853 dev=504
+2026-08-16 19:25:37,982 | INFO | MainThread | loading model/tokenizer from local path models/Qwen/Qwen3-0.6B (no remote download)
+2026-08-16 19:25:39,197 | INFO | MainThread | system prompt: lean (1698 chars) + dialog flow from emnllp-dialog-flow-dialog-flow.json (4654 chars)
+2026-08-16 19:25:39,197 | INFO | MainThread | --st1-only: completion is {"st1":...} alone; st2/st3 in logged metrics are fixed placeholders, read st1_macro_f1 only; best-checkpoint selection uses st1_macro_f1 instead of mean_macro_f1
+2026-08-16 19:38:30,404 | INFO | MainThread | epoch 1: mean train loss = 0.5788
+2026-08-16 19:38:30,404 | INFO | MainThread | epoch 1: train input length (tokens, unpadded) -- min=1589 mean=2776 max=4010 n=1853
+2026-08-16 19:51:20,709 | INFO | MainThread | epoch 2: mean train loss = 0.0397
+2026-08-16 19:51:20,710 | INFO | MainThread | epoch 2: train input length (tokens, unpadded) -- min=1589 mean=2776 max=4010 n=1853

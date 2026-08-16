@@ -30,6 +30,7 @@ from common.dialog_flow import df_pre_context  # noqa: E402
 from common.predict_utils import log_evaluation, write_submission  # noqa: E402
 from lora import CONTEXT_CHOICES, SFT_TAXONOMY, SYSTEM_PROMPT, evaluate, load_split, setup_logging  # noqa: E402
 from lora.lora_data import GenerativeCollator, GenerativeDataset  # noqa: E402
+from lora.lora_few_shot import FEW_SHOT_BUILDERS  # noqa: E402
 from lora.lora_generative import generate_predictions  # noqa: E402
 from lora.lora_model import PARALLELISM_CHOICES, load_peft_model_causal  # noqa: E402
 
@@ -47,6 +48,18 @@ def main():
                     help="must match the flag used in training -- the adapter was fit against "
                          "whichever system prompt was in front of it")
     ap.add_argument("--df-path", default=None, help="must match the path used in training")
+    ap.add_argument("--st3-only", action="store_true", help="must match the flag used in "
+                     "training -- selects the {\"st3\":[...]} completion schema for parsing")
+    ap.add_argument("--st12-only", action="store_true", help="must match the flag used in "
+                     "training -- selects the {\"st1\":...,\"st2\":[...]} completion schema "
+                     "for parsing")
+    ap.add_argument("--st1-only", action="store_true", help="must match the flag used in "
+                     "training -- selects the {\"st1\":...} completion schema for parsing. "
+                     "Mutually exclusive with --st3-only/--st12-only")
+    ap.add_argument("--few-shot", action="store_true", help="must match the flag used in "
+                     "training -- appends the same hand-picked FEW-SHOT EXAMPLES section to "
+                     "the system prompt (see lora_few_shot.py). Only --st1-only has a curated "
+                     "example set so far")
     ap.add_argument("--max-length", type=int, default=4096)
     ap.add_argument("--batch-size", type=int, default=4)
     ap.add_argument("--max-new-tokens", type=int, default=128)
@@ -60,6 +73,13 @@ def main():
     ap.add_argument("--device", default=None)
     ap.add_argument("--out", help="defaults to runs/submission_lora_generative_<timestamp>.jsonl")
     args = ap.parse_args()
+    if sum([args.st3_only, args.st12_only, args.st1_only]) > 1:
+        ap.error("--st3-only, --st12-only, and --st1-only are mutually exclusive")
+    tier_mode = "st1_only" if args.st1_only else (
+        "st12_only" if args.st12_only else ("st3_only" if args.st3_only else "joint"))
+    if args.few_shot and tier_mode not in FEW_SHOT_BUILDERS:
+        ap.error(f"--few-shot has no curated examples for {tier_mode} mode yet (only "
+                 f"{sorted(FEW_SHOT_BUILDERS)} are curated -- see lora_few_shot.py)")
 
     device = args.device or ("cuda" if torch.cuda.is_available() else "cpu")
     is_main = int(os.environ.get("RANK", "0")) == 0  # only rank 0 logs/writes output under --parallelism tensor
@@ -97,14 +117,22 @@ def main():
         instances = random.Random(args.seed).sample(instances, min(args.sample_size, len(instances)))
     system_prompt = SFT_TAXONOMY if args.lean_prompt else SYSTEM_PROMPT
     df_text = df_pre_context(args.df_path, lean=args.lean_prompt) if args.df_path else None
+    if args.few_shot:
+        few_shot_text = FEW_SHOT_BUILDERS[tier_mode]()
+        log.info(f"--few-shot: appending {tier_mode} FEW-SHOT EXAMPLES section "
+                 f"({len(few_shot_text)} chars) to the system prompt")
+        system_prompt = f"{system_prompt}\n\n{few_shot_text}"
     log.info(f"system prompt: {'lean' if args.lean_prompt else 'full'} ({len(system_prompt)} chars)"
              + (f" + dialog flow from {args.df_path} ({len(df_text)} chars)" if df_text else ""))
     loader = DataLoader(
         GenerativeDataset(instances, tokenizer, args.context, args.max_length, system_prompt, df_text,
+                          st3_only=args.st3_only, st12_only=args.st12_only, st1_only=args.st1_only,
                           include_completion=False),
         batch_size=args.batch_size, shuffle=False, collate_fn=GenerativeCollator(tokenizer),
     )
-    ids, predictions = generate_predictions(model, loader, tokenizer, args.max_new_tokens, log=log)
+    ids, predictions = generate_predictions(model, loader, tokenizer, args.max_new_tokens,
+                                            st3_only=args.st3_only, st12_only=args.st12_only,
+                                            st1_only=args.st1_only, log=log)
 
     if not is_main:  # avoid every rank racing to write the same output files under --parallelism tensor
         return

@@ -52,6 +52,7 @@ from lora import (  # noqa: E402
     setup_logging,
 )
 from lora.lora_data import GenerativeCollator, GenerativeDataset  # noqa: E402
+from lora.lora_few_shot import FEW_SHOT_BUILDERS  # noqa: E402
 from lora.lora_generative import generate_predictions  # noqa: E402
 from lora.lora_model import (  # noqa: E402
     PARALLELISM_CHOICES, build_peft_model_causal, build_prompt_tuned_causal, load_peft_model_causal,
@@ -192,6 +193,13 @@ def main():
                      "sanitize_st3([]) respectively), not meaningful predictions -- read "
                      "st1_macro_f1 only; best-checkpoint selection switches to st1_macro_f1 in "
                      "this mode. Mutually exclusive with --st3-only/--st12-only")
+    ap.add_argument("--few-shot", action="store_true", help="append a hand-picked FEW-SHOT "
+                     "EXAMPLES section to the system prompt, pairing each label's taxonomy "
+                     "definition with real train.jsonl exemplars (see lora_few_shot.py) -- the "
+                     "same idea as baseline_gpt.py's --few-shot for the GPT baseline. Only "
+                     "--st1-only has a curated example set so far (see FEW_SHOT_BUILDERS in "
+                     "lora_few_shot.py); combining --few-shot with --st12-only/--st3-only/joint "
+                     "mode is an error until those get their own exemplar sets")
     ap.add_argument("--no-gradient-checkpointing", action="store_true", help="disable gradient "
                      "checkpointing (on by default). Checkpointing trades wall-clock time (recomputes "
                      "forward activations during backward) for VRAM headroom -- when a run has memory "
@@ -222,6 +230,11 @@ def main():
     args = ap.parse_args()
     if sum([args.st3_only, args.st12_only, args.st1_only]) > 1:
         ap.error("--st3-only, --st12-only, and --st1-only are mutually exclusive")
+    tier_mode = "st1_only" if args.st1_only else (
+        "st12_only" if args.st12_only else ("st3_only" if args.st3_only else "joint"))
+    if args.few_shot and tier_mode not in FEW_SHOT_BUILDERS:
+        ap.error(f"--few-shot has no curated examples for {tier_mode} mode yet (only "
+                 f"{sorted(FEW_SHOT_BUILDERS)} are curated -- see lora_few_shot.py)")
 
     torch.manual_seed(args.seed)
     device = args.device or ("cuda" if torch.cuda.is_available() else "cpu")
@@ -315,6 +328,11 @@ def main():
         log.warning("--lean-prompt without --df-path: the lean taxonomy gives bare ST1/ST3 label "
                     "lists because the dialog flow is expected to supply their definitions, so "
                     "nothing in this prompt defines them. Intended only as an ablation.")
+    if args.few_shot:
+        few_shot_text = FEW_SHOT_BUILDERS[tier_mode]()
+        log.info(f"--few-shot: appending {tier_mode} FEW-SHOT EXAMPLES section "
+                 f"({len(few_shot_text)} chars) to the system prompt")
+        system_prompt = f"{system_prompt}\n\n{few_shot_text}"
     log.info(f"system prompt: {'lean' if args.lean_prompt else 'full'} ({len(system_prompt)} chars)"
              + (f" + dialog flow from {args.df_path} ({len(df_text)} chars)" if df_text else ""))
 
