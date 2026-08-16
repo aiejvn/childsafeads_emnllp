@@ -123,6 +123,7 @@ def build_peft_model_causal(
     device: str = "cuda",
     local_files_only: bool = False,
     parallelism: str = "none",
+    gradient_checkpointing: bool = True,
 ) -> PeftModel:
     """Build a fresh causal LM (e.g. Qwen) and LoRA-adapt its attention projections, for the
     generative training path (see lora_train_generative.py): the model is fine-tuned via
@@ -132,12 +133,15 @@ def build_peft_model_causal(
     _load_causal_base) -- otherwise the caller is expected to `.to(device)` the returned model
     themselves, or not to (see `parallelism`, PARALLELISM_CHOICES).
 
-    Gradient checkpointing is always on: with LoRA, the frozen base layers still need their
+    Gradient checkpointing defaults on: with LoRA, the frozen base layers still need their
     forward activations cached to backprop into the adapters, so peak memory scales with
     num_layers * batch_size * seq_len same as full fine-tuning unless checkpointing recomputes
     them instead of retaining them. `use_cache=False` goes with it -- Qwen3.5 has no
     auto-disable guard for this like some other model classes, and also slows down
-    lora_generative.py's model.generate() calls; deferred for now."""
+    lora_generative.py's model.generate() calls; deferred for now. Pass
+    gradient_checkpointing=False (see --no-gradient-checkpointing) to trade the memory saving
+    back for speed -- checkpointing's recompute-on-backward costs real wall-clock time, and
+    when a run has VRAM headroom to spare that trade isn't worth it."""
     model = _load_causal_base(
         base_model_name, load_in_4bit, device, local_files_only=local_files_only, parallelism=parallelism,
     )
@@ -147,7 +151,8 @@ def build_peft_model_causal(
         # checkpointing enabled below, uniformly for both branches -- this only does the
         # quantization-specific prep (freezing base params, upcasting norms to fp32)
         model = prepare_model_for_kbit_training(model, use_gradient_checkpointing=False)
-    model.gradient_checkpointing_enable()
+    if gradient_checkpointing:
+        model.gradient_checkpointing_enable()
     model.enable_input_require_grads()
     lora_config = LoraConfig(
         task_type=TaskType.CAUSAL_LM,
