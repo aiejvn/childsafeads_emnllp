@@ -48,7 +48,7 @@ from common.dialog_flow import df_pre_context  # noqa: E402
 from common.predict_utils import log_prediction_diagnostics, write_submission  # noqa: E402
 from common.train_utils import compute_pos_weight  # noqa: E402
 from lora import (  # noqa: E402
-    CONTEXT_CHOICES, SFT_TAXONOMY, ST2_LABELS, ST3_LABELS, SYSTEM_PROMPT, SFT_TAXONOMY, SYSTEM_PROMPT, evaluate, load_split, setup_logging,
+    CONTEXT_CHOICES, SFT_TAXONOMY, ST2_LABELS, ST3_LABELS, SYSTEM_PROMPT, evaluate, load_split, setup_logging,
 )
 from lora.lora_data import GenerativeCollator, GenerativeDataset  # noqa: E402
 from lora.lora_generative import generate_predictions  # noqa: E402
@@ -317,6 +317,11 @@ def main():
         log.info("--st1-only: completion is {\"st1\":...} alone; st2/st3 in logged metrics are "
                  "fixed placeholders, read st1_macro_f1 only; best-checkpoint selection uses "
                  "st1_macro_f1 instead of mean_macro_f1")
+    # log_prediction_diagnostics' default tiers=("st1","st2","st3") would also print
+    # distribution/cross-product diagnostics for whichever tier(s) this mode doesn't
+    # train -- pred is a constant placeholder there, so it's noise, not signal.
+    diag_tiers = ("st3",) if args.st3_only else (
+        ("st1", "st2") if args.st12_only else (("st1",) if args.st1_only else ("st1", "st2", "st3")))
 
     collate = GenerativeCollator(tokenizer)
     train_ds = GenerativeDataset(train_instances, tokenizer, args.context, args.max_length,
@@ -394,7 +399,7 @@ def main():
         for tier, per_label in metrics["per_label_f1"].items():
             log.info(f"epoch {epoch + 1} dev {tier} per-label F1: "
                      + ", ".join(f"{label}={f1:.3f}" for label, f1 in sorted(per_label.items())))
-        log_prediction_diagnostics(log, gold, preds)
+        log_prediction_diagnostics(log, gold, preds, tiers=diag_tiers)
 
         if args.st3_only:
             selection_metric = metrics["st3_macro_f1"]
@@ -461,7 +466,7 @@ def main():
             for tier, per_label in test_metrics["per_label_f1"].items():
                 log.info(f"{tier} per-label F1: "
                         + ", ".join(f"{label}={f1:.3f}" for label, f1 in sorted(per_label.items())))
-            log_prediction_diagnostics(log, test_gold, test_preds)
+            log_prediction_diagnostics(log, test_gold, test_preds, tiers=diag_tiers)
             write_submission(
                 os.path.join(best_dir, "test_submission.jsonl"),
                 os.path.join(best_dir, "test_submission_error.jsonl"),
