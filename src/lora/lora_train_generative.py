@@ -176,6 +176,10 @@ def main():
                      "st1_macro_f1/st2_macro_f1 only; best-checkpoint selection switches to "
                      "mean(st1_macro_f1, st2_macro_f1) in this mode. Mutually exclusive with "
                      "--st3-only")
+    ap.add_argument("--no-gradient-checkpointing", action="store_true", help="disable gradient "
+                     "checkpointing (on by default). Checkpointing trades wall-clock time (recomputes "
+                     "forward activations during backward) for VRAM headroom -- when a run has memory "
+                     "to spare, disabling it should speed up training at the cost of more VRAM")
     ap.add_argument("--load-in-4bit", action="store_true", help="QLoRA via bitsandbytes (must be installed separately)")
     ap.add_argument("--parallelism", choices=PARALLELISM_CHOICES, default="none", help="split the model "
                      "across GPUs (requires >=2): \"pipeline\" shards layers via device_map=\"auto\"; \"tensor\" "
@@ -271,6 +275,7 @@ def main():
             model_path, lora_r=args.lora_r, lora_alpha=args.lora_alpha, lora_dropout=args.lora_dropout,
             target_modules=args.target_modules.split(","), load_in_4bit=args.load_in_4bit, device=device,
             local_files_only=True, parallelism=args.parallelism,
+            gradient_checkpointing=not args.no_gradient_checkpointing,
         )
     if args.parallelism == "none" and not args.load_in_4bit:
         model = model.to(device)
