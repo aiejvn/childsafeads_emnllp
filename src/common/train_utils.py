@@ -23,3 +23,19 @@ def compute_pos_weight(instances: list, labels_key: str, label_list: list) -> to
     total = len(instances)
     neg = total - pos
     return (neg / pos.clamp(min=1)).clamp(max=50.0)
+
+
+def compute_class_weight(instances: list, labels_key: str, label_list: list) -> torch.Tensor:
+    """Inverse-frequency class weight per label for a single-label (multi-class,
+    mutually exclusive) field -- the categorical-CE analogue of compute_pos_weight,
+    which assumes each label is an independent binary flag (right for st2/st3's
+    multi-label sets, wrong for a field like st1 where every instance has exactly
+    one value). weight[c] = total / count[c], clamped the same way as
+    compute_pos_weight so a near-empty class doesn't get an extreme weight."""
+    counts = torch.zeros(len(label_list))
+    for inst in instances:
+        value = inst["labels"][labels_key]
+        if value in label_list:
+            counts[label_list.index(value)] += 1
+    total = len(instances)
+    return (total / counts.clamp(min=1)).clamp(max=50.0)

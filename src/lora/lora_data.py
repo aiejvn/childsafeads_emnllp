@@ -43,17 +43,19 @@ def _quoted_label_chunks(labels_sorted: list, weights: dict) -> list:
 
 
 def format_completion_chunks(
-    labels: dict, st2_weights: dict = None, st3_weights: dict = None, st3_only: bool = False,
-    st12_only: bool = False, st1_only: bool = False,
+    labels: dict, st1_weight: float = 1.0, st2_weights: dict = None, st3_weights: dict = None,
+    st3_only: bool = False, st12_only: bool = False, st1_only: bool = False,
 ) -> list:
     """Same rendering as format_completion, split into (text, weight) chunks whose
-    concatenated text reproduces format_completion(labels) exactly. Each st2/st3 label's
-    own quoted-string token span carries that label's weight (`weights.get(label, 1.0)`);
-    st1 and all JSON punctuation stay at weight 1.0. `st2_weights`/`st3_weights` are
-    {label: weight} dicts -- e.g. inverse-train-frequency from --pos-weight, or a flat
-    per-field multiplier like --st3-loss-weight. Used by GenerativeDataset to build a
-    per-token loss_weight array for a custom weighted cross-entropy (see
-    lora_train_generative.py's weighted_lm_loss).
+    concatenated text reproduces format_completion(labels) exactly. st1's own quoted-string
+    value token span carries `st1_weight` (e.g. inverse-train-frequency from --pos-weight,
+    same idea as st2/st3's per-label weighting but for a single-label/multi-class field --
+    see common.train_utils.compute_class_weight); each st2/st3 label's own quoted-string
+    token span carries that label's weight (`weights.get(label, 1.0)`); all JSON punctuation
+    stays at weight 1.0. `st2_weights`/`st3_weights` are {label: weight} dicts -- e.g.
+    inverse-train-frequency from --pos-weight, or a flat per-field multiplier like
+    --st3-loss-weight. Used by GenerativeDataset to build a per-token loss_weight array for
+    a custom weighted cross-entropy (see lora_train_generative.py's weighted_lm_loss).
 
     `st3_only` drops st1/st2 from the completion entirely -- `{"st3":[...]}` instead of
     the full three-key object -- so every completion token trains st3 specifically (see
@@ -68,20 +70,19 @@ def format_completion_chunks(
     trains st1 alone (see --st1-only). Pairs with lora_generative.py's St1OnlyPrediction.
     Mutually exclusive with st3_only/st12_only (enforced by the caller's argparse)."""
     st2_weights, st3_weights = st2_weights or {}, st3_weights or {}
-    if st1_only:
-        return [(json.dumps({"st1": labels["st1"]}, separators=(",", ":")), 1.0)]
     if st3_only:
         chunks = [('{"st3":[', 1.0)]
         chunks += _quoted_label_chunks(sorted(labels["st3"]), st3_weights)
         chunks.append(("]}", 1.0))
         return chunks
+    st1_chunks = [('{"st1":', 1.0), (json.dumps(labels["st1"]), st1_weight)]
+    if st1_only:
+        return st1_chunks + [("}", 1.0)]
+    chunks = st1_chunks + [(',"st2":[', 1.0)]
+    chunks += _quoted_label_chunks(sorted(labels["st2"]), st2_weights)
     if st12_only:
-        chunks = [(json.dumps({"st1": labels["st1"]}, separators=(",", ":"))[:-1] + ',"st2":[', 1.0)]
-        chunks += _quoted_label_chunks(sorted(labels["st2"]), st2_weights)
         chunks.append(("]}", 1.0))
         return chunks
-    chunks = [(json.dumps({"st1": labels["st1"]}, separators=(",", ":"))[:-1] + ',"st2":[', 1.0)]
-    chunks += _quoted_label_chunks(sorted(labels["st2"]), st2_weights)
     chunks.append(('],"st3":[', 1.0))
     chunks += _quoted_label_chunks(sorted(labels["st3"]), st3_weights)
     chunks.append(("]}", 1.0))
@@ -110,13 +111,15 @@ class GenerativeDataset(Dataset):
 
     def __init__(self, instances: list, tokenizer, context: str = "full", max_length: int = 4096,
                  system_prompt: str = SYSTEM_PROMPT, df_text: str = None, st3_loss_weight: float = 1.0,
-                 st2_pos_weight: dict = None, st3_pos_weight: dict = None, st3_only: bool = False,
-                 st12_only: bool = False, st1_only: bool = False, include_completion: bool = True):
+                 st1_pos_weight: dict = None, st2_pos_weight: dict = None, st3_pos_weight: dict = None,
+                 st3_only: bool = False, st12_only: bool = False, st1_only: bool = False,
+                 include_completion: bool = True):
         self.instances = instances
         self.tokenizer = tokenizer
         self.st3_only = st3_only
         self.st12_only = st12_only
         self.st1_only = st1_only
+        self.st1_pos_weight = st1_pos_weight or {}
         # Whether to append the gold completion to input_ids. True for training (the
         # completion IS the supervision signal). Must be False for anything headed into
         # model.generate() -- dev/test instances carry gold "labels" too (needed for
@@ -185,13 +188,15 @@ class GenerativeDataset(Dataset):
         item = {"instanceID": inst["instanceID"]}
         labels = inst.get("labels")
         if labels and self.include_completion:
-            # Each st2/st3 label's own quoted-string token span is tokenized separately
+            # Each st1/st2/st3 label's own quoted-string token span is tokenized separately
             # (same splice-and-concatenate approach as prefix_ids/suffix_ids above) so it
             # can carry its own loss weight -- inverse-train-frequency per label
             # (--pos-weight) and/or a flat st3-wide multiplier (--st3-loss-weight).
+            st1_weight = self.st1_pos_weight.get(labels["st1"], 1.0)
             st2_weights = {l: self.st2_pos_weight.get(l, 1.0) for l in labels["st2"]}
             st3_weights = {l: self.st3_pos_weight.get(l, self.default_st3_weight) for l in labels["st3"]}
-            chunks = format_completion_chunks(labels, st2_weights, st3_weights, st3_only=self.st3_only,
+            chunks = format_completion_chunks(labels, st1_weight=st1_weight, st2_weights=st2_weights,
+                                              st3_weights=st3_weights, st3_only=self.st3_only,
                                               st12_only=self.st12_only, st1_only=self.st1_only)
             completion_ids, weight_per_tok = [], []
             for text, weight in chunks:

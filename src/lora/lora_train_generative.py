@@ -46,9 +46,10 @@ from transformers import AutoTokenizer, get_linear_schedule_with_warmup
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))  # so `import lora` resolves src/lora as a package
 from common.dialog_flow import df_pre_context  # noqa: E402
 from common.predict_utils import log_prediction_diagnostics, write_submission  # noqa: E402
-from common.train_utils import compute_pos_weight  # noqa: E402
+from common.train_utils import compute_class_weight, compute_pos_weight  # noqa: E402
 from lora import (  # noqa: E402
-    CONTEXT_CHOICES, SFT_TAXONOMY, ST2_LABELS, ST3_LABELS, SYSTEM_PROMPT, evaluate, load_split, setup_logging,
+    CONTEXT_CHOICES, SFT_TAXONOMY, ST1_LABELS, ST2_LABELS, ST3_LABELS, SYSTEM_PROMPT, evaluate, load_split,
+    setup_logging,
 )
 from lora.lora_data import GenerativeCollator, GenerativeDataset  # noqa: E402
 from lora.lora_generative import generate_predictions  # noqa: E402
@@ -144,13 +145,17 @@ def main():
                      "tokens are unaffected). st3 is this task's weakest, most class-imbalanced "
                      "subtask (insufficient_context/hfss_food_marketing/age_restricted are all "
                      "under 3%% of train); default 1.0 reproduces the unweighted loss exactly")
-    ap.add_argument("--pos-weight", action="store_true", help="reweight each st2/st3 label's "
-                     "own completion-token span by its inverse train-set frequency (same "
-                     "neg/pos-per-label computation as lora_train.py's --pos-weight for the "
-                     "encoder/BCE path, adapted here to per-token CE weighting -- see "
-                     "common.train_utils.compute_pos_weight). Composes with --st3-loss-weight "
-                     "(multiplicative): pos-weight corrects imbalance within st2/st3, "
-                     "st3-loss-weight is an additional flat multiplier for the whole st3 field")
+    ap.add_argument("--pos-weight", action="store_true", help="reweight each st1/st2/st3 "
+                     "label's own completion-token span by its inverse train-set frequency. "
+                     "For st2/st3 (multi-label) this is the same neg/pos-per-label computation "
+                     "as lora_train.py's --pos-weight for the encoder/BCE path, adapted here to "
+                     "per-token CE weighting -- see common.train_utils.compute_pos_weight. For "
+                     "st1 (single-label/multi-class -- every instance has exactly one value, so "
+                     "the BCE neg/pos framing doesn't apply) this is a categorical class weight, "
+                     "total/count[c], via common.train_utils.compute_class_weight. Composes with "
+                     "--st3-loss-weight (multiplicative): pos-weight corrects imbalance within "
+                     "each field, st3-loss-weight is an additional flat multiplier for the whole "
+                     "st3 field")
     ap.add_argument("--oversample-rare-st3", type=int, default=1, help="duplicate each train "
                      "instance this many times over if its st3 list contains a label under 5%% "
                      "train frequency (insufficient_context/hfss_food_marketing/"
@@ -159,6 +164,10 @@ def main():
                      "existing exposure, this changes how often the model sees these examples "
                      "per epoch -- a different mechanism, can be combined with either. 1 "
                      "(default) disables oversampling")
+    ap.add_argument("--oversample-rare-st1", type=int, default=1, help="mirror of "
+                     "--oversample-rare-st3 for st1: duplicate each train instance this many "
+                     "times over if its st1 value is under 5%% train frequency (\"none\"/\"other\" "
+                     "on this dataset, both under 2%%). 1 (default) disables oversampling")
     ap.add_argument("--st3-only", action="store_true", help="train/predict on st3 alone: the "
                      "completion is \"{\\\"st3\\\":[...]}\" instead of the full st1/st2/st3 "
                      "object, so every completion token trains st3 -- none are spent on "
@@ -257,6 +266,18 @@ def main():
                  f"train {len(train_instances)} -> {len(oversampled)}")
         train_instances = oversampled
 
+    if args.oversample_rare_st1 > 1:
+        st1_freq = Counter(inst["labels"]["st1"] for inst in train_instances)
+        rare_st1 = {label for label, c in st1_freq.items() if c / len(train_instances) < 0.05}
+        oversampled = []
+        for inst in train_instances:
+            oversampled.append(inst)
+            if inst["labels"]["st1"] in rare_st1:
+                oversampled += [inst] * (args.oversample_rare_st1 - 1)
+        log.info(f"oversampling rare st1 labels {sorted(rare_st1)} {args.oversample_rare_st1}x: "
+                 f"train {len(train_instances)} -> {len(oversampled)}")
+        train_instances = oversampled
+
     model_path = args.model_path or os.path.join("models", args.model)
     if not os.path.isdir(model_path):
         raise FileNotFoundError(
@@ -297,10 +318,12 @@ def main():
     log.info(f"system prompt: {'lean' if args.lean_prompt else 'full'} ({len(system_prompt)} chars)"
              + (f" + dialog flow from {args.df_path} ({len(df_text)} chars)" if df_text else ""))
 
-    st2_pos_weight = st3_pos_weight = None
+    st1_pos_weight = st2_pos_weight = st3_pos_weight = None
     if args.pos_weight:
+        st1_pos_weight = dict(zip(ST1_LABELS, compute_class_weight(train_instances, "st1", ST1_LABELS).tolist()))
         st2_pos_weight = dict(zip(ST2_LABELS, compute_pos_weight(train_instances, "st2", ST2_LABELS).tolist()))
         st3_pos_weight = dict(zip(ST3_LABELS, compute_pos_weight(train_instances, "st3", ST3_LABELS).tolist()))
+        log.info(f"pos_weight st1: {st1_pos_weight}")
         log.info(f"pos_weight st2: {st2_pos_weight}")
         log.info(f"pos_weight st3: {st3_pos_weight}")
 
@@ -326,8 +349,9 @@ def main():
     collate = GenerativeCollator(tokenizer)
     train_ds = GenerativeDataset(train_instances, tokenizer, args.context, args.max_length,
                                  system_prompt, df_text, st3_loss_weight=args.st3_loss_weight,
-                                 st2_pos_weight=st2_pos_weight, st3_pos_weight=st3_pos_weight,
-                                 st3_only=args.st3_only, st12_only=args.st12_only, st1_only=args.st1_only)
+                                 st1_pos_weight=st1_pos_weight, st2_pos_weight=st2_pos_weight,
+                                 st3_pos_weight=st3_pos_weight, st3_only=args.st3_only,
+                                 st12_only=args.st12_only, st1_only=args.st1_only)
     dev_ds = GenerativeDataset(dev_instances, tokenizer, args.context, args.max_length,
                                system_prompt, df_text, st3_only=args.st3_only,
                                st12_only=args.st12_only, st1_only=args.st1_only, include_completion=False)
