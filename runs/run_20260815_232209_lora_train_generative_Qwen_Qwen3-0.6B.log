@@ -1,0 +1,202 @@
+2026-08-15 23:22:09,933 | INFO | MainThread | logging to runs/run_20260815_232209_lora_train_generative_Qwen_Qwen3-0.6B.log
+2026-08-15 23:22:09,933 | INFO | MainThread | config: {'train': 'public_data_dev/train.jsonl', 'dev': 'public_data_dev/dev.jsonl', 'model': 'Qwen/Qwen3-0.6B', 'model_path': None, 'context': 'full', 'lean_prompt': True, 'df_path': 'emnllp-dialog-flow-dialog-flow.json', 'max_length': 4096, 'epochs': 100, 'batch_size': 1, 'eval_batch_size': 8, 'eval_every': 10, 'grad_accum_steps': 4, 'lr': 0.0002, 'warmup_ratio': 0.06, 'lora_r': 8, 'lora_alpha': 16, 'lora_dropout': 0.1, 'target_modules': 'q_proj,v_proj', 'peft_method': 'lora', 'num_virtual_tokens': 20, 'prompt_tuning_init_text': None, 'st3_loss_weight': 1.0, 'pos_weight': True, 'oversample_rare_st3': 1, 'st3_only': False, 'st12_only': True, 'no_gradient_checkpointing': True, 'load_in_4bit': False, 'parallelism': 'none', 'max_new_tokens': 128, 'sample_size': None, 'test_holdout': 500, 'split_seed': None, 'seed': 42, 'device': None, 'output_dir': 'runs/lora-qwen-st12-100epoch-standing', 'checkpoint_save_path': None} device=cuda
+2026-08-15 23:22:10,064 | INFO | MainThread | train/test-holdout split (fresh random split every run unless --split-seed is pinned): split_seed=1556411495 train=1853 test_holdout=500
+2026-08-15 23:22:10,065 | INFO | MainThread | train=1853 dev=504
+2026-08-15 23:22:10,065 | INFO | MainThread | loading model/tokenizer from local path models/Qwen/Qwen3-0.6B (no remote download)
+2026-08-15 23:22:11,314 | INFO | MainThread | system prompt: lean (1698 chars) + dialog flow from emnllp-dialog-flow-dialog-flow.json (4654 chars)
+2026-08-15 23:22:11,364 | INFO | MainThread | pos_weight st2: {'apps': 2.654832363128662, 'creator_community': 7.7819905281066895, 'education': 16.48113250732422, 'fashion': 7.699530601501465, 'financial': 16.157407760620117, 'food': 6.753138065338135, 'gambling': 50.0, 'gambling_adjacent': 23.38157844543457, 'hardware_electronics': 3.667506217956543, 'health': 7.61860466003418, 'other': 4.581325531005859, 'toys': 32.08928680419922}
+2026-08-15 23:22:11,365 | INFO | MainThread | pos_weight st3: {'age_restricted_or_prohibited_product': 34.63461685180664, 'direct_exhortation': 6.65702486038208, 'hfss_food_marketing': 50.0, 'inadequate_disclosure': 2.781632661819458, 'insufficient_context': 50.0, 'misleading_claim': 0.8346534371376038, 'no_flag': 3.4436450004577637, 'undisclosed_advertising': 5.7381815910339355}
+2026-08-15 23:22:11,365 | INFO | MainThread | --st12-only: completion is {"st1":...,"st2":[...]} alone; st3 in logged metrics is a fixed placeholder, read st1_macro_f1/st2_macro_f1 only; best-checkpoint selection uses mean(st1_macro_f1, st2_macro_f1) instead of mean_macro_f1
+2026-08-15 23:35:03,589 | INFO | MainThread | epoch 1: mean train loss = 2.3924
+2026-08-15 23:35:03,589 | INFO | MainThread | epoch 1: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-15 23:47:54,989 | INFO | MainThread | epoch 2: mean train loss = 0.2261
+2026-08-15 23:47:54,989 | INFO | MainThread | epoch 2: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 00:00:46,230 | INFO | MainThread | epoch 3: mean train loss = 0.1597
+2026-08-16 00:00:46,230 | INFO | MainThread | epoch 3: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 00:13:37,416 | INFO | MainThread | epoch 4: mean train loss = 0.1287
+2026-08-16 00:13:37,416 | INFO | MainThread | epoch 4: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 00:26:28,623 | INFO | MainThread | epoch 5: mean train loss = 0.1017
+2026-08-16 00:26:28,624 | INFO | MainThread | epoch 5: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 00:39:19,765 | INFO | MainThread | epoch 6: mean train loss = 0.0921
+2026-08-16 00:39:19,765 | INFO | MainThread | epoch 6: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 00:52:10,916 | INFO | MainThread | epoch 7: mean train loss = 0.0700
+2026-08-16 00:52:10,916 | INFO | MainThread | epoch 7: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 01:05:01,981 | INFO | MainThread | epoch 8: mean train loss = 0.0514
+2026-08-16 01:05:01,981 | INFO | MainThread | epoch 8: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 01:17:53,092 | INFO | MainThread | epoch 9: mean train loss = 0.0367
+2026-08-16 01:17:53,092 | INFO | MainThread | epoch 9: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 01:30:44,208 | INFO | MainThread | epoch 10: mean train loss = 0.0289
+2026-08-16 01:30:44,208 | INFO | MainThread | epoch 10: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 01:34:06,333 | INFO | MainThread | generate_predictions: input length (tokens, unpadded) -- min=1628 mean=2702 max=4000 n=504
+2026-08-16 01:34:06,492 | INFO | MainThread | epoch 10 dev metrics: st1_macro_f1=0.797, st2_macro_f1=0.593, st3_macro_f1=0.003, st3_family_macro_f1=0.105, mean_macro_f1=0.464
+2026-08-16 01:34:06,492 | INFO | MainThread | epoch 10 dev st1 per-label F1: digital_content_or_services=0.896, none=0.667, physical_goods=0.924, physical_services=0.700
+2026-08-16 01:34:06,492 | INFO | MainThread | epoch 10 dev st2 per-label F1: apps=0.821, creator_community=0.508, education=0.692, fashion=0.773, financial=0.757, food=0.872, gambling=0.000, gambling_adjacent=0.000, hardware_electronics=0.780, health=0.855, other=0.490, toys=0.571
+2026-08-16 01:34:06,492 | INFO | MainThread | epoch 10 dev st3 per-label F1: age_restricted_or_prohibited_product=0.000, direct_exhortation=0.000, hfss_food_marketing=0.000, inadequate_disclosure=0.000, insufficient_context=0.027, misleading_claim=0.000, no_flag=0.000, undisclosed_advertising=0.000
+2026-08-16 01:34:06,492 | INFO | MainThread | epoch 10 dev st3_family per-label F1: content=0.000, disclosure=0.000, housekeeping=0.420, product=0.000
+2026-08-16 01:34:06,536 | INFO | MainThread | epoch 10: new best mean(st1,st2)_macro_f1=0.695, saved to runs/lora-qwen-st12-100epoch-standing/best
+2026-08-16 01:46:57,549 | INFO | MainThread | epoch 11: mean train loss = 0.0200
+2026-08-16 01:46:57,549 | INFO | MainThread | epoch 11: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 01:59:48,545 | INFO | MainThread | epoch 12: mean train loss = 0.0190
+2026-08-16 01:59:48,546 | INFO | MainThread | epoch 12: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 02:12:39,616 | INFO | MainThread | epoch 13: mean train loss = 0.0148
+2026-08-16 02:12:39,616 | INFO | MainThread | epoch 13: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 02:25:30,679 | INFO | MainThread | epoch 14: mean train loss = 0.0129
+2026-08-16 02:25:30,679 | INFO | MainThread | epoch 14: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 02:38:21,716 | INFO | MainThread | epoch 15: mean train loss = 0.0122
+2026-08-16 02:38:21,716 | INFO | MainThread | epoch 15: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 02:51:12,696 | INFO | MainThread | epoch 16: mean train loss = 0.0113
+2026-08-16 02:51:12,696 | INFO | MainThread | epoch 16: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 03:04:03,686 | INFO | MainThread | epoch 17: mean train loss = 0.0106
+2026-08-16 03:04:03,686 | INFO | MainThread | epoch 17: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 03:16:54,843 | INFO | MainThread | epoch 18: mean train loss = 0.0074
+2026-08-16 03:16:54,843 | INFO | MainThread | epoch 18: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 03:29:45,813 | INFO | MainThread | epoch 19: mean train loss = 0.0076
+2026-08-16 03:29:45,813 | INFO | MainThread | epoch 19: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 03:42:36,795 | INFO | MainThread | epoch 20: mean train loss = 0.0060
+2026-08-16 03:42:36,795 | INFO | MainThread | epoch 20: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 03:45:58,305 | INFO | MainThread | generate_predictions: input length (tokens, unpadded) -- min=1628 mean=2702 max=4000 n=504
+2026-08-16 03:45:58,539 | INFO | MainThread | epoch 20 dev metrics: st1_macro_f1=0.709, st2_macro_f1=0.591, st3_macro_f1=0.003, st3_family_macro_f1=0.105, mean_macro_f1=0.435
+2026-08-16 03:45:58,539 | INFO | MainThread | epoch 20 dev st1 per-label F1: digital_content_or_services=0.922, none=0.250, physical_goods=0.926, physical_services=0.739
+2026-08-16 03:45:58,539 | INFO | MainThread | epoch 20 dev st2 per-label F1: apps=0.850, creator_community=0.529, education=0.538, fashion=0.617, financial=0.703, food=0.851, gambling=0.000, gambling_adjacent=0.417, hardware_electronics=0.817, health=0.844, other=0.465, toys=0.462
+2026-08-16 03:45:58,539 | INFO | MainThread | epoch 20 dev st3 per-label F1: age_restricted_or_prohibited_product=0.000, direct_exhortation=0.000, hfss_food_marketing=0.000, inadequate_disclosure=0.000, insufficient_context=0.027, misleading_claim=0.000, no_flag=0.000, undisclosed_advertising=0.000
+2026-08-16 03:45:58,539 | INFO | MainThread | epoch 20 dev st3_family per-label F1: content=0.000, disclosure=0.000, housekeeping=0.420, product=0.000
+2026-08-16 03:58:49,718 | INFO | MainThread | epoch 21: mean train loss = 0.0089
+2026-08-16 03:58:49,718 | INFO | MainThread | epoch 21: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 04:11:40,683 | INFO | MainThread | epoch 22: mean train loss = 0.0064
+2026-08-16 04:11:40,683 | INFO | MainThread | epoch 22: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 04:24:31,593 | INFO | MainThread | epoch 23: mean train loss = 0.0050
+2026-08-16 04:24:31,593 | INFO | MainThread | epoch 23: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 04:37:22,488 | INFO | MainThread | epoch 24: mean train loss = 0.0066
+2026-08-16 04:37:22,489 | INFO | MainThread | epoch 24: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 04:50:13,406 | INFO | MainThread | epoch 25: mean train loss = 0.0041
+2026-08-16 04:50:13,407 | INFO | MainThread | epoch 25: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 05:03:04,358 | INFO | MainThread | epoch 26: mean train loss = 0.0050
+2026-08-16 05:03:04,358 | INFO | MainThread | epoch 26: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 05:15:55,364 | INFO | MainThread | epoch 27: mean train loss = 0.0081
+2026-08-16 05:15:55,364 | INFO | MainThread | epoch 27: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 05:28:46,310 | INFO | MainThread | epoch 28: mean train loss = 0.0016
+2026-08-16 05:28:46,310 | INFO | MainThread | epoch 28: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 05:41:37,253 | INFO | MainThread | epoch 29: mean train loss = 0.0058
+2026-08-16 05:41:37,253 | INFO | MainThread | epoch 29: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 05:54:28,221 | INFO | MainThread | epoch 30: mean train loss = 0.0063
+2026-08-16 05:54:28,222 | INFO | MainThread | epoch 30: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 05:57:46,459 | INFO | MainThread | generate_predictions: input length (tokens, unpadded) -- min=1628 mean=2702 max=4000 n=504
+2026-08-16 05:57:46,601 | INFO | MainThread | epoch 30 dev metrics: st1_macro_f1=0.813, st2_macro_f1=0.581, st3_macro_f1=0.003, st3_family_macro_f1=0.105, mean_macro_f1=0.466
+2026-08-16 05:57:46,602 | INFO | MainThread | epoch 30 dev st1 per-label F1: digital_content_or_services=0.941, none=0.636, physical_goods=0.934, physical_services=0.741
+2026-08-16 05:57:46,602 | INFO | MainThread | epoch 30 dev st2 per-label F1: apps=0.842, creator_community=0.574, education=0.609, fashion=0.695, financial=0.706, food=0.882, gambling=0.000, gambling_adjacent=0.190, hardware_electronics=0.882, health=0.862, other=0.475, toys=0.250
+2026-08-16 05:57:46,602 | INFO | MainThread | epoch 30 dev st3 per-label F1: age_restricted_or_prohibited_product=0.000, direct_exhortation=0.000, hfss_food_marketing=0.000, inadequate_disclosure=0.000, insufficient_context=0.027, misleading_claim=0.000, no_flag=0.000, undisclosed_advertising=0.000
+2026-08-16 05:57:46,602 | INFO | MainThread | epoch 30 dev st3_family per-label F1: content=0.000, disclosure=0.000, housekeeping=0.420, product=0.000
+2026-08-16 05:57:46,647 | INFO | MainThread | epoch 30: new best mean(st1,st2)_macro_f1=0.697, saved to runs/lora-qwen-st12-100epoch-standing/best
+2026-08-16 06:10:37,828 | INFO | MainThread | epoch 31: mean train loss = 0.0048
+2026-08-16 06:10:37,828 | INFO | MainThread | epoch 31: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 06:23:28,866 | INFO | MainThread | epoch 32: mean train loss = 0.0016
+2026-08-16 06:23:28,866 | INFO | MainThread | epoch 32: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 06:36:20,141 | INFO | MainThread | epoch 33: mean train loss = 0.0069
+2026-08-16 06:36:20,141 | INFO | MainThread | epoch 33: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 06:49:11,481 | INFO | MainThread | epoch 34: mean train loss = 0.0046
+2026-08-16 06:49:11,481 | INFO | MainThread | epoch 34: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 07:02:02,739 | INFO | MainThread | epoch 35: mean train loss = 0.0036
+2026-08-16 07:02:02,739 | INFO | MainThread | epoch 35: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 07:14:53,726 | INFO | MainThread | epoch 36: mean train loss = 0.0032
+2026-08-16 07:14:53,726 | INFO | MainThread | epoch 36: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 07:27:44,903 | INFO | MainThread | epoch 37: mean train loss = 0.0028
+2026-08-16 07:27:44,904 | INFO | MainThread | epoch 37: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 07:40:36,033 | INFO | MainThread | epoch 38: mean train loss = 0.0040
+2026-08-16 07:40:36,034 | INFO | MainThread | epoch 38: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 07:53:27,204 | INFO | MainThread | epoch 39: mean train loss = 0.0017
+2026-08-16 07:53:27,204 | INFO | MainThread | epoch 39: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 08:06:18,289 | INFO | MainThread | epoch 40: mean train loss = 0.0029
+2026-08-16 08:06:18,290 | INFO | MainThread | epoch 40: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 08:09:38,619 | INFO | MainThread | generate_predictions: input length (tokens, unpadded) -- min=1628 mean=2702 max=4000 n=504
+2026-08-16 08:09:38,843 | INFO | MainThread | epoch 40 dev metrics: st1_macro_f1=0.720, st2_macro_f1=0.616, st3_macro_f1=0.003, st3_family_macro_f1=0.105, mean_macro_f1=0.447
+2026-08-16 08:09:38,843 | INFO | MainThread | epoch 40 dev st1 per-label F1: digital_content_or_services=0.927, none=0.333, physical_goods=0.921, physical_services=0.700
+2026-08-16 08:09:38,843 | INFO | MainThread | epoch 40 dev st2 per-label F1: apps=0.832, creator_community=0.545, education=0.609, fashion=0.717, financial=0.743, food=0.891, gambling=0.000, gambling_adjacent=0.364, hardware_electronics=0.868, health=0.891, other=0.513, toys=0.421
+2026-08-16 08:09:38,843 | INFO | MainThread | epoch 40 dev st3 per-label F1: age_restricted_or_prohibited_product=0.000, direct_exhortation=0.000, hfss_food_marketing=0.000, inadequate_disclosure=0.000, insufficient_context=0.027, misleading_claim=0.000, no_flag=0.000, undisclosed_advertising=0.000
+2026-08-16 08:09:38,843 | INFO | MainThread | epoch 40 dev st3_family per-label F1: content=0.000, disclosure=0.000, housekeeping=0.420, product=0.000
+2026-08-16 08:22:30,273 | INFO | MainThread | epoch 41: mean train loss = 0.0059
+2026-08-16 08:22:30,274 | INFO | MainThread | epoch 41: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 08:35:21,221 | INFO | MainThread | epoch 42: mean train loss = 0.0033
+2026-08-16 08:35:21,221 | INFO | MainThread | epoch 42: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 08:48:12,218 | INFO | MainThread | epoch 43: mean train loss = 0.0019
+2026-08-16 08:48:12,218 | INFO | MainThread | epoch 43: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 09:01:03,229 | INFO | MainThread | epoch 44: mean train loss = 0.0008
+2026-08-16 09:01:03,230 | INFO | MainThread | epoch 44: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 09:13:54,272 | INFO | MainThread | epoch 45: mean train loss = 0.0007
+2026-08-16 09:13:54,273 | INFO | MainThread | epoch 45: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 09:26:45,259 | INFO | MainThread | epoch 46: mean train loss = 0.0018
+2026-08-16 09:26:45,259 | INFO | MainThread | epoch 46: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 09:39:36,243 | INFO | MainThread | epoch 47: mean train loss = 0.0038
+2026-08-16 09:39:36,243 | INFO | MainThread | epoch 47: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 09:52:27,208 | INFO | MainThread | epoch 48: mean train loss = 0.0043
+2026-08-16 09:52:27,208 | INFO | MainThread | epoch 48: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 10:05:18,114 | INFO | MainThread | epoch 49: mean train loss = 0.0006
+2026-08-16 10:05:18,114 | INFO | MainThread | epoch 49: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 10:18:09,116 | INFO | MainThread | epoch 50: mean train loss = 0.0042
+2026-08-16 10:18:09,116 | INFO | MainThread | epoch 50: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 10:21:29,675 | INFO | MainThread | generate_predictions: input length (tokens, unpadded) -- min=1628 mean=2702 max=4000 n=504
+2026-08-16 10:21:29,815 | INFO | MainThread | epoch 50 dev metrics: st1_macro_f1=0.768, st2_macro_f1=0.637, st3_macro_f1=0.003, st3_family_macro_f1=0.105, mean_macro_f1=0.469
+2026-08-16 10:21:29,815 | INFO | MainThread | epoch 50 dev st1 per-label F1: digital_content_or_services=0.916, none=0.500, physical_goods=0.918, physical_services=0.737
+2026-08-16 10:21:29,815 | INFO | MainThread | epoch 50 dev st2 per-label F1: apps=0.815, creator_community=0.600, education=0.667, fashion=0.781, financial=0.778, food=0.863, gambling=0.000, gambling_adjacent=0.444, hardware_electronics=0.836, health=0.881, other=0.554, toys=0.421
+2026-08-16 10:21:29,815 | INFO | MainThread | epoch 50 dev st3 per-label F1: age_restricted_or_prohibited_product=0.000, direct_exhortation=0.000, hfss_food_marketing=0.000, inadequate_disclosure=0.000, insufficient_context=0.027, misleading_claim=0.000, no_flag=0.000, undisclosed_advertising=0.000
+2026-08-16 10:21:29,815 | INFO | MainThread | epoch 50 dev st3_family per-label F1: content=0.000, disclosure=0.000, housekeeping=0.420, product=0.000
+2026-08-16 10:21:29,852 | INFO | MainThread | epoch 50: new best mean(st1,st2)_macro_f1=0.702, saved to runs/lora-qwen-st12-100epoch-standing/best
+2026-08-16 10:34:21,092 | INFO | MainThread | epoch 51: mean train loss = 0.0007
+2026-08-16 10:34:21,092 | INFO | MainThread | epoch 51: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 10:47:12,141 | INFO | MainThread | epoch 52: mean train loss = 0.0031
+2026-08-16 10:47:12,142 | INFO | MainThread | epoch 52: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 11:00:03,151 | INFO | MainThread | epoch 53: mean train loss = 0.0017
+2026-08-16 11:00:03,151 | INFO | MainThread | epoch 53: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 11:12:54,185 | INFO | MainThread | epoch 54: mean train loss = 0.0000
+2026-08-16 11:12:54,186 | INFO | MainThread | epoch 54: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 11:25:45,211 | INFO | MainThread | epoch 55: mean train loss = 0.0000
+2026-08-16 11:25:45,211 | INFO | MainThread | epoch 55: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 11:38:36,279 | INFO | MainThread | epoch 56: mean train loss = 0.0000
+2026-08-16 11:38:36,279 | INFO | MainThread | epoch 56: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 11:51:27,263 | INFO | MainThread | epoch 57: mean train loss = 0.0000
+2026-08-16 11:51:27,264 | INFO | MainThread | epoch 57: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 12:04:18,269 | INFO | MainThread | epoch 58: mean train loss = 0.0000
+2026-08-16 12:04:18,269 | INFO | MainThread | epoch 58: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 12:17:09,308 | INFO | MainThread | epoch 59: mean train loss = 0.0000
+2026-08-16 12:17:09,308 | INFO | MainThread | epoch 59: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 12:30:00,346 | INFO | MainThread | epoch 60: mean train loss = 0.0000
+2026-08-16 12:30:00,346 | INFO | MainThread | epoch 60: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 12:33:26,161 | INFO | MainThread | generate_predictions: input length (tokens, unpadded) -- min=1628 mean=2702 max=4000 n=504
+2026-08-16 12:33:26,348 | INFO | MainThread | epoch 60 dev metrics: st1_macro_f1=0.775, st2_macro_f1=0.656, st3_macro_f1=0.003, st3_family_macro_f1=0.105, mean_macro_f1=0.478
+2026-08-16 12:33:26,348 | INFO | MainThread | epoch 60 dev st1 per-label F1: digital_content_or_services=0.924, none=0.545, physical_goods=0.938, physical_services=0.694
+2026-08-16 12:33:26,348 | INFO | MainThread | epoch 60 dev st2 per-label F1: apps=0.819, creator_community=0.544, education=0.696, fashion=0.738, financial=0.732, food=0.903, gambling=0.286, gambling_adjacent=0.500, hardware_electronics=0.822, health=0.870, other=0.547, toys=0.421
+2026-08-16 12:33:26,349 | INFO | MainThread | epoch 60 dev st3 per-label F1: age_restricted_or_prohibited_product=0.000, direct_exhortation=0.000, hfss_food_marketing=0.000, inadequate_disclosure=0.000, insufficient_context=0.027, misleading_claim=0.000, no_flag=0.000, undisclosed_advertising=0.000
+2026-08-16 12:33:26,349 | INFO | MainThread | epoch 60 dev st3_family per-label F1: content=0.000, disclosure=0.000, housekeeping=0.420, product=0.000
+2026-08-16 12:33:26,387 | INFO | MainThread | epoch 60: new best mean(st1,st2)_macro_f1=0.716, saved to runs/lora-qwen-st12-100epoch-standing/best
+2026-08-16 12:46:17,775 | INFO | MainThread | epoch 61: mean train loss = 0.0000
+2026-08-16 12:46:17,776 | INFO | MainThread | epoch 61: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 12:59:08,985 | INFO | MainThread | epoch 62: mean train loss = 0.0000
+2026-08-16 12:59:08,985 | INFO | MainThread | epoch 62: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 13:12:00,153 | INFO | MainThread | epoch 63: mean train loss = 0.0000
+2026-08-16 13:12:00,153 | INFO | MainThread | epoch 63: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 13:24:51,305 | INFO | MainThread | epoch 64: mean train loss = 0.0035
+2026-08-16 13:24:51,305 | INFO | MainThread | epoch 64: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 13:37:42,541 | INFO | MainThread | epoch 65: mean train loss = 0.0026
+2026-08-16 13:37:42,541 | INFO | MainThread | epoch 65: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 13:50:33,878 | INFO | MainThread | epoch 66: mean train loss = 0.0005
+2026-08-16 13:50:33,878 | INFO | MainThread | epoch 66: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 14:03:25,412 | INFO | MainThread | epoch 67: mean train loss = 0.0002
+2026-08-16 14:03:25,413 | INFO | MainThread | epoch 67: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 14:16:16,917 | INFO | MainThread | epoch 68: mean train loss = 0.0000
+2026-08-16 14:16:16,917 | INFO | MainThread | epoch 68: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 14:29:08,381 | INFO | MainThread | epoch 69: mean train loss = 0.0000
+2026-08-16 14:29:08,382 | INFO | MainThread | epoch 69: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 14:41:59,642 | INFO | MainThread | epoch 70: mean train loss = 0.0000
+2026-08-16 14:41:59,642 | INFO | MainThread | epoch 70: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 14:45:20,541 | INFO | MainThread | generate_predictions: input length (tokens, unpadded) -- min=1628 mean=2702 max=4000 n=504
+2026-08-16 14:45:20,763 | INFO | MainThread | epoch 70 dev metrics: st1_macro_f1=0.814, st2_macro_f1=0.652, st3_macro_f1=0.003, st3_family_macro_f1=0.105, mean_macro_f1=0.490
+2026-08-16 14:45:20,763 | INFO | MainThread | epoch 70 dev st1 per-label F1: digital_content_or_services=0.935, none=0.545, physical_goods=0.931, physical_services=0.844
+2026-08-16 14:45:20,763 | INFO | MainThread | epoch 70 dev st2 per-label F1: apps=0.844, creator_community=0.563, education=0.727, fashion=0.766, financial=0.789, food=0.907, gambling=0.000, gambling_adjacent=0.480, hardware_electronics=0.832, health=0.902, other=0.544, toys=0.471
+2026-08-16 14:45:20,763 | INFO | MainThread | epoch 70 dev st3 per-label F1: age_restricted_or_prohibited_product=0.000, direct_exhortation=0.000, hfss_food_marketing=0.000, inadequate_disclosure=0.000, insufficient_context=0.027, misleading_claim=0.000, no_flag=0.000, undisclosed_advertising=0.000
+2026-08-16 14:45:20,764 | INFO | MainThread | epoch 70 dev st3_family per-label F1: content=0.000, disclosure=0.000, housekeeping=0.420, product=0.000
+2026-08-16 14:45:20,800 | INFO | MainThread | epoch 70: new best mean(st1,st2)_macro_f1=0.733, saved to runs/lora-qwen-st12-100epoch-standing/best
+2026-08-16 14:58:12,199 | INFO | MainThread | epoch 71: mean train loss = 0.0000
+2026-08-16 14:58:12,200 | INFO | MainThread | epoch 71: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 15:11:03,600 | INFO | MainThread | epoch 72: mean train loss = 0.0000
+2026-08-16 15:11:03,600 | INFO | MainThread | epoch 72: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
+2026-08-16 15:23:55,060 | INFO | MainThread | epoch 73: mean train loss = 0.0000
+2026-08-16 15:23:55,060 | INFO | MainThread | epoch 73: train input length (tokens, unpadded) -- min=1692 mean=2780 max=4036 n=1853
