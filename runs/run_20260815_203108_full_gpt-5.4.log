@@ -1,0 +1,24 @@
+2026-08-15 20:31:08,993 | INFO | MainThread | logging to runs/run_20260815_203108_full_gpt-5.4.log
+2026-08-15 20:31:08,993 | INFO | MainThread | config: target=public_data_dev/dev.jsonl model=gpt-5.4 context=full sample_size=5 max_concurrency=8 st3_only=True lean_prompt=False df_path=None few_shot=False few_shot_n=1 cot=inline out=runs/submission_gpt_20260815_203108.jsonl seed=42
+2026-08-15 20:31:08,993 | INFO | MainThread | appending CoT instructions to the system prompt
+2026-08-15 20:31:08,993 | INFO | MainThread | system prompt: full st3-only cot=inline (17968 chars)
+2026-08-15 20:31:13,822 | INFO | MainThread | wrote 5 predictions to runs/submission_gpt_20260815_203108.jsonl
+2026-08-15 20:31:13,824 | INFO | MainThread | copied predictions to submission_gpt_st3.jsonl (canonical submission file)
+2026-08-15 20:31:13,824 | INFO | MainThread | wrote 1 misclassified instance(s) to runs/submission_gpt_error_20260815_203108.jsonl
+2026-08-15 20:31:13,824 | INFO | MainThread | === Distinct gold labels observed, by tier ===
+2026-08-15 20:31:13,824 | INFO | MainThread | [ST1 - commercial type]     ['digital_content_or_services', 'physical_goods', 'physical_services']
+2026-08-15 20:31:13,824 | INFO | MainThread | [ST2 - product category]    ['apps', 'fashion', 'hardware_electronics', 'other']
+2026-08-15 20:31:13,824 | INFO | MainThread | [ST3 - compliance flags]    ['misleading_claim', 'no_flag']
+2026-08-15 20:31:13,825 | INFO | MainThread | Evaluation:
+2026-08-15 20:31:13,825 | INFO | MainThread |   st3_macro_f1: 0.762
+2026-08-15 20:31:13,825 | INFO | MainThread |   st3_family_macro_f1: 0.762
+2026-08-15 20:31:13,825 | INFO | MainThread |   st3 per-label F1: misleading_claim=0.857, no_flag=0.667
+2026-08-15 20:31:13,825 | INFO | MainThread |   st3_family per-label F1: content=0.857, housekeeping=0.667
+2026-08-15 20:31:13,825 | INFO | MainThread | === Prediction diagnostics ===
+2026-08-15 20:31:13,825 | INFO | MainThread | [st3] label distribution (gold / pred):
+2026-08-15 20:31:13,825 | INFO | MainThread |   misleading_claim: gold=3, pred=4
+2026-08-15 20:31:13,825 | INFO | MainThread |   no_flag: gold=2, pred=1
+2026-08-15 20:31:13,825 | INFO | MainThread | [st3] gold x pred cross-product counts (gold -> pred: count):
+2026-08-15 20:31:13,825 | INFO | MainThread |   misleading_claim -> misleading_claim: 3
+2026-08-15 20:31:13,825 | INFO | MainThread |   no_flag -> misleading_claim: 1
+2026-08-15 20:31:13,825 | INFO | MainThread |   no_flag -> no_flag: 1

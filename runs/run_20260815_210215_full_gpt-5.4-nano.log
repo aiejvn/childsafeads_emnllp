@@ -1,0 +1,60 @@
+2026-08-15 21:02:15,767 | INFO | MainThread | logging to runs/run_20260815_210215_full_gpt-5.4-nano.log
+2026-08-15 21:02:15,767 | INFO | MainThread | config: target=public_data_dev/dev.jsonl model=gpt-5.4-nano context=full sample_size=100 max_concurrency=8 st3_only=True lean_prompt=True df_path=emnllp-dialog-flow-dialog-flow.json few_shot=False few_shot_n=1 cot=inline out=runs/submission_gpt_20260815_210215.jsonl seed=42
+2026-08-15 21:02:15,768 | INFO | MainThread | appending stripped dialog flow from emnllp-dialog-flow-dialog-flow.json (5685 chars) to the system prompt
+2026-08-15 21:02:15,768 | INFO | MainThread | appending CoT instructions to the system prompt
+2026-08-15 21:02:15,768 | INFO | MainThread | system prompt: lean st3-only cot=inline (8009 chars)
+2026-08-15 21:02:39,406 | INFO | MainThread | wrote 100 predictions to runs/submission_gpt_20260815_210215.jsonl
+2026-08-15 21:02:39,407 | INFO | MainThread | copied predictions to submission_gpt_st3.jsonl (canonical submission file)
+2026-08-15 21:02:39,407 | INFO | MainThread | wrote 87 misclassified instance(s) to runs/submission_gpt_error_20260815_210215.jsonl
+2026-08-15 21:02:39,407 | INFO | MainThread | === Distinct gold labels observed, by tier ===
+2026-08-15 21:02:39,407 | INFO | MainThread | [ST1 - commercial type]     ['digital_content_or_services', 'none', 'physical_goods', 'physical_services']
+2026-08-15 21:02:39,407 | INFO | MainThread | [ST2 - product category]    ['apps', 'creator_community', 'education', 'fashion', 'financial', 'food', 'gambling', 'gambling_adjacent', 'hardware_electronics', 'health', 'other', 'toys']
+2026-08-15 21:02:39,407 | INFO | MainThread | [ST3 - compliance flags]    ['age_restricted_or_prohibited_product', 'direct_exhortation', 'hfss_food_marketing', 'inadequate_disclosure', 'insufficient_context', 'misleading_claim', 'no_flag', 'undisclosed_advertising']
+2026-08-15 21:02:39,408 | INFO | MainThread | Evaluation:
+2026-08-15 21:02:39,408 | INFO | MainThread |   st3_macro_f1: 0.285
+2026-08-15 21:02:39,408 | INFO | MainThread |   st3_family_macro_f1: 0.407
+2026-08-15 21:02:39,408 | INFO | MainThread |   st3 per-label F1: age_restricted_or_prohibited_product=0.000, direct_exhortation=0.301, hfss_food_marketing=0.000, inadequate_disclosure=0.222, insufficient_context=0.571, misleading_claim=0.525, no_flag=0.324, undisclosed_advertising=0.333
+2026-08-15 21:02:39,408 | INFO | MainThread |   st3_family per-label F1: content=0.789, disclosure=0.429, housekeeping=0.409, product=0.000
+2026-08-15 21:02:39,408 | INFO | MainThread | === Prediction diagnostics ===
+2026-08-15 21:02:39,408 | INFO | MainThread | [st3] label distribution (gold / pred):
+2026-08-15 21:02:39,408 | INFO | MainThread |   age_restricted_or_prohibited_product: gold=1, pred=0
+2026-08-15 21:02:39,408 | INFO | MainThread |   direct_exhortation: gold=16, pred=77
+2026-08-15 21:02:39,408 | INFO | MainThread |   hfss_food_marketing: gold=2, pred=0
+2026-08-15 21:02:39,408 | INFO | MainThread |   inadequate_disclosure: gold=13, pred=5
+2026-08-15 21:02:39,408 | INFO | MainThread |   insufficient_context: gold=4, pred=3
+2026-08-15 21:02:39,408 | INFO | MainThread |   misleading_claim: gold=57, pred=23
+2026-08-15 21:02:39,408 | INFO | MainThread |   no_flag: gold=24, pred=13
+2026-08-15 21:02:39,408 | INFO | MainThread |   undisclosed_advertising: gold=18, pred=6
+2026-08-15 21:02:39,408 | INFO | MainThread | [st3] gold x pred cross-product counts (gold -> pred: count):
+2026-08-15 21:02:39,409 | INFO | MainThread |   misleading_claim -> direct_exhortation: 49
+2026-08-15 21:02:39,409 | INFO | MainThread |   misleading_claim -> misleading_claim: 21
+2026-08-15 21:02:39,409 | INFO | MainThread |   no_flag -> direct_exhortation: 17
+2026-08-15 21:02:39,409 | INFO | MainThread |   direct_exhortation -> direct_exhortation: 14
+2026-08-15 21:02:39,409 | INFO | MainThread |   undisclosed_advertising -> direct_exhortation: 14
+2026-08-15 21:02:39,409 | INFO | MainThread |   inadequate_disclosure -> direct_exhortation: 10
+2026-08-15 21:02:39,409 | INFO | MainThread |   no_flag -> no_flag: 6
+2026-08-15 21:02:39,409 | INFO | MainThread |   direct_exhortation -> misleading_claim: 5
+2026-08-15 21:02:39,409 | INFO | MainThread |   misleading_claim -> undisclosed_advertising: 4
+2026-08-15 21:02:39,409 | INFO | MainThread |   undisclosed_advertising -> undisclosed_advertising: 4
+2026-08-15 21:02:39,409 | INFO | MainThread |   inadequate_disclosure -> misleading_claim: 3
+2026-08-15 21:02:39,409 | INFO | MainThread |   inadequate_disclosure -> no_flag: 3
+2026-08-15 21:02:39,409 | INFO | MainThread |   misleading_claim -> no_flag: 3
+2026-08-15 21:02:39,409 | INFO | MainThread |   undisclosed_advertising -> misleading_claim: 3
+2026-08-15 21:02:39,409 | INFO | MainThread |   direct_exhortation -> inadequate_disclosure: 2
+2026-08-15 21:02:39,409 | INFO | MainThread |   hfss_food_marketing -> direct_exhortation: 2
+2026-08-15 21:02:39,409 | INFO | MainThread |   inadequate_disclosure -> inadequate_disclosure: 2
+2026-08-15 21:02:39,409 | INFO | MainThread |   insufficient_context -> insufficient_context: 2
+2026-08-15 21:02:39,410 | INFO | MainThread |   misleading_claim -> inadequate_disclosure: 2
+2026-08-15 21:02:39,410 | INFO | MainThread |   no_flag -> misleading_claim: 2
+2026-08-15 21:02:39,410 | INFO | MainThread |   undisclosed_advertising -> inadequate_disclosure: 2
+2026-08-15 21:02:39,410 | INFO | MainThread |   undisclosed_advertising -> no_flag: 2
+2026-08-15 21:02:39,410 | INFO | MainThread |   age_restricted_or_prohibited_product -> direct_exhortation: 1
+2026-08-15 21:02:39,410 | INFO | MainThread |   age_restricted_or_prohibited_product -> misleading_claim: 1
+2026-08-15 21:02:39,410 | INFO | MainThread |   age_restricted_or_prohibited_product -> undisclosed_advertising: 1
+2026-08-15 21:02:39,410 | INFO | MainThread |   direct_exhortation -> undisclosed_advertising: 1
+2026-08-15 21:02:39,410 | INFO | MainThread |   hfss_food_marketing -> inadequate_disclosure: 1
+2026-08-15 21:02:39,410 | INFO | MainThread |   inadequate_disclosure -> undisclosed_advertising: 1
+2026-08-15 21:02:39,410 | INFO | MainThread |   insufficient_context -> no_flag: 1
+2026-08-15 21:02:39,410 | INFO | MainThread |   insufficient_context -> undisclosed_advertising: 1
+2026-08-15 21:02:39,410 | INFO | MainThread |   no_flag -> inadequate_disclosure: 1
+2026-08-15 21:02:39,410 | INFO | MainThread |   undisclosed_advertising -> insufficient_context: 1
