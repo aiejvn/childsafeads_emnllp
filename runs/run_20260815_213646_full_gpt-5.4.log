@@ -1,0 +1,114 @@
+2026-08-15 21:36:46,884 | INFO | MainThread | logging to runs/run_20260815_213646_full_gpt-5.4.log
+2026-08-15 21:36:46,884 | INFO | MainThread | config: target=public_data_dev/dev.jsonl model=gpt-5.4 context=full sample_size=30 max_concurrency=8 st3_only=True lean_prompt=True df_path=None few_shot=True few_shot_n=3 cot=inline out=runs/submission_gpt_20260815_213646.jsonl seed=42
+2026-08-15 21:36:46,901 | INFO | MainThread | few-shot examples collected: direct_exhortation=3, inadequate_disclosure=3, insufficient_context=3
+2026-08-15 21:36:46,901 | INFO | MainThread | appending few-shot examples (1969 chars) to the system prompt
+2026-08-15 21:36:46,901 | INFO | MainThread | appending CoT instructions to the system prompt
+2026-08-15 21:36:46,901 | INFO | MainThread | system prompt: lean st3-only few-shot cot=inline (4293 chars)
+2026-08-15 21:36:46,901 | INFO | MainThread | system prompt used: ## Given
+
+The channel is child-facing and the segment is commercial. Both are facts of the
+dataset. Do not re-assess either.
+
+## ST1 — Commercial Type (exactly one)
+
+`physical_goods`, `digital_content_or_services`, `physical_services`, `none`, `other`
+
+## ST2 — Product Category (one or more)
+
+One offer often carries several: a mobile game with paid loot boxes is `apps` **and**
+`gambling_adjacent`.
+
+| Label | Definition |
+|-------|------------|
+| `toys` | Toys and games (physical) |
+| `food` | Food and beverages |
+| `apps` | Apps and digital games |
+| `hardware_electronics` | Consumer electronics: phones, PCs, peripherals, audio, cameras, gadgets |
+| `fashion` | Fashion and apparel |
+| `health` | Health and wellness: supplements, fitness, skincare, mental health |
+| `education` | Education and learning |
+| `financial` | Financial products and services |
+| `gambling` | Gambling: casinos, sports betting, poker, lotteries |
+| `gambling_adjacent` | Gambling-like mechanics: loot boxes, gacha, mystery boxes, skins markets |
+| `creator_community` | Fan and creator community: merchandise, memberships, Patreon |
+| `other` | None of the above; name the category you see |
+
+## ST3 — Compliance Risk Flags (one or more)
+
+`undisclosed_advertising`, `inadequate_disclosure`, `direct_exhortation`,
+`misleading_claim`, `age_restricted_or_prohibited_product`, `hfss_food_marketing`,
+`no_flag`, `insufficient_context`
+
+### Constraints
+
+1. Emit every flag that applies.
+2. `no_flag` and `insufficient_context` are each exclusive of all other flags.
+3. `undisclosed_advertising` and `inadequate_disclosure` are mutually exclusive: either
+   there is no disclosure, or there is one that is inadequate.
+
+
+## FEW-SHOT EXAMPLES
+
+Live examples from the training data, pairing each label's definition with real evidence that earned it.
+
+### `direct_exhortation`
+Definition: A direct appeal to children to buy the product, or to persuade their parents or other adults to buy it for them (see the test below)
+Example 1 (evidence quote): "so if you have a game or franchise that you really like definitely pick one of these up"
+Example 2 (evidence quote): "please get yourself a PC you deserve the link to Star Forge systems will be in the description go and check out their PCS today"
+Example 3 (evidence quote): "Look, if you're not taking good care of your face, you need to start today. And if you go to geology.com or use the link in the description and take their free skin care quiz, you will save up to 70% off on a 30-day trial."
+
+### `inadequate_disclosure`
+Definition: A disclosure exists but fails the child-audience clarity test: buried in description text, phrased in adult jargon, or otherwise not clear and comprehensible to a child. Assessed on the text and where the disclosure appears; visual and timing cues are outside the scope of this release
+Example 1 (evidence quote): "interrupting the video to thank today's amazing sponsor which is marvel's guardians of the galaxy"
+Example 2 (evidence quote): "interrupting the video to thank today's wonderful sponsor which is seat geek"
+Example 3 (evidence quote): "Thank you to Surfshark for sponsoring this video."
+
+### `insufficient_context`
+Definition: The segment is too short or ambiguous to assess
+Example 1 (transcript excerpt): "[Music] [Music] [Music] do [Music] so [Music] [Music] [Music] [Music] um [Music] [Music] [Music] [Music] [Music] [Music] [Music] [Music] [Music] do [Music] [Music] [Music] [Music] hey hey people oh"
+Example 2 (transcript excerpt): "*outro* *but can you this?* *outro* *bye* *broderfist*"
+Example 3 (transcript excerpt): "[Music] oh [Music] last time on game groups oh please let"
+
+The structured prediction has a `reasoning` field before `st3` -- use
+it to actually work through the checks above against the specific evidence in this segment
+before committing to labels, rather than stating a conclusion first and justifying it after.
+Keep it to a few sentences: name which checks you evaluated, what evidence (or absence of
+evidence) drove each one, and, where two labels are commonly confused (e.g.
+`undisclosed_advertising` vs. `inadequate_disclosure`), which side of that specific line this
+segment fell on and why. Do not restate the taxonomy definitions -- reason about this
+segment's actual text.
+2026-08-15 21:36:59,068 | INFO | MainThread | wrote 30 predictions to runs/submission_gpt_20260815_213646.jsonl
+2026-08-15 21:36:59,069 | INFO | MainThread | copied predictions to submission_gpt_st3.jsonl (canonical submission file)
+2026-08-15 21:36:59,069 | INFO | MainThread | wrote 28 misclassified instance(s) to runs/submission_gpt_error_20260815_213646.jsonl
+2026-08-15 21:36:59,069 | INFO | MainThread | === Distinct gold labels observed, by tier ===
+2026-08-15 21:36:59,069 | INFO | MainThread | [ST1 - commercial type]     ['digital_content_or_services', 'none', 'physical_goods', 'physical_services']
+2026-08-15 21:36:59,069 | INFO | MainThread | [ST2 - product category]    ['apps', 'creator_community', 'education', 'fashion', 'food', 'hardware_electronics', 'health', 'other']
+2026-08-15 21:36:59,069 | INFO | MainThread | [ST3 - compliance flags]    ['direct_exhortation', 'inadequate_disclosure', 'insufficient_context', 'misleading_claim', 'no_flag', 'undisclosed_advertising']
+2026-08-15 21:36:59,069 | INFO | MainThread | Evaluation:
+2026-08-15 21:36:59,069 | INFO | MainThread |   st3_macro_f1: 0.164
+2026-08-15 21:36:59,069 | INFO | MainThread |   st3_family_macro_f1: 0.408
+2026-08-15 21:36:59,069 | INFO | MainThread |   st3 per-label F1: direct_exhortation=0.222, inadequate_disclosure=0.261, insufficient_context=0.500, misleading_claim=0.000, no_flag=0.000, undisclosed_advertising=0.000
+2026-08-15 21:36:59,070 | INFO | MainThread |   st3_family per-label F1: content=0.762, disclosure=0.296, housekeeping=0.167
+2026-08-15 21:36:59,070 | INFO | MainThread | === Prediction diagnostics ===
+2026-08-15 21:36:59,070 | INFO | MainThread | [st3] label distribution (gold / pred):
+2026-08-15 21:36:59,070 | INFO | MainThread |   direct_exhortation: gold=3, pred=24
+2026-08-15 21:36:59,070 | INFO | MainThread |   inadequate_disclosure: gold=5, pred=18
+2026-08-15 21:36:59,070 | INFO | MainThread |   insufficient_context: gold=2, pred=2
+2026-08-15 21:36:59,070 | INFO | MainThread |   misleading_claim: gold=18, pred=0
+2026-08-15 21:36:59,070 | INFO | MainThread |   no_flag: gold=8, pred=0
+2026-08-15 21:36:59,070 | INFO | MainThread |   undisclosed_advertising: gold=1, pred=3
+2026-08-15 21:36:59,070 | INFO | MainThread | [st3] gold x pred cross-product counts (gold -> pred: count):
+2026-08-15 21:36:59,070 | INFO | MainThread |   misleading_claim -> direct_exhortation: 16
+2026-08-15 21:36:59,070 | INFO | MainThread |   misleading_claim -> inadequate_disclosure: 11
+2026-08-15 21:36:59,070 | INFO | MainThread |   no_flag -> direct_exhortation: 8
+2026-08-15 21:36:59,070 | INFO | MainThread |   no_flag -> inadequate_disclosure: 6
+2026-08-15 21:36:59,070 | INFO | MainThread |   direct_exhortation -> direct_exhortation: 3
+2026-08-15 21:36:59,070 | INFO | MainThread |   inadequate_disclosure -> direct_exhortation: 3
+2026-08-15 21:36:59,070 | INFO | MainThread |   inadequate_disclosure -> inadequate_disclosure: 3
+2026-08-15 21:36:59,070 | INFO | MainThread |   direct_exhortation -> inadequate_disclosure: 2
+2026-08-15 21:36:59,070 | INFO | MainThread |   misleading_claim -> undisclosed_advertising: 2
+2026-08-15 21:36:59,071 | INFO | MainThread |   direct_exhortation -> undisclosed_advertising: 1
+2026-08-15 21:36:59,071 | INFO | MainThread |   inadequate_disclosure -> undisclosed_advertising: 1
+2026-08-15 21:36:59,071 | INFO | MainThread |   insufficient_context -> insufficient_context: 1
+2026-08-15 21:36:59,071 | INFO | MainThread |   insufficient_context -> undisclosed_advertising: 1
+2026-08-15 21:36:59,071 | INFO | MainThread |   undisclosed_advertising -> insufficient_context: 1

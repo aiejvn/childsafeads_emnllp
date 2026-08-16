@@ -8,7 +8,7 @@ Usage:
     python baseline_gpt.py ../public_data_dev/dev.jsonl
     python baseline_gpt.py ../public_data_dev/dev.jsonl --sample-size 20  # smoke test
     python baseline_gpt.py ../public_data_dev/dev.jsonl --st3-only        # ST3 only, its own tuned prompt
-    python baseline_gpt.py ../public_data_dev/dev.jsonl --st3-only --few-shot  # + live train.jsonl examples
+    python baseline_gpt.py ../public_data_dev/dev.jsonl --st3-only --few-shot  # + hand-picked baked-in examples
     python baseline_gpt.py ../public_data_dev/dev.jsonl --st3-only --cot inline  # + inline reasoning field
     python baseline_gpt.py ../public_data_dev/dev.jsonl --lean-prompt --df-path ../emnllp-dialog-flow-dialog-flow.json
 
@@ -18,9 +18,11 @@ whenever the target split carries gold "labels" (train/dev, not the withheld tes
 three tiers) and writes to submission_gpt_st3.jsonl instead of the canonical
 submission_gpt.jsonl. --lean-prompt and --df-path mirror the LoRA baselines' flags of the
 same name, for a like-for-like comparison against them. --few-shot (st3-only only) appends
-1-2 real train.jsonl examples each for direct_exhortation, inadequate_disclosure, and
-insufficient_context to the system prompt, pairing each label's definition with a live
-example. --cot (st3-only only) switches on chain-of-thought: "inline" adds a `reasoning`
+a FEW-SHOT EXAMPLES section to the system prompt with hand-picked, rubric-vetted train.jsonl
+examples (baked in, not rescanned per run -- see GOLDEN_FEW_SHOT_EXAMPLES in st3_prompts.py)
+for direct_exhortation, undisclosed_advertising, inadequate_disclosure, misleading_claim,
+no_flag, and insufficient_context, pairing each label's definition with real evidence and a
+one-line rationale. --cot (st3-only only) switches on chain-of-thought: "inline" adds a `reasoning`
 field to the structured-output schema (one call, model reasons before committing to
 labels); "flow" walks the local dialog-flow graph node by node (see st3_flow_executor.py).
 
@@ -102,11 +104,16 @@ def main():
                           "--lean-prompt")
     ap.add_argument("--few-shot", action="store_true",
                      help="st3-only only: append a FEW-SHOT EXAMPLES section to the system prompt "
-                          "-- for direct_exhortation, inadequate_disclosure, and insufficient_context, "
-                          "--few-shot-n live train.jsonl example(s) each, pairing the label's "
-                          "taxonomy definition with real evidence that earned it")
+                          "-- hand-picked, baked-in train.jsonl examples (see "
+                          "GOLDEN_FEW_SHOT_EXAMPLES in st3_prompts.py) for direct_exhortation, "
+                          "undisclosed_advertising, inadequate_disclosure, misleading_claim, "
+                          "no_flag, and insufficient_context, pairing each label's taxonomy "
+                          "definition with real evidence and a one-line rationale")
     ap.add_argument("--few-shot-n", type=int, default=1,
-                     help="live train.jsonl examples per label to include when --few-shot is set")
+                     help="deprecated/no-op: examples are baked in now (see "
+                          "GOLDEN_FEW_SHOT_EXAMPLES), no longer scanned live from train.jsonl, "
+                          "so this no longer has any effect -- kept only so old invocations "
+                          "don't break")
     ap.add_argument("--cot", choices=COT_CHOICES, default="off",
                      help="st3-only only: off = today's one-shot call (default); inline = adds a "
                           "`reasoning` field to the structured-output schema (ST3PredictionCoT) so "
@@ -159,6 +166,7 @@ def main():
              f"{' st3-only' if args.st3_only else ''}{' few-shot' if args.few_shot else ''}"
              f"{' cot=' + args.cot if args.cot != 'off' else ''} "
              f"({len(system_prompt)} chars)")
+    log.info(f"system prompt used: {system_prompt}")
 
     instances = list(load_split(args.target))
     if args.sample_size:

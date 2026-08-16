@@ -11,7 +11,7 @@ import sys
 from langchain_core.messages import HumanMessage, SystemMessage
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "starting_kit"))
-from load_data import full_context, load_split, transcript_only
+from load_data import full_context, transcript_only
 
 LABELS_TAXONOMY_PATH = os.path.join(
     os.path.dirname(__file__), "..", "public_data_dev", "labels_taxonomy.md"
@@ -21,17 +21,139 @@ with open(LABELS_TAXONOMY_PATH, encoding="utf-8") as _f:
 
 TRAIN_PATH = os.path.join(os.path.dirname(__file__), "..", "public_data_dev", "train.jsonl")
 
-# --few-shot pairs each of these labels' definition with a live train.jsonl example. Definitions
-# are parsed out of the `| T1.x | \`label\` | definition | ... |` rows in LABELS_TAXONOMY rather
-# than duplicated here, so they can't drift from the taxonomy file.
-FEW_SHOT_LABELS = ("direct_exhortation", "inadequate_disclosure", "insufficient_context")
+# --few-shot pairs each of these labels' definition with a hand-picked, baked-in example (see
+# GOLDEN_FEW_SHOT_EXAMPLES below) -- no longer built live from train.jsonl each run. Definitions
+# are still parsed out of the `| T1.x | \`label\` | definition | ... |` rows in LABELS_TAXONOMY
+# rather than duplicated here, so they can't drift from the taxonomy file; only the examples/
+# why-lines/contrastive notes are hand-authored.
+FEW_SHOT_LABELS = (
+    "direct_exhortation",
+    "undisclosed_advertising",
+    "inadequate_disclosure",
+    "misleading_claim",
+    "no_flag",
+    "insufficient_context",
+)
 
-# Per-label overrides of --few-shot-n (empty by default -- see FEW_SHOT_N_OVERRIDES usage in
-# build_few_shot_section). Tried giving the worst-performing labels n=2 here (exp10, exp11);
-# both regressed st3_macro_f1 on a 3-run average, and even inadequate_disclosure -- the label
-# being targeted -- got worse, not better. Left empty; kept the override mechanism since it's
-# correct and cheap to re-enable if a future prompt structure responds differently.
-FEW_SHOT_N_OVERRIDES = {}
+# Hand-picked exemplars, one set per FEW_SHOT_LABELS, each pulled from train.jsonl and vetted
+# against a rubric (prototypical, isolates the label's actual trigger, no cross-label confound,
+# length-matched to real segments, no overlap with dev.jsonl) before being baked in here.
+#
+# inadequate_disclosure note: the previous exemplars here were plain "thank you to today's
+# sponsor X" quotes -- spoken aloud, first thing said, plain language. Dropped after a spot
+# check found gold labels are genuinely inconsistent about that exact pattern: identical
+# phrasing shows up as both inadequate_disclosure and no_flag within the same channel, across
+# at least four different channels, with no textual feature distinguishing the two. Baking in
+# an exemplar that contradicts this file's own stated adequate-disclosure worked example (see
+# ST3_SYSTEM_PROMPT below) risked re-teaching the over-flagging regression a past tuning round
+# already had to walk back -- see feedback_check_prompt_examples_for_leakage-adjacent notes.
+# The replacement below (buried + adult-jargon disclosure, not a plain sponsor mention) is
+# defensible under the taxonomy's own stated failure modes without leaning on that unresolved
+# inconsistency. Two other candidates were tried and rejected first: one where the disclosed
+# link was a generic tools list unrelated to what the segment was actually about, and one where
+# the same channel used identical phrasing in 8+ other segments labeled no_flag.
+GOLDEN_FEW_SHOT_EXAMPLES = {
+    "direct_exhortation": {
+        "examples": [
+            {
+                "quote": "so if you have a game or franchise that you really like definitely "
+                         "pick one of these up",
+                "why": "direct imperative (\"pick one up\") aimed at the viewer with no "
+                       "accompanying product claim -- the exhortation is the whole content of "
+                       "the sentence.",
+            },
+            {
+                "quote": "please get yourself a PC you deserve the link to Star Forge systems "
+                         "will be in the description go and check out their PCS today",
+                "why": "two stacked imperatives (\"get yourself,\" \"go and check out\") plus a "
+                       "direct instruction to use the link -- a textbook appeal to act now.",
+            },
+        ],
+        "contrastive": {
+            "quote": "This laptop has a 12-hour battery and a way better screen than my old "
+                     "one, use the code in the description if you want it.",
+            "note": "the first clause is a product claim (goes to misleading_claim if the "
+                    "claim is false/unverifiable, otherwise no flag on its own); the "
+                    "imperative is a discount-code mechanic, not a direct appeal to buy. Do "
+                    "not tag direct_exhortation just because a link or code is mentioned -- "
+                    "the imperative has to be the \"go get this\" act itself, not incidental "
+                    "transactional detail.",
+        },
+    },
+    "undisclosed_advertising": {
+        "examples": [
+            {
+                "quote": "bring your setup to the next level with cablemod's all-new custom "
+                         "coiled keyboard cables available in a variety of colors and connector "
+                         "types utilizing best-in-class connectors the keyboard cables give "
+                         "your setup a look and feel it deserves to see the complete lineup of "
+                         "custom keyboard cables available from cablemod click the link in the "
+                         "description below",
+                "why": "the product (CableMod custom keyboard cables) is named, described, and "
+                       "linked with unambiguous commercial intent, yet neither the transcript "
+                       "nor the rest of the video description (which also lists merch and "
+                       "Amazon links) contains any acknowledgment of a commercial/compensation "
+                       "relationship anywhere -- no \"sponsor,\" \"ad,\" \"paid,\" or "
+                       "\"affiliate\" language at all.",
+            },
+        ],
+    },
+    "inadequate_disclosure": {
+        "examples": [
+            {
+                "quote": "Buy the MSI 342C on Amazon [PAID LINK]: https://geni.us/D5qtPe",
+                "why": "the transcript segment is entirely a spec pitch for this exact monitor "
+                       "and never once says sponsor/ad/paid/affiliate -- the ONLY disclosure "
+                       "anywhere is this terse \"[PAID LINK]\" tag next to the matching product "
+                       "link, backed by FTC-style legal boilerplate (\"...an affiliate "
+                       "advertising programme designed to provide a means for sites to earn "
+                       "advertising fees...\") buried under two dozen other tagged links "
+                       "further down the description. Buried and adult-jargon at once, with no "
+                       "plain \"this video is sponsored by X\" statement to fall back on.",
+            },
+        ],
+    },
+    "misleading_claim": {
+        "examples": [
+            {
+                "quote": "Like Tininoan, the gold standard for anti-aging skin care, Tininoan "
+                         "is 20 times stronger than over-the-counter retinols.",
+                "why": "asserts a specific, falsifiable multiplier (\"20 times stronger\") "
+                       "against a named comparator as flat fact, not opinion -- a quantified "
+                       "skincare efficacy claim the segment gives no support for.",
+            },
+        ],
+    },
+    "no_flag": {
+        "examples": [
+            {
+                "quote": "Before we get into this, I just want to say a massive thank you to "
+                         "PCB way for sponsoring this video. PCB Way is your one-stop solution "
+                         "for all of your DIY needs... It's an absolutely fantastic service. I "
+                         "recently used it to make a bracket for my kiosk... So, check out PCB "
+                         "Way through the link in the description below.",
+                "why": "disclosure is plain, spoken, and the very first thing said in the "
+                       "segment; every claim about the product stays at the level of "
+                       "subjective puffery (\"one-stop solution,\" \"fantastic service\") "
+                       "rather than a specific/quantified assertion; and the closing CTA is a "
+                       "bare instruction with no added pressure -- so despite having both a "
+                       "sponsor pitch AND a link-based CTA (the surface features that make a "
+                       "segment look risky), nothing here crosses into a flaggable claim or "
+                       "exhortation.",
+            },
+        ],
+    },
+    "insufficient_context": {
+        "kind": "transcript excerpt",
+        "examples": [
+            {"quote": "[Music] [Music] [Music] do [Music] so [Music] [Music] [Music] [Music] "
+                      "um [Music] [Music] [Music] [Music] [Music] [Music] [Music] [Music] "
+                      "[Music] do [Music] [Music] [Music] [Music] hey hey people oh"},
+            {"quote": "*outro* *but can you this?* *outro* *bye* *broderfist*"},
+            {"quote": "[Music] oh [Music] last time on game groups oh please let"},
+        ],
+    },
+}
 
 def parse_taxonomy_defs(taxonomy_text: str, labels) -> dict:
     """Pull {label: definition} for `labels` out of LABELS_TAXONOMY's `| T1.x | \`label\` | def | ... |` rows."""
@@ -478,69 +600,43 @@ Respond with the structured prediction ONLY."""
 COT_INSTRUCTIONS = """The structured prediction has a `reasoning` field before `st3` -- use
 it to actually work through the checks above against the specific evidence in this segment
 before committing to labels, rather than stating a conclusion first and justifying it after.
-Keep it to a few sentences: name which checks you evaluated, what evidence (or absence of
+Name which checks you evaluated, what evidence (or absence of
 evidence) drove each one, and, where two labels are commonly confused (e.g.
 `undisclosed_advertising` vs. `inadequate_disclosure`), which side of that specific line this
 segment fell on and why. Do not restate the taxonomy definitions -- reason about this
 segment's actual text."""
 
-MAX_FEW_SHOT_EXAMPLE_LEN = 300  # skip, don't truncate -- a chopped quote/excerpt reads as garbled
-
-def build_few_shot_section(train_path: str, log: logging.Logger, n_per_label: int = 1) -> str:
-    """n_per_label live examples per FEW_SHOT_LABELS (overridable per label via
-    FEW_SHOT_N_OVERRIDES), pulled from train.jsonl gold labels. Most labels use the quote in
-    labels.st3_evidence that earned the flag; insufficient_context has no evidence quote
-    (there's nothing to point at), so it uses a transcript excerpt instead.
-    For the evidence-quote labels, the FIRST exemplar collected is always a "solo" instance --
-    that flag is the SOLE st3 label on it, so it's a clean example of the boundary the flag is
-    testing rather than a mixed case. Once a label has its solo exemplar, further slots (for
-    labels with n>1) accept a quote from any instance carrying the flag, solo or not, since solo
-    instances are scarce for some labels.
-    Candidates longer than MAX_FEW_SHOT_EXAMPLE_LEN are skipped rather than truncated, so every
-    example shown is a complete, unmutilated quote/excerpt."""
+def build_few_shot_section(train_path: str = None, log: logging.Logger = None, n_per_label: int = 1) -> str:
+    """Assembles the FEW-SHOT EXAMPLES section from GOLDEN_FEW_SHOT_EXAMPLES -- hand-picked,
+    rubric-vetted exemplars baked in above -- paired with each label's taxonomy definition
+    (still parsed from LABELS_TAXONOMY so definitions can't drift). No longer scans train.jsonl
+    at call time; train_path/n_per_label are accepted for backward compatibility with existing
+    callers but otherwise unused now that example counts are fixed by hand per label."""
+    if log is not None and n_per_label != 1:
+        log.warning(f"build_few_shot_section: n_per_label={n_per_label} has no effect -- "
+                    "examples are baked in now (see GOLDEN_FEW_SHOT_EXAMPLES), not scanned "
+                    "live from train.jsonl")
     defs = parse_taxonomy_defs(LABELS_TAXONOMY, FEW_SHOT_LABELS)
-    print(defs)
-    target_n = {label: FEW_SHOT_N_OVERRIDES.get(label, n_per_label) for label in FEW_SHOT_LABELS}
-    evidence_labels = tuple(label for label in FEW_SHOT_LABELS if label != "insufficient_context")
-    examples = {label: [] for label in FEW_SHOT_LABELS}
-    has_solo = {label: False for label in evidence_labels}
-    for inst in load_split(train_path):
-        if all(len(v) >= target_n[label] for label, v in examples.items()):
-            break
-        labels = inst.get("labels")
-        if not labels:
-            continue
-        st3 = labels.get("st3", [])
-        if "insufficient_context" in st3 and len(examples["insufficient_context"]) < target_n["insufficient_context"]:
-            text = transcript_only(inst).strip()
-            if text and len(text) <= MAX_FEW_SHOT_EXAMPLE_LEN:
-                examples["insufficient_context"].append(text)
-        evidence = {ev["flag"]: ev["quote"] for ev in labels.get("st3_evidence", [])}
-        for label in evidence_labels:
-            if len(examples[label]) >= target_n[label]:
-                continue
-            quote = evidence.get(label)
-            if not quote or len(quote) > MAX_FEW_SHOT_EXAMPLE_LEN:
-                continue
-            is_solo = set(st3) == {label}
-            if not is_solo and not has_solo[label]:
-                continue  # keep looking for a solo exemplar before accepting a mixed one
-            examples[label].append(quote)
-            has_solo[label] = has_solo[label] or is_solo
 
-    missing = [label for label, exs in examples.items() if not exs]
-    if missing:
-        raise ValueError(f"found no train.jsonl examples for {missing} in {train_path}")
-
-    log.info("few-shot examples collected: " +
-             ", ".join(f"{label}={len(exs)}" for label, exs in examples.items()))
-
-    sections = ["## FEW-SHOT EXAMPLES\n\nLive examples from the training data, pairing each "
-                "label's definition with real evidence that earned it."]
+    sections = ["## FEW-SHOT EXAMPLES\n\nHand-picked examples from the training data, pairing "
+                "each label's definition with real evidence that earned it. Each example "
+                "includes a one-line rationale -- read the rationale, not just the quote. The "
+                "quote alone is not the pattern; two segments can share surface vocabulary (a "
+                "discount, a sponsor mention, an urgent tone) and still take different labels "
+                "depending on what the segment is actually doing."]
     for label in FEW_SHOT_LABELS:
-        kind = "transcript excerpt" if label == "insufficient_context" else "evidence quote"
+        spec = GOLDEN_FEW_SHOT_EXAMPLES[label]
+        kind = spec.get("kind", "evidence quote")
         lines = [f"### `{label}`", f"Definition: {defs[label]}"]
-        lines += [f'Example {i} ({kind}): "{ex}"' for i, ex in enumerate(examples[label], 1)]
+        if "test" in spec:
+            lines.append(f"Test: {spec['test']}")
+        for i, ex in enumerate(spec["examples"], 1):
+            lines.append(f'Example {i} ({kind}): "{ex["quote"]}"')
+            if ex.get("why"):
+                lines.append(f"Why this qualifies: {ex['why']}")
+        if "contrastive" in spec:
+            c = spec["contrastive"]
+            lines.append(f'Contrastive non-example: "{c["quote"]}" -- {c["note"]}')
         sections.append("\n".join(lines))
     return "\n\n".join(sections)
 

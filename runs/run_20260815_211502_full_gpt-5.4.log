@@ -1,0 +1,23 @@
+2026-08-15 21:15:02,767 | INFO | MainThread | logging to runs/run_20260815_211502_full_gpt-5.4.log
+2026-08-15 21:15:02,767 | INFO | MainThread | config: target=public_data_dev/dev.jsonl model=gpt-5.4 context=full sample_size=1 max_concurrency=8 st3_only=True lean_prompt=False df_path=None few_shot=True few_shot_n=1 cot=inline out=runs/submission_gpt_20260815_211502.jsonl seed=42
+2026-08-15 21:15:02,774 | INFO | MainThread | few-shot examples collected: direct_exhortation=1, inadequate_disclosure=1, insufficient_context=1
+2026-08-15 21:15:02,774 | INFO | MainThread | appending few-shot examples (1190 chars) to the system prompt
+2026-08-15 21:15:02,774 | INFO | MainThread | appending CoT instructions to the system prompt
+2026-08-15 21:15:02,774 | INFO | MainThread | system prompt: full st3-only few-shot cot=inline (19160 chars)
+2026-08-15 21:15:06,361 | INFO | MainThread | wrote 1 predictions to runs/submission_gpt_20260815_211502.jsonl
+2026-08-15 21:15:06,361 | INFO | MainThread | copied predictions to submission_gpt_st3.jsonl (canonical submission file)
+2026-08-15 21:15:06,361 | INFO | MainThread | wrote 0 misclassified instance(s) to runs/submission_gpt_error_20260815_211502.jsonl
+2026-08-15 21:15:06,362 | INFO | MainThread | === Distinct gold labels observed, by tier ===
+2026-08-15 21:15:06,362 | INFO | MainThread | [ST1 - commercial type]     ['digital_content_or_services']
+2026-08-15 21:15:06,362 | INFO | MainThread | [ST2 - product category]    ['other']
+2026-08-15 21:15:06,362 | INFO | MainThread | [ST3 - compliance flags]    ['misleading_claim']
+2026-08-15 21:15:06,362 | INFO | MainThread | Evaluation:
+2026-08-15 21:15:06,362 | INFO | MainThread |   st3_macro_f1: 1.000
+2026-08-15 21:15:06,362 | INFO | MainThread |   st3_family_macro_f1: 1.000
+2026-08-15 21:15:06,362 | INFO | MainThread |   st3 per-label F1: misleading_claim=1.000
+2026-08-15 21:15:06,362 | INFO | MainThread |   st3_family per-label F1: content=1.000
+2026-08-15 21:15:06,362 | INFO | MainThread | === Prediction diagnostics ===
+2026-08-15 21:15:06,363 | INFO | MainThread | [st3] label distribution (gold / pred):
+2026-08-15 21:15:06,363 | INFO | MainThread |   misleading_claim: gold=1, pred=1
+2026-08-15 21:15:06,363 | INFO | MainThread | [st3] gold x pred cross-product counts (gold -> pred: count):
+2026-08-15 21:15:06,363 | INFO | MainThread |   misleading_claim -> misleading_claim: 1
