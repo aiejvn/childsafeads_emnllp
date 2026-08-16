@@ -1,0 +1,6 @@
+Running on rg32102
+Started: Fri 14 Aug 2026 12:15:53 AM EDT
+Account: rrg-zhu2048_gpu
+Partition: gpubase_bynode_b2
+---
+[2026-08-14T04:16:13.775] error: *** JOB 19003324 ON rg32102 CANCELLED AT 2026-08-14T04:16:13 DUE to SIGNAL Terminated ***

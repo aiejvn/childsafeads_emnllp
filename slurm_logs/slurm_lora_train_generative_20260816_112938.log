@@ -1,0 +1,6 @@
+Running on rg21708
+Started: Sun 16 Aug 2026 11:30:34 AM EDT
+Account: rrg-zhu2048_gpu
+Partition: gpubase_bygpu_b2
+---
+[2026-08-16T15:31:03.465] error: *** JOB 19121704 ON rg21708 CANCELLED AT 2026-08-16T15:31:03 DUE to SIGNAL Terminated ***
