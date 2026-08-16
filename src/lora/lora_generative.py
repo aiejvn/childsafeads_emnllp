@@ -39,20 +39,32 @@ class St12OnlyPrediction(BaseModel):
     st2: List[Literal[tuple(ST2_LABELS)]]
 
 
-def parse_completion(text: str, st3_only: bool = False, st12_only: bool = False) -> dict | None:
+class St1OnlyPrediction(BaseModel):
+    """Schema for --st1-only mode's completion: drops st2/st3 both, leaving just
+    `{"st1":...}` (see format_completion_chunks's st1_only branch in lora_data.py) so
+    every completion token trains st1 alone."""
+    st1: Literal[tuple(ST1_LABELS)]
+
+
+def parse_completion(text: str, st3_only: bool = False, st12_only: bool = False,
+                     st1_only: bool = False) -> dict | None:
     """Extract+validate a JSON object from a freeform completion against the Prediction
-    schema (or St3OnlyPrediction/St12OnlyPrediction, in --st3-only/--st12-only mode).
-    Returns None (rather than a fallback dict) so the caller can tell a parse failure apart
-    from a genuine prediction and decide whether to retry. In --st3-only mode st1/st2 are
-    filled with a fixed placeholder ("other"/[]); in --st12-only mode st3 is filled with a
-    fixed placeholder (sanitize_st3([]), i.e. ["insufficient_context"]) -- common.evaluate()
-    always scores all three subtasks, and write_submission needs a complete prediction dict,
-    but the placeholder tier is never trained/meaningful in that mode; only the tiers that
-    mode actually trains should be read from the result."""
+    schema (or St3OnlyPrediction/St12OnlyPrediction/St1OnlyPrediction, in --st3-only/
+    --st12-only/--st1-only mode). Returns None (rather than a fallback dict) so the caller
+    can tell a parse failure apart from a genuine prediction and decide whether to retry.
+    In --st3-only mode st1/st2 are filled with a fixed placeholder ("other"/[]); in
+    --st12-only mode st3 is filled with a fixed placeholder (sanitize_st3([]), i.e.
+    ["insufficient_context"]); in --st1-only mode both st2/st3 get their placeholders --
+    common.evaluate() always scores all three subtasks, and write_submission needs a
+    complete prediction dict, but the placeholder tier(s) are never trained/meaningful in
+    that mode; only the tier(s) that mode actually trains should be read from the result."""
     match = _JSON_RE.search(text)
     if not match:
         return None
     try:
+        if st1_only:
+            pred = St1OnlyPrediction.model_validate_json(match.group(0))
+            return {"st1": pred.st1, "st2": [], "st3": sanitize_st3([])}
         if st3_only:
             pred = St3OnlyPrediction.model_validate_json(match.group(0))
             return {"st1": "other", "st2": [], "st3": sanitize_st3(list(pred.st3))}
@@ -75,13 +87,13 @@ def _to_device(batch: dict, device: str) -> dict:
 
 @torch.no_grad()
 def generate_predictions(model, loader, tokenizer, max_new_tokens: int, st3_only: bool = False,
-                         st12_only: bool = False, log=None) -> tuple:
+                         st12_only: bool = False, st1_only: bool = False, log=None) -> tuple:
     """Batched freeform generation over `loader`. Requires `loader`'s collator to have
     left-padded input_ids/attention_mask (set tokenizer.padding_side = "left" before building
     it) so every sequence's prompt ends at the same position and `out[:, prompt_len:]` is
-    exactly the new tokens for the whole batch. `st3_only`/`st12_only` must match how the
-    model was trained (see GenerativeDataset's st3_only/st12_only) -- they only change which
-    schema completions are parsed against, not generation itself.
+    exactly the new tokens for the whole batch. `st3_only`/`st12_only`/`st1_only` must match
+    how the model was trained (see GenerativeDataset's st3_only/st12_only/st1_only) -- they
+    only change which schema completions are parsed against, not generation itself.
 
     Items that fail to parse are regenerated (sampled, sub-batched to just the failing rows)
     up to MAX_ATTEMPTS times; anything still unparseable after that falls back to a default
@@ -120,7 +132,7 @@ def generate_predictions(model, loader, tokenizer, max_new_tokens: int, st3_only
             still_pending = []
             for row_idx, gen_row in zip(pending, out[:, prompt_len:]):
                 pred = parse_completion(tokenizer.decode(gen_row, skip_special_tokens=True),
-                                        st3_only=st3_only, st12_only=st12_only)
+                                        st3_only=st3_only, st12_only=st12_only, st1_only=st1_only)
                 if pred is None:
                     still_pending.append(row_idx)
                 else:

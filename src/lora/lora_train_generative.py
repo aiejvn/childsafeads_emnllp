@@ -174,7 +174,14 @@ def main():
                      "[\"insufficient_context\"]), not a meaningful prediction -- read "
                      "st1_macro_f1/st2_macro_f1 only; best-checkpoint selection switches to "
                      "mean(st1_macro_f1, st2_macro_f1) in this mode. Mutually exclusive with "
-                     "--st3-only")
+                     "--st3-only/--st1-only")
+    ap.add_argument("--st1-only", action="store_true", help="train/predict on st1 alone, dropping "
+                     "st2/st3 entirely from the completion (\"{\\\"st1\\\":...}\") so every "
+                     "completion token trains st1 -- none are spent on st2/st3, which this run "
+                     "isn't scoring. st2/st3 in the logged metrics are fixed placeholders ([] and "
+                     "sanitize_st3([]) respectively), not meaningful predictions -- read "
+                     "st1_macro_f1 only; best-checkpoint selection switches to st1_macro_f1 in "
+                     "this mode. Mutually exclusive with --st3-only/--st12-only")
     ap.add_argument("--no-gradient-checkpointing", action="store_true", help="disable gradient "
                      "checkpointing (on by default). Checkpointing trades wall-clock time (recomputes "
                      "forward activations during backward) for VRAM headroom -- when a run has memory "
@@ -203,8 +210,8 @@ def main():
                      "the best/last adapter checkpoints (<checkpoint-save-path>/best, "
                      "<checkpoint-save-path>/last); defaults to --output-dir")
     args = ap.parse_args()
-    if args.st3_only and args.st12_only:
-        ap.error("--st3-only and --st12-only are mutually exclusive")
+    if sum([args.st3_only, args.st12_only, args.st1_only]) > 1:
+        ap.error("--st3-only, --st12-only, and --st1-only are mutually exclusive")
 
     torch.manual_seed(args.seed)
     device = args.device or ("cuda" if torch.cuda.is_available() else "cpu")
@@ -305,15 +312,19 @@ def main():
                  "metrics is a fixed placeholder, read st1_macro_f1/st2_macro_f1 only; "
                  "best-checkpoint selection uses mean(st1_macro_f1, st2_macro_f1) instead of "
                  "mean_macro_f1")
+    if args.st1_only:
+        log.info("--st1-only: completion is {\"st1\":...} alone; st2/st3 in logged metrics are "
+                 "fixed placeholders, read st1_macro_f1 only; best-checkpoint selection uses "
+                 "st1_macro_f1 instead of mean_macro_f1")
 
     collate = GenerativeCollator(tokenizer)
     train_ds = GenerativeDataset(train_instances, tokenizer, args.context, args.max_length,
                                  system_prompt, df_text, st3_loss_weight=args.st3_loss_weight,
                                  st2_pos_weight=st2_pos_weight, st3_pos_weight=st3_pos_weight,
-                                 st3_only=args.st3_only, st12_only=args.st12_only)
+                                 st3_only=args.st3_only, st12_only=args.st12_only, st1_only=args.st1_only)
     dev_ds = GenerativeDataset(dev_instances, tokenizer, args.context, args.max_length,
                                system_prompt, df_text, st3_only=args.st3_only,
-                               st12_only=args.st12_only, include_completion=False)
+                               st12_only=args.st12_only, st1_only=args.st1_only, include_completion=False)
     train_loader = DataLoader(train_ds, batch_size=args.batch_size, shuffle=True, collate_fn=collate)
     eval_batch_size = args.eval_batch_size or args.batch_size
     dev_loader = DataLoader(dev_ds, batch_size=eval_batch_size, shuffle=False, collate_fn=collate)
@@ -369,7 +380,8 @@ def main():
 
         tokenizer.padding_side = "left"  # batched model.generate() needs left-padding
         ids, preds = generate_predictions(model, dev_loader, tokenizer, args.max_new_tokens,
-                                          st3_only=args.st3_only, st12_only=args.st12_only, log=log)
+                                          st3_only=args.st3_only, st12_only=args.st12_only,
+                                          st1_only=args.st1_only, log=log)
         torch.cuda.empty_cache()  # generate()'s KV-cache/activation memory is cached by the
         # allocator, not returned to the driver on its own -- release it now so a concurrent
         # process on this GPU can use it, and so the next epoch's training resumes from the
@@ -386,6 +398,8 @@ def main():
             selection_metric = metrics["st3_macro_f1"]
         elif args.st12_only:
             selection_metric = (metrics["st1_macro_f1"] + metrics["st2_macro_f1"]) / 2
+        elif args.st1_only:
+            selection_metric = metrics["st1_macro_f1"]
         else:
             selection_metric = metrics["mean_macro_f1"]
         if selection_metric > best_f1:
@@ -399,13 +413,15 @@ def main():
                     ids, dev_instances, preds,
                 )
                 selection_name = "st3_macro_f1" if args.st3_only else (
-                    "mean(st1,st2)_macro_f1" if args.st12_only else "mean_macro_f1")
+                    "mean(st1,st2)_macro_f1" if args.st12_only else (
+                    "st1_macro_f1" if args.st1_only else "mean_macro_f1"))
                 log.info(f"epoch {epoch + 1}: new best {selection_name}={best_f1:.3f}, saved to {checkpoint_dir}/best")
 
     if is_main:
         model.save_pretrained(os.path.join(checkpoint_dir, "last"))
         selection_name = "st3_macro_f1" if args.st3_only else (
-            "mean(st1,st2)_macro_f1" if args.st12_only else "mean_macro_f1")
+            "mean(st1,st2)_macro_f1" if args.st12_only else (
+            "st1_macro_f1" if args.st1_only else "mean_macro_f1"))
         log.info(f"saved final epoch adapter to {checkpoint_dir}/last (best dev {selection_name}={best_f1:.3f})")
         log.info("best dev metrics: " + ", ".join(f"{k}={v:.3f}" for k, v in best_dev_scalar_metrics.items()))
 
@@ -427,12 +443,12 @@ def main():
             test_loader = DataLoader(
                 GenerativeDataset(test_holdout_instances, tokenizer, args.context, args.max_length,
                                   system_prompt, df_text, st3_only=args.st3_only,
-                                  st12_only=args.st12_only, include_completion=False),
+                                  st12_only=args.st12_only, st1_only=args.st1_only, include_completion=False),
                 batch_size=eval_batch_size, shuffle=False, collate_fn=collate,
             )
             test_ids, test_preds = generate_predictions(
                 test_model, test_loader, tokenizer, args.max_new_tokens,
-                st3_only=args.st3_only, st12_only=args.st12_only, log=log,
+                st3_only=args.st3_only, st12_only=args.st12_only, st1_only=args.st1_only, log=log,
             )
             del test_model  # separate model instance from the training `model`, both briefly
             torch.cuda.empty_cache()  # resident together -- free it as soon as its one pass is done

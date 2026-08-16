@@ -44,7 +44,7 @@ def _quoted_label_chunks(labels_sorted: list, weights: dict) -> list:
 
 def format_completion_chunks(
     labels: dict, st2_weights: dict = None, st3_weights: dict = None, st3_only: bool = False,
-    st12_only: bool = False,
+    st12_only: bool = False, st1_only: bool = False,
 ) -> list:
     """Same rendering as format_completion, split into (text, weight) chunks whose
     concatenated text reproduces format_completion(labels) exactly. Each st2/st3 label's
@@ -61,9 +61,15 @@ def format_completion_chunks(
     St3OnlyPrediction, which parses this shorter schema back out at decode time.
 
     `st12_only` is the mirror image: drops st3, leaving `{"st1":...,"st2":[...]}`, so
-    every completion token trains st1/st2 (see --st12-only). Mutually exclusive with
-    st3_only. Pairs with lora_generative.py's St12OnlyPrediction."""
+    every completion token trains st1/st2 (see --st12-only). Pairs with lora_generative.py's
+    St12OnlyPrediction.
+
+    `st1_only` drops st2/st3 both, leaving just `{"st1":...}` -- every completion token
+    trains st1 alone (see --st1-only). Pairs with lora_generative.py's St1OnlyPrediction.
+    Mutually exclusive with st3_only/st12_only (enforced by the caller's argparse)."""
     st2_weights, st3_weights = st2_weights or {}, st3_weights or {}
+    if st1_only:
+        return [(json.dumps({"st1": labels["st1"]}, separators=(",", ":")), 1.0)]
     if st3_only:
         chunks = [('{"st3":[', 1.0)]
         chunks += _quoted_label_chunks(sorted(labels["st3"]), st3_weights)
@@ -105,11 +111,12 @@ class GenerativeDataset(Dataset):
     def __init__(self, instances: list, tokenizer, context: str = "full", max_length: int = 4096,
                  system_prompt: str = SYSTEM_PROMPT, df_text: str = None, st3_loss_weight: float = 1.0,
                  st2_pos_weight: dict = None, st3_pos_weight: dict = None, st3_only: bool = False,
-                 st12_only: bool = False, include_completion: bool = True):
+                 st12_only: bool = False, st1_only: bool = False, include_completion: bool = True):
         self.instances = instances
         self.tokenizer = tokenizer
         self.st3_only = st3_only
         self.st12_only = st12_only
+        self.st1_only = st1_only
         # Whether to append the gold completion to input_ids. True for training (the
         # completion IS the supervision signal). Must be False for anything headed into
         # model.generate() -- dev/test instances carry gold "labels" too (needed for
@@ -185,7 +192,7 @@ class GenerativeDataset(Dataset):
             st2_weights = {l: self.st2_pos_weight.get(l, 1.0) for l in labels["st2"]}
             st3_weights = {l: self.st3_pos_weight.get(l, self.default_st3_weight) for l in labels["st3"]}
             chunks = format_completion_chunks(labels, st2_weights, st3_weights, st3_only=self.st3_only,
-                                              st12_only=self.st12_only)
+                                              st12_only=self.st12_only, st1_only=self.st1_only)
             completion_ids, weight_per_tok = [], []
             for text, weight in chunks:
                 ids = self.tokenizer(text, add_special_tokens=False)["input_ids"]
