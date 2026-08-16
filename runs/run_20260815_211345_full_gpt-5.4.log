@@ -1,0 +1,3 @@
+2026-08-15 21:13:45,599 | INFO | MainThread | logging to runs/run_20260815_211345_full_gpt-5.4.log
+2026-08-15 21:13:45,599 | INFO | MainThread | config: target=public_data_dev/dev.jsonl model=gpt-5.4 context=full sample_size=1 max_concurrency=8 st3_only=True lean_prompt=False df_path=None few_shot=True few_shot_n=1 cot=inline out=runs/submission_gpt_20260815_211345.jsonl seed=42
+2026-08-15 21:13:45,607 | INFO | MainThread | few-shot examples collected: direct_exhortation=1, inadequate_disclosure=1, insufficient_context=1

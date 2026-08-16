@@ -25,7 +25,9 @@ from transformers import AutoTokenizer, get_linear_schedule_with_warmup
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))  # so `import lora` resolves src/lora as a package
 from common.dialog_flow import df_pre_context  # noqa: E402
-from common.predict_utils import save_thresholds, tune_and_decode, write_submission  # noqa: E402
+from common.predict_utils import (  # noqa: E402
+    log_prediction_diagnostics, save_thresholds, tune_and_decode, write_submission,
+)
 from common.train_utils import compute_pos_weight, to_device  # noqa: E402
 from lora import CONTEXT_CHOICES, ST1_LABELS, ST2_LABELS, ST3_LABELS, evaluate, setup_logging  # noqa: E402
 from lora.lora_data import Collator, ClassificationDataset, load_split  # noqa: E402
@@ -66,6 +68,7 @@ def curriculum_sampler(train_instances: list, label_f1: dict, epoch: int, total_
 
 
 #  python src/lora/lora_train.py public_data_dev/train.jsonl public_data_dev/dev.jsonl --model nlpaueb/legal-bert-base-uncased --epochs 200 --output-dir runs/lora_legalbert --no-wandb
+#  bash slurm_wrapper.sh 1 src/lora/lora_train.py public_data_dev/train.jsonl public_data_dev/dev.jsonl --epochs 200 --output-dir runs/lora_legalbert --no-wandb --local --grad-accum-steps 0 --lora-r 64 --lora-alpha 128  --target-modules "query,key,value,dense" --st3-loss-weight 2 --pos-weight
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("train", help="training split, e.g. public_data_dev/train.jsonl")
@@ -241,6 +244,7 @@ def main():
         for tier, per_label in metrics["per_label_f1"].items():
             log.info(f"epoch {epoch + 1} dev {tier} per-label F1: "
                      + ", ".join(f"{label}={f1:.3f}" for label, f1 in sorted(per_label.items())))
+        log_prediction_diagnostics(log, gold, preds)
         wandb.log({
             "epoch": epoch + 1, "train_loss": train_loss,
             **{f"dev_{k}": v for k, v in scalar_metrics.items()},

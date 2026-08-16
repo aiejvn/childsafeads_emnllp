@@ -1,0 +1,14 @@
+Running on rg13402
+Started: Sat 15 Aug 2026 02:43:19 PM EDT
+Account: rrg-zhu2048_gpu
+Partition: gpubase_bygpu_b2
+---
+Python: /lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/bin/python  Torch: 2.13.0
+---
+Command: python src/lora/lora_train_generative.py public_data_dev/train.jsonl public_data_dev/dev.jsonl --epochs 200 --model Qwen/Qwen3-4B --df-path emnllp-dialog-flow-dialog-flow.json --lean-prompt --batch-size 1 --output-dir runs/lora_qwen3-4B --checkpoint-save-path /scratch/kwang103/8-14/Qwen3-4B --pos-weight --test-holdout 500 --eval-every 10 --eval-batch-size 16 --target-modules q_proj,k_proj,v_proj,o_proj
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/src/lora/lora_train_generative.py", line 51
+    CONTEXT_CHOICES, SFT_TAXONOMY, ST2_LABELS, ST3_LABELS, SYSTEM_PROMPT, SFT_TAXONOMY, SYSTEM_PROMPT \ 
+                                                                                                       ^
+SyntaxError: unexpected character after line continuation character
+---
+Finished: Sat 15 Aug 2026 02:43:43 PM EDT

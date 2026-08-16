@@ -45,6 +45,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 from baseline_gpt import (
     ST1, ST2, ST3, ST1_LABELS, ST2_LABELS, ST3_LABELS, Prediction, sanitize_st3,
     setup_logging, log_gold_label_inventory, evaluate, prediction_errors,
+    CONTEXT_CHOICES, no_product_page,
 )
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "starting_kit"))
@@ -120,7 +121,12 @@ def build_df_node(df_id: str, base_url: str) -> "oj_flowchart.FlowchartTask":
 def process_instance(inst: dict, context: str, flowchart_engine, node, model, llm_extract, log) -> dict:
     """Returns {"pred": ..., "df": ...} -- pred is the st1/st2/st3 prediction written to
     --out; df is this instance's dialog-flow execution trace written to the runs/df/ dump."""
-    text = full_context(inst) if context == "full" else transcript_only(inst)
+    if context == "full":
+        text = full_context(inst)
+    elif context == "no_product_page":
+        text = no_product_page(inst)
+    else:
+        text = transcript_only(inst)
     df_record = {"instanceID": inst["instanceID"]}
     try:
         local_input = {
@@ -161,8 +167,9 @@ def main():
     ap.add_argument("--base-url", default="https://api.staging.openjustice.ai")
     ap.add_argument("--model", default="gpt-5.4",
                      help="model the dialog flow runs on, and the fallback extraction model")
-    ap.add_argument("--context", choices=["transcript", "full"], default="full",
-                     help="how much of the instance to show the dialog flow")
+    ap.add_argument("--context", choices=CONTEXT_CHOICES, default="full",
+                     help="how much of the instance to show the dialog flow. no_product_page drops "
+                          "the linked page entirely -- transcript + video title/description/disclosure only")
     ap.add_argument("--sample-size", type=int, default=None,
                      help="only run on a random sample of N instances (seeded, for smoke tests)")
     ap.add_argument("--max-concurrency", type=int, default=8)

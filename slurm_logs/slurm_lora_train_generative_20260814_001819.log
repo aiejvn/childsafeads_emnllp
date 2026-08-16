@@ -1,0 +1,31 @@
+Running on rg21704
+Started: Fri 14 Aug 2026 12:18:20 AM EDT
+Account: rrg-zhu2048_gpu
+Partition: gpubase_bynode_b2
+---
+Python: /lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/bin/python  Torch: 2.13.0
+---
+Command: python src/lora/lora_train_generative.py public_data_dev/train.jsonl public_data_dev/dev.jsonl --epochs 200 --parallelism pipeline --df-path emnllp-dialog-flow-dialog-flow.json --lean-prompt --batch-size 1 --output-dir runs/lora_gemma-4-12B --checkpoint-save-path /scratch/kwang103/8-14/ google/gemma-4-12B --model google/gemma-4-12B --split-seed 42
+usage: lora_train_generative.py [-h] [--model MODEL] [--model-path MODEL_PATH]
+                                [--context {transcript,no_product_page,st2_page,full}]
+                                [--lean-prompt] [--df-path DF_PATH]
+                                [--max-length MAX_LENGTH] [--epochs EPOCHS]
+                                [--batch-size BATCH_SIZE]
+                                [--eval-batch-size EVAL_BATCH_SIZE]
+                                [--grad-accum-steps GRAD_ACCUM_STEPS]
+                                [--lr LR] [--warmup-ratio WARMUP_RATIO]
+                                [--lora-r LORA_R] [--lora-alpha LORA_ALPHA]
+                                [--lora-dropout LORA_DROPOUT]
+                                [--target-modules TARGET_MODULES]
+                                [--load-in-4bit]
+                                [--parallelism {none,pipeline,tensor}]
+                                [--max-new-tokens MAX_NEW_TOKENS]
+                                [--sample-size SAMPLE_SIZE]
+                                [--test-holdout TEST_HOLDOUT]
+                                [--split-seed SPLIT_SEED] [--seed SEED]
+                                [--device DEVICE] --output-dir OUTPUT_DIR
+                                [--checkpoint-save-path CHECKPOINT_SAVE_PATH]
+                                train dev
+lora_train_generative.py: error: unrecognized arguments: google/gemma-4-12B
+---
+Finished: Fri 14 Aug 2026 12:26:09 AM EDT

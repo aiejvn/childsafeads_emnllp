@@ -1,0 +1,15 @@
+# Run outputs and caches are per-machine.
+out/
+.cache/
+documents/
+__pycache__/
+*.pyc
+.env
+
+# Flow exports can contain client instructions — keep them out of the repo.
+# Sample fixtures must be added with an explicit `git add -f`.
+fixtures/*
+!fixtures/.gitkeep
+
+# Local virtualenv
+.venv/

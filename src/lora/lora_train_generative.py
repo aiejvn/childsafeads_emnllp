@@ -45,10 +45,10 @@ from transformers import AutoTokenizer, get_linear_schedule_with_warmup
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))  # so `import lora` resolves src/lora as a package
 from common.dialog_flow import df_pre_context  # noqa: E402
-from common.predict_utils import write_submission  # noqa: E402
+from common.predict_utils import log_prediction_diagnostics, write_submission  # noqa: E402
 from common.train_utils import compute_pos_weight  # noqa: E402
 from lora import (  # noqa: E402
-    CONTEXT_CHOICES, SFT_TAXONOMY, ST2_LABELS, ST3_LABELS, SYSTEM_PROMPT, evaluate, load_split, setup_logging,
+    CONTEXT_CHOICES, SFT_TAXONOMY, ST2_LABELS, ST3_LABELS, SYSTEM_PROMPT, SFT_TAXONOMY, SYSTEM_PROMPT, evaluate, load_split, setup_logging,
 )
 from lora.lora_data import GenerativeCollator, GenerativeDataset  # noqa: E402
 from lora.lora_generative import generate_predictions  # noqa: E402
@@ -60,6 +60,7 @@ from lora.lora_model import (  # noqa: E402
 def to_device(batch: dict, device: str) -> dict:
     return {k: (v.to(device) if torch.is_tensor(v) else v) for k, v in batch.items()}
 
+# bash slurm_wrapper.sh 4 src/lora/lora_train_generative.py public_data_dev/train.jsonl public_data_dev/dev.jsonl --epochs 200 --parallelism pipeline --model Qwen/Qwen3-8B --df-path emnllp-dialog-flow-dialog-flow.json --lean-prompt --batch-size 1 --output-dir runs/lora_qwen3-8B --checkpoint-save-path $SCRATCH/8-13/Qwen3-8B-batch-size-1 --split-seed 42
 
 def weighted_lm_loss(logits: torch.Tensor, labels: torch.Tensor, loss_weight: torch.Tensor) -> torch.Tensor:
     """Next-token cross-entropy, per-token weighted by `loss_weight` (see --st3-loss-weight
@@ -393,6 +394,7 @@ def main():
         for tier, per_label in metrics["per_label_f1"].items():
             log.info(f"epoch {epoch + 1} dev {tier} per-label F1: "
                      + ", ".join(f"{label}={f1:.3f}" for label, f1 in sorted(per_label.items())))
+        log_prediction_diagnostics(log, gold, preds)
 
         if args.st3_only:
             selection_metric = metrics["st3_macro_f1"]
@@ -459,6 +461,7 @@ def main():
             for tier, per_label in test_metrics["per_label_f1"].items():
                 log.info(f"{tier} per-label F1: "
                         + ", ".join(f"{label}={f1:.3f}" for label, f1 in sorted(per_label.items())))
+            log_prediction_diagnostics(log, test_gold, test_preds)
             write_submission(
                 os.path.join(best_dir, "test_submission.jsonl"),
                 os.path.join(best_dir, "test_submission_error.jsonl"),

@@ -1,0 +1,42 @@
+2026-08-15 20:35:44,337 | INFO | MainThread | logging to runs/run_20260815_203544_full_gpt-5.4.log
+2026-08-15 20:35:44,337 | INFO | MainThread | config: target=public_data_dev/dev.jsonl model=gpt-5.4 context=full sample_size=3 max_concurrency=8 st3_only=True lean_prompt=True df_path=emnllp-dialog-flow-dialog-flow.json few_shot=False few_shot_n=1 cot=flow out=runs/submission_gpt_20260815_203544.jsonl seed=42
+2026-08-15 20:35:44,339 | INFO | MainThread | appending stripped dialog flow from emnllp-dialog-flow-dialog-flow.json (5685 chars) to the system prompt
+2026-08-15 20:35:44,339 | INFO | MainThread | system prompt: lean st3-only cot=flow (7385 chars)
+2026-08-15 20:35:54,646 | INFO | MainThread | UCrPseYLGpNygVi34QpGNqpA_RDAROhyCnSc_cf8eda2f: Assessability -> 'assessable'
+2026-08-15 20:35:56,119 | INFO | MainThread | UCuvSqzfO_LV_QzHdmEj84SQ_wrbyP7y5z80_7de330ad: Assessability -> 'assessable'
+2026-08-15 20:35:56,786 | INFO | MainThread | UCa-DreapaYm4Roo0CfUBGQg_s2NOMxaH3l8_7e973a1b: Assessability -> 'assessable'
+2026-08-15 20:36:01,340 | INFO | MainThread | UCrPseYLGpNygVi34QpGNqpA_RDAROhyCnSc_cf8eda2f: Undisclosed Advertising? -> 'no'
+2026-08-15 20:36:03,953 | INFO | MainThread | UCuvSqzfO_LV_QzHdmEj84SQ_wrbyP7y5z80_7de330ad: Undisclosed Advertising? -> 'no'
+2026-08-15 20:36:04,325 | INFO | MainThread | UCa-DreapaYm4Roo0CfUBGQg_s2NOMxaH3l8_7e973a1b: Undisclosed Advertising? -> 'no'
+2026-08-15 20:36:10,105 | INFO | MainThread | UCrPseYLGpNygVi34QpGNqpA_RDAROhyCnSc_cf8eda2f: Inadequate Disclosure? -> 'no'
+2026-08-15 20:36:14,521 | INFO | MainThread | UCa-DreapaYm4Roo0CfUBGQg_s2NOMxaH3l8_7e973a1b: Inadequate Disclosure? -> 'no'
+2026-08-15 20:36:17,495 | INFO | MainThread | UCuvSqzfO_LV_QzHdmEj84SQ_wrbyP7y5z80_7de330ad: Inadequate Disclosure? -> 'no'
+2026-08-15 20:36:17,983 | INFO | MainThread | UCrPseYLGpNygVi34QpGNqpA_RDAROhyCnSc_cf8eda2f: Direct Exhortation? -> 'no'
+2026-08-15 20:36:21,723 | INFO | MainThread | UCa-DreapaYm4Roo0CfUBGQg_s2NOMxaH3l8_7e973a1b: Direct Exhortation? -> 'no'
+2026-08-15 20:36:28,500 | INFO | MainThread | UCuvSqzfO_LV_QzHdmEj84SQ_wrbyP7y5z80_7de330ad: Direct Exhortation? -> 'no'
+2026-08-15 20:36:29,849 | INFO | MainThread | UCrPseYLGpNygVi34QpGNqpA_RDAROhyCnSc_cf8eda2f: Misleading Claim? -> 'yes'
+2026-08-15 20:36:32,937 | INFO | MainThread | UCa-DreapaYm4Roo0CfUBGQg_s2NOMxaH3l8_7e973a1b: Misleading Claim? -> 'yes'
+2026-08-15 20:36:36,178 | INFO | MainThread | UCrPseYLGpNygVi34QpGNqpA_RDAROhyCnSc_cf8eda2f: Age-Restricted/Prohibited Product? -> 'no'
+2026-08-15 20:36:40,040 | INFO | MainThread | UCa-DreapaYm4Roo0CfUBGQg_s2NOMxaH3l8_7e973a1b: Age-Restricted/Prohibited Product? -> 'no'
+2026-08-15 20:36:43,631 | INFO | MainThread | UCrPseYLGpNygVi34QpGNqpA_RDAROhyCnSc_cf8eda2f: HFSS Food Marketing? -> 'no'
+2026-08-15 20:36:45,847 | INFO | MainThread | UCuvSqzfO_LV_QzHdmEj84SQ_wrbyP7y5z80_7de330ad: Misleading Claim? -> 'yes'
+2026-08-15 20:36:49,115 | INFO | MainThread | UCa-DreapaYm4Roo0CfUBGQg_s2NOMxaH3l8_7e973a1b: HFSS Food Marketing? -> 'no'
+2026-08-15 20:36:53,762 | INFO | MainThread | UCuvSqzfO_LV_QzHdmEj84SQ_wrbyP7y5z80_7de330ad: Age-Restricted/Prohibited Product? -> 'no'
+2026-08-15 20:36:59,688 | INFO | MainThread | UCuvSqzfO_LV_QzHdmEj84SQ_wrbyP7y5z80_7de330ad: HFSS Food Marketing? -> 'no'
+2026-08-15 20:36:59,692 | INFO | MainThread | wrote 3 predictions to runs/submission_gpt_20260815_203544.jsonl
+2026-08-15 20:36:59,692 | INFO | MainThread | copied predictions to submission_gpt_st3.jsonl (canonical submission file)
+2026-08-15 20:36:59,692 | INFO | MainThread | wrote 0 misclassified instance(s) to runs/submission_gpt_error_20260815_203544.jsonl
+2026-08-15 20:36:59,692 | INFO | MainThread | === Distinct gold labels observed, by tier ===
+2026-08-15 20:36:59,693 | INFO | MainThread | [ST1 - commercial type]     ['digital_content_or_services', 'physical_goods', 'physical_services']
+2026-08-15 20:36:59,693 | INFO | MainThread | [ST2 - product category]    ['fashion', 'hardware_electronics', 'other']
+2026-08-15 20:36:59,693 | INFO | MainThread | [ST3 - compliance flags]    ['misleading_claim']
+2026-08-15 20:36:59,693 | INFO | MainThread | Evaluation:
+2026-08-15 20:36:59,693 | INFO | MainThread |   st3_macro_f1: 1.000
+2026-08-15 20:36:59,693 | INFO | MainThread |   st3_family_macro_f1: 1.000
+2026-08-15 20:36:59,693 | INFO | MainThread |   st3 per-label F1: misleading_claim=1.000
+2026-08-15 20:36:59,693 | INFO | MainThread |   st3_family per-label F1: content=1.000
+2026-08-15 20:36:59,693 | INFO | MainThread | === Prediction diagnostics ===
+2026-08-15 20:36:59,693 | INFO | MainThread | [st3] label distribution (gold / pred):
+2026-08-15 20:36:59,693 | INFO | MainThread |   misleading_claim: gold=3, pred=3
+2026-08-15 20:36:59,693 | INFO | MainThread | [st3] gold x pred cross-product counts (gold -> pred: count):
+2026-08-15 20:36:59,693 | INFO | MainThread |   misleading_claim -> misleading_claim: 3

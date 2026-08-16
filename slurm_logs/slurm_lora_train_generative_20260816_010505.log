@@ -1,0 +1,38 @@
+Running on rg21801
+Started: Sun 16 Aug 2026 01:05:40 AM EDT
+Account: rrg-zhu2048_gpu
+Partition: gpubase_bygpu_b2
+---
+Python: /lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/bin/python  Torch: 2.13.0
+---
+Command: python src/lora/lora_train_generative.py public_data_dev/train.jsonl public_data_dev/dev.jsonl --model Qwen/Qwen3-0.6B --context full --lean-prompt --df-path emnllp-dialog-flow-dialog-flow.json --max-length 4096 --epochs 100 --eval-every 10 --batch-size 1 --eval-batch-size 8 --grad-accum-steps 4 --lr 4e-4 --warmup-ratio 0.06 --lora-r 8 --lora-alpha 16 --lora-dropout 0.1 --target-modules q_proj,v_proj --pos-weight --st12-only --no-gradient-checkpointing --test-holdout 500 --seed 42 --output-dir /scratch/kwang103/lora-qwen-st12-100epoch-lr4e4-aug-15
+usage: lora_train_generative.py [-h] [--model MODEL] [--model-path MODEL_PATH]
+                                [--context {transcript,no_product_page,st2_page,full}]
+                                [--lean-prompt] [--df-path DF_PATH]
+                                [--max-length MAX_LENGTH] [--epochs EPOCHS]
+                                [--batch-size BATCH_SIZE]
+                                [--eval-batch-size EVAL_BATCH_SIZE]
+                                [--eval-every EVAL_EVERY]
+                                [--grad-accum-steps GRAD_ACCUM_STEPS]
+                                [--lr LR] [--warmup-ratio WARMUP_RATIO]
+                                [--lora-r LORA_R] [--lora-alpha LORA_ALPHA]
+                                [--lora-dropout LORA_DROPOUT]
+                                [--target-modules TARGET_MODULES]
+                                [--peft-method {lora,prompt_tuning}]
+                                [--num-virtual-tokens NUM_VIRTUAL_TOKENS]
+                                [--prompt-tuning-init-text PROMPT_TUNING_INIT_TEXT]
+                                [--st3-loss-weight ST3_LOSS_WEIGHT]
+                                [--pos-weight]
+                                [--oversample-rare-st3 OVERSAMPLE_RARE_ST3]
+                                [--st3-only] [--st12-only] [--load-in-4bit]
+                                [--parallelism {none,pipeline,tensor}]
+                                [--max-new-tokens MAX_NEW_TOKENS]
+                                [--sample-size SAMPLE_SIZE]
+                                [--test-holdout TEST_HOLDOUT]
+                                [--split-seed SPLIT_SEED] [--seed SEED]
+                                [--device DEVICE] --output-dir OUTPUT_DIR
+                                [--checkpoint-save-path CHECKPOINT_SAVE_PATH]
+                                train dev
+lora_train_generative.py: error: unrecognized arguments: --no-gradient-checkpointing
+---
+Finished: Sun 16 Aug 2026 01:10:55 AM EDT

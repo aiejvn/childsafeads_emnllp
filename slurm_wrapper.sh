@@ -3,6 +3,11 @@
 #
 # Example:
 #   bash slurm_wrapper.sh 4 src/lora/lora_train_generative.py public_data_dev/train.jsonl public_data_dev/dev.jsonl --epochs 200 --output-dir runs/lora_legalbert --no-wandb
+#   bash slurm_wrapper.sh 4 src/lora/lora_train_generative.py public_data_dev/train.jsonl public_data_dev/dev.jsonl --epochs 200 --output-dir runs/lora_legalbert --parallelism pipeline --model Qwen/Qwen3-4B --df-path emnllp-dialog-flow-dialog-flow.json --lean-prompt --batch-size 1 --output-dir runs/lora_qwen --checkpoint-save-path $SCRATCH/8-12/Qwen3-4B-batch-size-1
+
+#  bash slurm_wrapper.sh 4 src/lora/lora_train_generative.py public_data_dev/train.jsonl public_data_dev/dev.jsonl --epochs 200 --parallelism pipeline --model Qwen/Qwen3-4B --df-path emnllp-dialog-flow-dialog-flow.json --lean-prompt --batch-size 1 --output-dir runs/lora_qwen3-4B --checkpoint-save-path $SCRATCH/8-14/Qwen3-4B --split-seed 42 
+#  bash slurm_wrapper.sh 4 src/lora/lora_train_generative.py public_data_dev/train.jsonl public_data_dev/dev.jsonl --epochs 200 --parallelism pipeline --df-path emnllp-dialog-flow-dialog-flow.json --lean-prompt --batch-size 1 --output-dir runs/lora_gemma-4-E4B --checkpoint-save-path $SCRATCH/8-14/gemma-4-E4B --model google/gemma-4-E4B --split-seed 42
+#  bash slurm_wrapper.sh 4 src/lora/lora_train_generative.py public_data_dev/train.jsonl public_data_dev/dev.jsonl --epochs 200 --parallelism pipeline --model Qwen/Qwen3-4B --df-path emnllp-dialog-flow-dialog-flow.json --lean-prompt --batch-size 1 --output-dir runs/lora_qwen3-4B --checkpoint-save-path $SCRATCH/8-14/Qwen3-4B --pos-weight --test-holdout 100 --eval-every 10
 
 GPUs=$1
 TRAIN_SCRIPT=$2
@@ -42,7 +47,7 @@ cat > "$SLURM_SCRIPT" <<EOF
 #SBATCH --job-name=$JOB_NAME
 #SBATCH --output=$LOG
 #SBATCH --ntasks=1
-#SBATCH --time=4:00:00
+#SBATCH --time=10:00:00
 #SBATCH --mem=40gb
 #SBATCH --cpus-per-task=10
 

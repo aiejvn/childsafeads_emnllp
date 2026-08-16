@@ -1,0 +1,238 @@
+{
+  "version": 1,
+  "exportedAt": "2026-01-01T00:00:00.000Z",
+  "exportedByUserId": "test",
+  "dialogFlow": {
+    "name": "Inline Children Test Flow",
+    "visibility": "private"
+  },
+  "nodes": [
+    {
+      "id": "parent",
+      "type": "reasoning",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "data": {
+        "label": "Parent",
+        "config": {
+          "dataType": "custom",
+          "question": "Question for Parent?",
+          "instructions": "Instructions for Parent.",
+          "annotations": [],
+          "childNodeIds": [
+            "child-0",
+            "child-1",
+            "child-2",
+            "child-3",
+            "child-4"
+          ],
+          "customEnumValues": [
+            "null",
+            "1 - Yes",
+            "2 - No"
+          ],
+          "vectorSearchConfig": {
+            "enabled": false,
+            "filters": [],
+            "documentScopes": []
+          }
+        }
+      }
+    },
+    {
+      "id": "child-0",
+      "type": "reasoning",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "data": {
+        "label": "Child 0",
+        "config": {
+          "dataType": "custom",
+          "question": "Question for Child 0?",
+          "instructions": "Instructions for Child 0.",
+          "annotations": [],
+          "childNodeIds": [],
+          "customEnumValues": [
+            "null",
+            "1 - Yes",
+            "2 - No"
+          ],
+          "vectorSearchConfig": {
+            "enabled": false,
+            "filters": [],
+            "documentScopes": []
+          }
+        }
+      }
+    },
+    {
+      "id": "child-1",
+      "type": "reasoning",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "data": {
+        "label": "Child 1",
+        "config": {
+          "dataType": "custom",
+          "question": "Question for Child 1?",
+          "instructions": "Instructions for Child 1.",
+          "annotations": [],
+          "childNodeIds": [],
+          "customEnumValues": [
+            "null",
+            "1 - Yes",
+            "2 - No"
+          ],
+          "vectorSearchConfig": {
+            "enabled": false,
+            "filters": [],
+            "documentScopes": []
+          }
+        }
+      }
+    },
+    {
+      "id": "child-2",
+      "type": "reasoning",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "data": {
+        "label": "Child 2",
+        "config": {
+          "dataType": "custom",
+          "question": "Question for Child 2?",
+          "instructions": "Instructions for Child 2.",
+          "annotations": [],
+          "childNodeIds": [],
+          "customEnumValues": [
+            "null",
+            "1 - Yes",
+            "2 - No"
+          ],
+          "vectorSearchConfig": {
+            "enabled": false,
+            "filters": [],
+            "documentScopes": []
+          }
+        }
+      }
+    },
+    {
+      "id": "child-3",
+      "type": "reasoning",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "data": {
+        "label": "Child 3",
+        "config": {
+          "dataType": "custom",
+          "question": "Question for Child 3?",
+          "instructions": "Instructions for Child 3.",
+          "annotations": [],
+          "childNodeIds": [],
+          "customEnumValues": [
+            "null",
+            "1 - Yes",
+            "2 - No"
+          ],
+          "vectorSearchConfig": {
+            "enabled": false,
+            "filters": [],
+            "documentScopes": []
+          }
+        }
+      }
+    },
+    {
+      "id": "child-4",
+      "type": "reasoning",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "data": {
+        "label": "Child 4",
+        "config": {
+          "dataType": "custom",
+          "question": "Question for Child 4?",
+          "instructions": "Instructions for Child 4.",
+          "annotations": [],
+          "childNodeIds": [],
+          "customEnumValues": [
+            "null",
+            "1 - Yes",
+            "2 - No"
+          ],
+          "vectorSearchConfig": {
+            "enabled": false,
+            "filters": [],
+            "documentScopes": []
+          }
+        }
+      }
+    },
+    {
+      "id": "annotated",
+      "type": "reasoning",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "data": {
+        "label": "Annotated",
+        "config": {
+          "dataType": "custom",
+          "question": "Question for Annotated?",
+          "instructions": "Instructions for Annotated.",
+          "annotations": [
+            {
+              "id": "ann-1",
+              "sources": [
+                {
+                  "id": "file-1",
+                  "type": "file",
+                  "importance": "authoritative"
+                },
+                {
+                  "id": "excerpt-1",
+                  "type": "excerpt",
+                  "importance": "illustrative"
+                }
+              ]
+            }
+          ],
+          "childNodeIds": [],
+          "customEnumValues": [
+            "null",
+            "1 - Yes",
+            "2 - No"
+          ],
+          "vectorSearchConfig": {
+            "enabled": false,
+            "filters": [],
+            "documentScopes": []
+          }
+        }
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-parent-annotated",
+      "source": "parent",
+      "target": "annotated",
+      "sourceHandle": "out_parent",
+      "targetHandle": "in_annotated"
+    }
+  ]
+}

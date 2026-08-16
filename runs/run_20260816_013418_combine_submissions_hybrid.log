@@ -1,0 +1,7 @@
+2026-08-16 01:34:18,077 | INFO | MainThread | logging to runs/run_20260816_013418_combine_submissions_hybrid.log
+2026-08-16 01:34:18,078 | INFO | MainThread | sources: st1<-test_submissions/8-16/submission_lora_qwen3-4B-8-14.jsonl  st2<-test_submissions//8-16/submission_lora_qwen3-4B-8-14.jsonl  st3<-test_submissions/8-16/(st3)_submission_gpt_20260816_005614.jsonl
+2026-08-16 01:34:18,079 | INFO | MainThread | loaded 503 predictions from test_submissions/8-16/submission_lora_qwen3-4B-8-14.jsonl
+2026-08-16 01:34:18,080 | INFO | MainThread | loaded 503 predictions from test_submissions//8-16/submission_lora_qwen3-4B-8-14.jsonl
+2026-08-16 01:34:18,084 | INFO | MainThread | loaded 503 predictions from test_submissions/8-16/(st3)_submission_gpt_20260816_005614.jsonl
+2026-08-16 01:34:18,106 | INFO | MainThread | wrote 503 merged predictions to test_submissions/8-16/submission.jsonl
+2026-08-16 01:34:18,137 | INFO | MainThread | target has no gold labels (or only partial coverage) -- skipping evaluation

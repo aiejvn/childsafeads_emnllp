@@ -37,7 +37,9 @@ from tqdm import tqdm
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))  # so `import greaselm`/`import common` resolve
 from common.classification_data import multi_hot  # noqa: E402
-from common.predict_utils import decode, multi_hot_matrix, save_thresholds, tune_per_label_thresholds  # noqa: E402
+from common.predict_utils import (  # noqa: E402
+    decode, log_prediction_diagnostics, multi_hot_matrix, save_thresholds, tune_per_label_thresholds,
+)
 from common.train_utils import compute_pos_weight  # noqa: E402
 from greaselm import (  # noqa: E402
     GreaseLMForClassification, ST1_LABELS, ST2_LABELS, ST3_LABELS,
@@ -239,8 +241,10 @@ def main():
             )
             gold = [inst["labels"] for inst in dev_instances]
             metrics = evaluate(gold, preds)
-            log.info(f"epoch {epoch + 1} dev metrics (tuned thresholds): " + ", ".join(f"{k}={v:.3f}" for k, v in metrics.items()))
-            log_payload.update({f"dev_{k}": v for k, v in metrics.items()})
+            scalar_metrics = {k: v for k, v in metrics.items() if k != "per_label_f1"}
+            log.info(f"epoch {epoch + 1} dev metrics (tuned thresholds): " + ", ".join(f"{k}={v:.3f}" for k, v in scalar_metrics.items()))
+            log_prediction_diagnostics(log, gold, preds)
+            log_payload.update({f"dev_{k}": v for k, v in scalar_metrics.items()})
 
             if metrics["mean_macro_f1"] > best_f1:
                 best_f1 = metrics["mean_macro_f1"]

@@ -1,0 +1,6 @@
+2026-08-15 18:25:14,070 | INFO | MainThread | logging to runs/run_20260815_182514_full_gpt-5.4.log
+2026-08-15 18:25:14,070 | INFO | MainThread | config: target=public_data_test/test.jsonl model=gpt-5.4 context=full sample_size=None max_concurrency=20 st3_only=True lean_prompt=False df_path=None few_shot=False few_shot_n=1 out=runs/submission_gpt_20260815_182514.jsonl seed=None
+2026-08-15 18:25:14,070 | INFO | MainThread | system prompt: full st3-only (17344 chars)
+2026-08-15 18:25:38,555 | INFO | MainThread | wrote 503 predictions to runs/submission_gpt_20260815_182514.jsonl
+2026-08-15 18:25:38,556 | INFO | MainThread | copied predictions to submission_gpt_st3.jsonl (canonical submission file)
+2026-08-15 18:25:38,556 | INFO | MainThread | target has no gold labels (or a partial mismatch) -- skipping evaluation

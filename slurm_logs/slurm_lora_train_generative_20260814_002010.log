@@ -1,0 +1,46 @@
+Running on rg32102
+Started: Fri 14 Aug 2026 12:27:33 AM EDT
+Account: rrg-zhu2048_gpu
+Partition: gpubase_bynode_b2
+---
+Python: /lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/bin/python  Torch: 2.13.0
+---
+Command: python src/lora/lora_train_generative.py public_data_dev/train.jsonl public_data_dev/dev.jsonl --epochs 200 --parallelism pipeline --df-path emnllp-dialog-flow-dialog-flow.json --lean-prompt --batch-size 1 --output-dir runs/lora_gemma-4-E2B-it --checkpoint-save-path /scratch/kwang103/8-14/gemma-4-E2B-it --model google/gemma-4-E2B-it --split-seed 42
+2026-08-14 00:27:46,587 | INFO | MainThread | logging to runs/run_20260814_002746_lora_train_generative_google_gemma-4-E2B-it.log
+2026-08-14 00:27:46,588 | INFO | MainThread | config: {'train': 'public_data_dev/train.jsonl', 'dev': 'public_data_dev/dev.jsonl', 'model': 'google/gemma-4-E2B-it', 'model_path': None, 'context': 'full', 'lean_prompt': True, 'df_path': 'emnllp-dialog-flow-dialog-flow.json', 'max_length': 4096, 'epochs': 200, 'batch_size': 1, 'eval_batch_size': None, 'grad_accum_steps': 4, 'lr': 0.0002, 'warmup_ratio': 0.06, 'lora_r': 8, 'lora_alpha': 16, 'lora_dropout': 0.1, 'target_modules': 'q_proj,v_proj', 'load_in_4bit': False, 'parallelism': 'pipeline', 'max_new_tokens': 128, 'sample_size': None, 'test_holdout': 500, 'split_seed': 42, 'seed': 42, 'device': None, 'output_dir': 'runs/lora_gemma-4-E2B-it', 'checkpoint_save_path': '/scratch/kwang103/8-14/gemma-4-E2B-it'} device=cuda
+2026-08-14 00:27:46,720 | INFO | MainThread | train/test-holdout split (fresh random split every run unless --split-seed is pinned): split_seed=42 train=1853 test_holdout=500
+2026-08-14 00:27:46,721 | INFO | MainThread | train=1853 dev=504
+2026-08-14 00:27:46,721 | INFO | MainThread | loading model/tokenizer from local path models/google/gemma-4-E2B-it (no remote download)
+[transformers] `torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/1951 [00:00<?, ?it/s]Loading weights:   3%|▎         | 64/1951 [00:00<00:03, 603.88it/s]Loading weights:   6%|▋         | 125/1951 [00:00<00:04, 374.55it/s]Loading weights:   9%|▊         | 168/1951 [00:00<00:06, 267.27it/s]Loading weights:  10%|█         | 200/1951 [00:00<00:07, 241.19it/s]Loading weights:  12%|█▏        | 243/1951 [00:00<00:06, 278.95it/s]Loading weights:  14%|█▍        | 275/1951 [00:00<00:06, 279.29it/s]Loading weights:  16%|█▌        | 317/1951 [00:01<00:05, 301.83it/s]Loading weights:  19%|█▊        | 364/1951 [00:01<00:04, 339.20it/s]Loading weights:  21%|██        | 400/1951 [00:01<00:04, 319.14it/s]Loading weights:  23%|██▎       | 442/1951 [00:01<00:04, 338.38it/s]Loading weights:  25%|██▌       | 488/1951 [00:01<00:03, 369.74it/s]Loading weights:  27%|██▋       | 527/1951 [00:01<00:04, 342.64it/s]Loading weights:  29%|██▉       | 566/1951 [00:01<00:03, 347.82it/s]Loading weights:  31%|███       | 609/1951 [00:01<00:03, 365.68it/s]Loading weights:  33%|███▎      | 647/1951 [00:01<00:03, 344.63it/s]Loading weights:  35%|███▌      | 684/1951 [00:02<00:03, 337.75it/s]Loading weights:  37%|███▋      | 719/1951 [00:02<00:03, 327.93it/s]Loading weights:  39%|███▊      | 753/1951 [00:02<00:03, 301.45it/s]Loading weights:  39%|███▊      | 753/1951 [00:20<00:03, 301.45it/s]Loading weights:  39%|███▊      | 755/1951 [01:01<13:29,  1.48it/s] Loading weights:  55%|█████▍    | 1071/1951 [01:01<01:37,  9.05it/s]Loading weights:  60%|██████    | 1176/1951 [01:04<01:06, 11.68it/s]Loading weights:  64%|██████▍   | 1251/1951 [01:05<00:50, 13.95it/s]Loading weights:  67%|██████▋   | 1305/1951 [01:07<00:40, 16.02it/s]Loading weights:  69%|██████▉   | 1344/1951 [01:07<00:31, 18.97it/s]Loading weights:  71%|███████   | 1383/1951 [01:07<00:24, 22.93it/s]Loading weights:  73%|███████▎  | 1420/1951 [01:07<00:18, 28.31it/s]Loading weights:  76%|███████▌  | 1485/1951 [01:07<00:11, 41.79it/s]Loading weights:  79%|███████▉  | 1548/1951 [01:07<00:06, 59.34it/s]Loading weights:  83%|████████▎ | 1614/1951 [01:07<00:04, 83.98it/s]Loading weights:  86%|████████▌ | 1675/1951 [01:07<00:02, 113.06it/s]Loading weights:  89%|████████▉ | 1746/1951 [01:07<00:01, 154.97it/s]Loading weights:  93%|█████████▎| 1812/1951 [01:08<00:00, 201.62it/s]Loading weights:  96%|█████████▋| 1881/1951 [01:08<00:00, 257.62it/s]Loading weights: 100%|██████████| 1951/1951 [01:08<00:00, 305.93it/s]Loading weights: 100%|██████████| 1951/1951 [01:08<00:00, 28.58it/s] 
+Traceback (most recent call last):
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/src/lora/lora_train_generative.py", line 283, in <module>
+    main()
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/src/lora/lora_train_generative.py", line 168, in main
+    model = build_peft_model_causal(
+            ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/src/lora/../common/../lora/lora_model.py", line 155, in build_peft_model_causal
+    return get_peft_model(model, lora_config)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/peft/mapping_func.py", line 122, in get_peft_model
+    return MODEL_TYPE_TO_PEFT_MODEL_MAPPING[peft_config.task_type](
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/peft/peft_model.py", line 2063, in __init__
+    super().__init__(model, peft_config, adapter_name, **kwargs)
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/peft/peft_model.py", line 164, in __init__
+    self.base_model = cls(model, {adapter_name: peft_config}, adapter_name)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/peft/tuners/tuners_utils.py", line 318, in __init__
+    self.inject_adapter(self.model, adapter_name, low_cpu_mem_usage=low_cpu_mem_usage, state_dict=state_dict)
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/peft/tuners/tuners_utils.py", line 917, in inject_adapter
+    self._create_and_replace(
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/peft/tuners/lora/model.py", line 281, in _create_and_replace
+    new_module = self._create_new_module(lora_config, adapter_name, target, device_map=device_map, **kwargs)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/peft/tuners/lora/model.py", line 436, in _create_new_module
+    raise ValueError(
+ValueError: Target module Gemma4ClippableLinear(
+  (linear): Linear(in_features=768, out_features=768, bias=False)
+) is not supported. Currently, only the following modules are supported: `torch.nn.Linear`, `torch.nn.Embedding`, `torch.nn.Conv1d`, `torch.nn.Conv2d`, `torch.nn.Conv3d`, `transformers.pytorch_utils.Conv1D`, `torch.nn.MultiheadAttention.`.
+---
+Finished: Fri 14 Aug 2026 12:28:59 AM EDT

@@ -8,6 +8,7 @@ falling back to a single flat --threshold.
 """
 import json
 import os
+from collections import Counter
 
 import torch
 from tqdm import tqdm
@@ -147,6 +148,43 @@ def log_evaluation(log, metrics: dict) -> None:
         log.info(f"  {k}: {v:.3f}")
     for tier, per_label in metrics["per_label_f1"].items():
         log.info(f"  {tier} per-label F1: " + ", ".join(f"{l}={f:.3f}" for l, f in sorted(per_label.items())))
+
+
+def log_label_diagnostics(log, tier: str, gold_labels: list, pred_labels: list) -> None:
+    """Logs `tier`'s label distribution (gold vs. predicted counts) and the gold-label x
+    predicted-label cross-product counts: the co-occurrence of every (gold, pred) label
+    pair within the same instance/token, tallied over `zip(gold_labels, pred_labels)`.
+    Surfaces systematic confusions (e.g. an inadequate_disclosure gold flag consistently
+    landing next to an undisclosed_advertising prediction) and under/over-flagging bias
+    that per-label F1 alone doesn't show. `gold_labels`/`pred_labels` are parallel lists,
+    one label collection (a list, even a singleton one for a single-label tier) per
+    instance/token."""
+    gold_counts = Counter(f for flags in gold_labels for f in flags)
+    pred_counts = Counter(f for flags in pred_labels for f in flags)
+    labels = sorted(set(gold_counts) | set(pred_counts))
+    log.info(f"[{tier}] label distribution (gold / pred):")
+    for label in labels:
+        log.info(f"  {label}: gold={gold_counts[label]}, pred={pred_counts[label]}")
+
+    cross = Counter()
+    for g_flags, p_flags in zip(gold_labels, pred_labels):
+        for g in g_flags:
+            for p in p_flags:
+                cross[(g, p)] += 1
+    log.info(f"[{tier}] gold x pred cross-product counts (gold -> pred: count):")
+    for (g, p), count in sorted(cross.items(), key=lambda kv: (-kv[1], kv[0])):
+        log.info(f"  {g} -> {p}: {count}")
+
+
+def log_prediction_diagnostics(log, gold: list, pred: list, tiers: tuple = ("st1", "st2", "st3")) -> None:
+    """st1/st2/st3-shaped wrapper around `log_label_diagnostics`: `gold`/`pred` are the
+    same {"st1": str, "st2": [...], "st3": [...]} dicts `evaluate()`/`write_submission()`
+    use. Run once per dev eval alongside `log_evaluation`."""
+    log.info("=== Prediction diagnostics ===")
+    for tier in tiers:
+        gold_labels = [[g["st1"]] for g in gold] if tier == "st1" else [g[tier] for g in gold]
+        pred_labels = [[p["st1"]] for p in pred] if tier == "st1" else [p[tier] for p in pred]
+        log_label_diagnostics(log, tier, gold_labels, pred_labels)
 
 
 def save_thresholds(output_dir: str, st2_threshold: torch.Tensor, st3_threshold: torch.Tensor) -> None:

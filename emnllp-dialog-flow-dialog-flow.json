@@ -207,26 +207,23 @@
       "selected": false
     },
     {
-      "id": "054641bf-a65c-4c90-81fe-77c7a8f8425a",
+      "id": "c905d7b8-7587-44c1-a58b-2be60091511f",
       "type": "reasoning",
       "position": {
         "x": 2349,
         "y": 182
       },
       "data": {
-        "label": "Disclosure and Claims",
+        "label": "Undisclosed Advertising?",
         "config": {
           "dataType": "custom",
-          "question": "Are there disclosure or misleading-claim concerns in the segment?",
+          "question": "Is the commercial nature of this segment left completely undisclosed?",
           "annotations": [],
           "childNodeIds": [],
-          "instructions": "Assess the segment for advertising-law concerns arising from disclosure and content. If no commercial disclosure is present anywhere available to the viewer, the concern is undisclosed_advertising. If a disclosure exists but would be unclear to a child, the concern is inadequate_disclosure. If the segment contains a direct appeal for children to buy or to persuade adults to buy, the concern is direct_exhortation. If it makes unsubstantiated or high-risk claims about characteristics, results, or price, the concern is misleading_claim. Apply the disclosure branches exclusively so that undisclosed_advertising and inadequate_disclosure do not both apply. If no concern exists in this branch, the output may be no_flag for this branch only.",
+          "instructions": "Check whether no commercial disclosure is present anywhere available to the viewer -- not in the spoken content, not in the description, and not via a platform paid-promotion label. If there is truly no disclosure anywhere, answer yes. If any disclosure exists (even if it might be inadequate), answer no -- that case is handled by the next check, not this one.",
           "customEnumValues": [
-            "undisclosed_advertising",
-            "inadequate_disclosure",
-            "direct_exhortation",
-            "misleading_claim",
-            "no_flag"
+            "yes",
+            "no"
           ]
         }
       },
@@ -236,29 +233,132 @@
       }
     },
     {
-      "id": "ef4f582e-c7d4-4251-9d00-e031399e9509",
+      "id": "b193bf82-e7f2-4b0b-88a3-08839eff90bb",
       "type": "reasoning",
       "position": {
-        "x": 2741,
+        "x": 2509,
         "y": 182
       },
       "data": {
-        "label": "Product Risk",
+        "label": "Inadequate Disclosure?",
         "config": {
           "dataType": "custom",
-          "question": "Does the promoted product create age-restriction or HFSS concerns?",
+          "question": "If a disclosure exists, is it inadequate for a child audience?",
           "annotations": [],
           "childNodeIds": [],
-          "instructions": "Assess whether the promoted product is age-restricted or prohibited, and whether the content clearly markets HFSS food. If the product is age-restricted or prohibited, the appropriate flag is age_restricted_or_prohibited_product. If the content clearly markets HFSS food, the appropriate flag is hfss_food_marketing. If neither applies, the output may be no_flag for this branch only. Do not consider destination-page issues or any out-of-scope materials.",
+          "instructions": "Only relevant if a disclosure exists somewhere (spoken, in the description, or via a platform label) but would be unclear to a child -- buried, in adult jargon, or otherwise not clear and comprehensible. If Undisclosed Advertising was already answered yes (no disclosure exists at all), answer no here -- these two checks are mutually exclusive by taxonomy rule; do not flag both an undisclosed segment as also having an inadequate disclosure.",
           "customEnumValues": [
-            "age_restricted_or_prohibited_product",
-            "hfss_food_marketing",
-            "no_flag"
+            "yes",
+            "no"
           ]
         }
       },
       "measured": {
-        "width": 228,
+        "width": 296,
+        "height": 93
+      }
+    },
+    {
+      "id": "04bf79fa-55d7-4cc1-a26f-1c3ace3cce0b",
+      "type": "reasoning",
+      "position": {
+        "x": 2669,
+        "y": 182
+      },
+      "data": {
+        "label": "Direct Exhortation?",
+        "config": {
+          "dataType": "custom",
+          "question": "Does the segment contain a direct appeal for children to buy, or to persuade adults to buy for them?",
+          "annotations": [],
+          "childNodeIds": [],
+          "instructions": "Answer yes if the segment contains a direct appeal for children to buy or to persuade adults to buy. Answer no for a segment that only states where/how to obtain a product without pressuring the viewer to act.",
+          "customEnumValues": [
+            "yes",
+            "no"
+          ]
+        }
+      },
+      "measured": {
+        "width": 296,
+        "height": 93
+      }
+    },
+    {
+      "id": "e7140f05-bab7-48c6-8242-a8f845a05e5a",
+      "type": "reasoning",
+      "position": {
+        "x": 2829,
+        "y": 182
+      },
+      "data": {
+        "label": "Misleading Claim?",
+        "config": {
+          "dataType": "custom",
+          "question": "Does the segment make an unsubstantiated or high-risk claim about the product's characteristics, results, or price?",
+          "annotations": [],
+          "childNodeIds": [],
+          "instructions": "Answer yes if it makes an unsubstantiated or high-risk claim about characteristics, results, or price -- such as a specific number, a comparison, a guarantee, or a health/fitness/skincare/supplement benefit stated as established fact. Answer no for ordinary subjective opinion/puffery with no specific fact attached.",
+          "customEnumValues": [
+            "yes",
+            "no"
+          ]
+        }
+      },
+      "measured": {
+        "width": 296,
+        "height": 93
+      }
+    },
+    {
+      "id": "41567e11-0306-45f6-a7d5-405aebe63be0",
+      "type": "reasoning",
+      "position": {
+        "x": 2989,
+        "y": 182
+      },
+      "data": {
+        "label": "Age-Restricted/Prohibited Product?",
+        "config": {
+          "dataType": "custom",
+          "question": "Is the promoted product age-restricted or prohibited (e.g. alcohol, tobacco/vaping, gambling, weapons)?",
+          "annotations": [],
+          "childNodeIds": [],
+          "instructions": "Answer yes if the promoted product is age-restricted or prohibited. Do not consider destination-page issues or any out-of-scope materials.",
+          "customEnumValues": [
+            "yes",
+            "no"
+          ]
+        }
+      },
+      "measured": {
+        "width": 296,
+        "height": 93
+      }
+    },
+    {
+      "id": "cc9dc6e1-7b49-4911-a8ce-cf39483dfe6c",
+      "type": "reasoning",
+      "position": {
+        "x": 3149,
+        "y": 182
+      },
+      "data": {
+        "label": "HFSS Food Marketing?",
+        "config": {
+          "dataType": "custom",
+          "question": "Does the content clearly market food high in fat, salt, or sugar (HFSS)?",
+          "annotations": [],
+          "childNodeIds": [],
+          "instructions": "Answer yes if the content clearly markets HFSS food. Do not consider destination-page issues or any out-of-scope materials.",
+          "customEnumValues": [
+            "yes",
+            "no"
+          ]
+        }
+      },
+      "measured": {
+        "width": 296,
         "height": 93
       }
     },
@@ -266,7 +366,7 @@
       "id": "35196c6c-cbc3-46f8-9227-9f463c441940",
       "type": "outcome",
       "position": {
-        "x": 3133,
+        "x": 3309,
         "y": 182
       },
       "data": {
@@ -326,24 +426,52 @@
       "targetHandle": "in_11100d62-ce9c-4011-a3b7-5b81cdcb0af1"
     },
     {
-      "id": "edge_11100d62-ce9c-4011-a3b7-5b81cdcb0af1_054641bf-a65c-4c90-81fe-77c7a8f8425a",
+      "id": "edge_11100d62-ce9c-4011-a3b7-5b81cdcb0af1_c905d7b8-7587-44c1-a58b-2be60091511f",
       "source": "11100d62-ce9c-4011-a3b7-5b81cdcb0af1",
-      "target": "054641bf-a65c-4c90-81fe-77c7a8f8425a",
+      "target": "c905d7b8-7587-44c1-a58b-2be60091511f",
       "sourceHandle": "out_11100d62-ce9c-4011-a3b7-5b81cdcb0af1",
-      "targetHandle": "in_054641bf-a65c-4c90-81fe-77c7a8f8425a"
+      "targetHandle": "in_c905d7b8-7587-44c1-a58b-2be60091511f"
     },
     {
-      "id": "edge_054641bf-a65c-4c90-81fe-77c7a8f8425a_ef4f582e-c7d4-4251-9d00-e031399e9509",
-      "source": "054641bf-a65c-4c90-81fe-77c7a8f8425a",
-      "target": "ef4f582e-c7d4-4251-9d00-e031399e9509",
-      "sourceHandle": "out_054641bf-a65c-4c90-81fe-77c7a8f8425a",
-      "targetHandle": "in_ef4f582e-c7d4-4251-9d00-e031399e9509"
+      "id": "edge_c905d7b8-7587-44c1-a58b-2be60091511f_b193bf82-e7f2-4b0b-88a3-08839eff90bb",
+      "source": "c905d7b8-7587-44c1-a58b-2be60091511f",
+      "target": "b193bf82-e7f2-4b0b-88a3-08839eff90bb",
+      "sourceHandle": "out_c905d7b8-7587-44c1-a58b-2be60091511f",
+      "targetHandle": "in_b193bf82-e7f2-4b0b-88a3-08839eff90bb"
     },
     {
-      "id": "edge_ef4f582e-c7d4-4251-9d00-e031399e9509_35196c6c-cbc3-46f8-9227-9f463c441940",
-      "source": "ef4f582e-c7d4-4251-9d00-e031399e9509",
+      "id": "edge_b193bf82-e7f2-4b0b-88a3-08839eff90bb_04bf79fa-55d7-4cc1-a26f-1c3ace3cce0b",
+      "source": "b193bf82-e7f2-4b0b-88a3-08839eff90bb",
+      "target": "04bf79fa-55d7-4cc1-a26f-1c3ace3cce0b",
+      "sourceHandle": "out_b193bf82-e7f2-4b0b-88a3-08839eff90bb",
+      "targetHandle": "in_04bf79fa-55d7-4cc1-a26f-1c3ace3cce0b"
+    },
+    {
+      "id": "edge_04bf79fa-55d7-4cc1-a26f-1c3ace3cce0b_e7140f05-bab7-48c6-8242-a8f845a05e5a",
+      "source": "04bf79fa-55d7-4cc1-a26f-1c3ace3cce0b",
+      "target": "e7140f05-bab7-48c6-8242-a8f845a05e5a",
+      "sourceHandle": "out_04bf79fa-55d7-4cc1-a26f-1c3ace3cce0b",
+      "targetHandle": "in_e7140f05-bab7-48c6-8242-a8f845a05e5a"
+    },
+    {
+      "id": "edge_e7140f05-bab7-48c6-8242-a8f845a05e5a_41567e11-0306-45f6-a7d5-405aebe63be0",
+      "source": "e7140f05-bab7-48c6-8242-a8f845a05e5a",
+      "target": "41567e11-0306-45f6-a7d5-405aebe63be0",
+      "sourceHandle": "out_e7140f05-bab7-48c6-8242-a8f845a05e5a",
+      "targetHandle": "in_41567e11-0306-45f6-a7d5-405aebe63be0"
+    },
+    {
+      "id": "edge_41567e11-0306-45f6-a7d5-405aebe63be0_cc9dc6e1-7b49-4911-a8ce-cf39483dfe6c",
+      "source": "41567e11-0306-45f6-a7d5-405aebe63be0",
+      "target": "cc9dc6e1-7b49-4911-a8ce-cf39483dfe6c",
+      "sourceHandle": "out_41567e11-0306-45f6-a7d5-405aebe63be0",
+      "targetHandle": "in_cc9dc6e1-7b49-4911-a8ce-cf39483dfe6c"
+    },
+    {
+      "id": "edge_cc9dc6e1-7b49-4911-a8ce-cf39483dfe6c_35196c6c-cbc3-46f8-9227-9f463c441940",
+      "source": "cc9dc6e1-7b49-4911-a8ce-cf39483dfe6c",
       "target": "35196c6c-cbc3-46f8-9227-9f463c441940",
-      "sourceHandle": "out_ef4f582e-c7d4-4251-9d00-e031399e9509",
+      "sourceHandle": "out_cc9dc6e1-7b49-4911-a8ce-cf39483dfe6c",
       "targetHandle": "in_35196c6c-cbc3-46f8-9227-9f463c441940"
     }
   ]

@@ -33,7 +33,7 @@ from lora.lora_data import GenerativeCollator, GenerativeDataset  # noqa: E402
 from lora.lora_generative import generate_predictions  # noqa: E402
 from lora.lora_model import PARALLELISM_CHOICES, load_peft_model_causal  # noqa: E402
 
-
+#  bash slurm_wrapper.sh 4 src/lora/lora_predict_generative.py public_data_test/test.jsonl  --model Qwen/Qwen3-4B --adapter-dir $SCRATCH/Qwen-4B/best --out runs/submission_lora_qwen3-4B-8-13.jsonl --parallelism pipeline --lean-prompt --df-path emnllp-dialog-flow-dialog-flow.json  --batch-size 1
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("target", help="split to predict on, e.g. public_data_dev/dev.jsonl")
