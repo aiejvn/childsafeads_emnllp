@@ -20,9 +20,22 @@ directions **discarded**, r8/a16/single-LR remains the standing default:
    specifically, a real generalization failure masked by a fine-looking macro gap. Do not adopt.
 
 Both logged to `runs/results_st1_classifiers.csv` (rows 6-7) and `runs/runs.log`, committed.
-Remaining untried sweep axes from next-candidates item #2: `--oversample-rare-st1` factor
-(currently fixed at 3), and combinations aren't likely worth it given both single-axis moves
-regressed.
+
+**Follow-up: `--oversample-rare-st1` factor sweep (2 vs 5, vs standing 3) — promising lead
+found.** Ran 2026-08-17 ~21:32-21:40, fresh splits, r8/a16/single-LR held fixed:
+- `--oversample-rare-st1 2`: dev macro_f1=0.580 (best@epoch3, none=0.500), **test
+  macro_f1=0.568, test none_f1=0.400** — beats BOTH oversample=3 baseline replicates
+  (test 0.559/0.553, test none 0.381/0.286) and has the tightest dev/test gap seen for this
+  classifier (0.012). Genuinely promising, but per standing practice (every surprising result
+  this session needed replication) — **not yet replicated, don't promote to standing default
+  until it is.**
+- `--oversample-rare-st1 5`: dev macro_f1=0.553, test macro_f1=0.525, test none_f1=0.296 — below
+  baseline, discarded. Combined with the =2 result, the pattern is LESS oversampling helps this
+  encoder classifier (opposite of what Track 1's generative recipe found, where oversample=3 is
+  part of the winning config — the two tracks' rare-class dynamics differ).
+
+Logged to `runs/results_st1_classifiers.csv` (rows 8-9) and `runs/runs.log`, committed.
+**Next action: replicate `--oversample-rare-st1 2` on a fresh split before promoting.**
 
 Prior job (`legal-bert-base-uncased` 5-way st1 classifier) finished and was logged/committed
 (`281facb`): clearly worse than roberta-base at the same untuned hyperparameters — dev
