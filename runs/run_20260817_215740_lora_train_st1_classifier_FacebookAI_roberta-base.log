@@ -1,0 +1,8 @@
+2026-08-17 21:57:40,371 | INFO | MainThread | logging to runs/run_20260817_215740_lora_train_st1_classifier_FacebookAI_roberta-base.log
+2026-08-17 21:57:40,372 | INFO | MainThread | config: {'train': 'public_data_dev/train.jsonl', 'dev': 'public_data_dev/dev.jsonl', 'model': 'FacebookAI/roberta-base', 'local': False, 'context': 'full', 'max_length': 512, 'epochs': 5, 'batch_size': 16, 'grad_accum_steps': 1, 'lr': 0.0002, 'head_lr': None, 'warmup_ratio': 0.06, 'lora_r': 8, 'lora_alpha': 16, 'lora_dropout': 0.1, 'target_modules': 'query,value', 'class_weight': True, 'oversample_rare_st1': 1, 'undersample_majority_st1': 2, 'sample_size': None, 'test_holdout': 500, 'split_seed': None, 'seed': 42, 'device': None, 'output_dir': 'runs/st1-classifier-roberta-undersample2', 'no_wandb': True} device=cuda
+2026-08-17 21:57:40,571 | INFO | MainThread | train/test-holdout split (fresh random split every run unless --split-seed is pinned): split_seed=1404347843 train=1853 test_holdout=500
+2026-08-17 21:57:40,574 | INFO | MainThread | train=1853 dist=digital_content_or_services=838 (45.2%), none=26 (1.4%), other=1 (0.1%), physical_goods=894 (48.2%), physical_services=94 (5.1%)
+2026-08-17 21:57:40,574 | INFO | MainThread | dev=504 dist=digital_content_or_services=248, none=14, other=0, physical_goods=218, physical_services=24
+2026-08-17 21:57:40,577 | INFO | MainThread | undersampled majority st1 labels ['digital_content_or_services', 'physical_goods', 'physical_services'] to 1/2: train now 940 instances
+2026-08-17 21:57:40,733 | INFO | MainThread | class_weight: digital_content_or_services=2.243, none=36.154, other=50.000, physical_goods=2.103, physical_services=20.000
+2026-08-17 21:58:54,362 | INFO | MainThread | epoch 1: mean train loss = 1.4769

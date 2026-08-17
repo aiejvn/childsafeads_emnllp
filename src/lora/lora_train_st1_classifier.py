@@ -110,6 +110,27 @@ def oversample_rare(instances: list, factor: int, threshold: float = 0.05) -> tu
     return out, rare
 
 
+def undersample_majority(instances: list, factor: int, seed: int, threshold: float = 0.05) -> tuple:
+    """Randomly drop train instances whose gold st1 is at/above `threshold` train-frequency down
+    to 1/factor of their original count -- the complementary lever to oversample_rare (shrinking
+    the majority classes instead of duplicating the rare ones). Same rare/majority split point
+    (computed pre-undersampling) as oversample_rare uses. Returns (instances, majority_labels)."""
+    if factor <= 1:
+        return instances, set()
+    freq = Counter(inst["labels"]["st1"] for inst in instances)
+    n = len(instances)
+    majority = {label for label in ST1_LABELS if freq.get(label, 0) / n >= threshold}
+    rng = random.Random(seed)
+    out = []
+    for label in ST1_LABELS:
+        label_instances = [inst for inst in instances if inst["labels"]["st1"] == label]
+        if label in majority:
+            keep_n = max(1, len(label_instances) // factor)
+            label_instances = rng.sample(label_instances, keep_n)
+        out.extend(label_instances)
+    return out, majority
+
+
 def build_model(model_path: str, lora_r: int, lora_alpha: int, lora_dropout: float, target_modules: list):
     model = AutoModelForSequenceClassification.from_pretrained(model_path, num_labels=len(ST1_LABELS))
     lora_config = LoraConfig(
@@ -218,6 +239,18 @@ def main():
                      "disables oversampling; composes with --class-weight (different mechanisms -- "
                      "this changes how often the model sees rare examples per epoch, class-weight "
                      "scales their loss)")
+    ap.add_argument("--undersample-majority-st1", type=int, default=1, help="randomly drop train "
+                     "instances whose gold st1 is at/above 5%% train frequency down to 1/factor of "
+                     "their original count -- complementary lever to --oversample-rare-st1 (shrinks "
+                     "the majority classes instead of duplicating the rare ones). 1 (default) "
+                     "disables it; can be combined with --oversample-rare-st1")
+    ap.add_argument("--oversample-first", action="store_true", help="when combining both levers, "
+                     "apply --oversample-rare-st1 before --undersample-majority-st1 instead of the "
+                     "default order (undersample majority first, then oversample rare) -- changes "
+                     "both the exact instance counts (oversample_rare's factor multiplies whatever "
+                     "count the rare labels have at that point) and which labels cross the 5%% "
+                     "rare/majority threshold, since that split is recomputed on whatever "
+                     "distribution exists when each function runs")
     ap.add_argument("--sample-size", type=int, default=None, help="sample N train and N dev instances (seeded smoke test)")
     ap.add_argument("--test-holdout", type=int, default=500, help="hold out this many instances from "
                      "`train` (disjoint from what's trained on) for a one-time generalization check "
@@ -276,10 +309,26 @@ def main():
         f"{label}={train_dist.get(label, 0)} ({train_dist.get(label, 0) / len(train_instances):.1%})" for label in ST1_LABELS))
     log.info(f"dev={len(dev_instances)} dist=" + ", ".join(f"{label}={dev_dist.get(label, 0)}" for label in ST1_LABELS))
 
-    train_instances, rare_labels = oversample_rare(train_instances, args.oversample_rare_st1)
-    if args.oversample_rare_st1 > 1:
-        log.info(f"oversampled rare st1 labels {sorted(rare_labels)} {args.oversample_rare_st1}x: "
-                 f"train now {len(train_instances)} instances")
+    def apply_undersample():
+        nonlocal train_instances
+        train_instances, majority_labels = undersample_majority(train_instances, args.undersample_majority_st1, args.seed)
+        if args.undersample_majority_st1 > 1:
+            log.info(f"undersampled majority st1 labels {sorted(majority_labels)} to 1/{args.undersample_majority_st1}: "
+                     f"train now {len(train_instances)} instances")
+
+    def apply_oversample():
+        nonlocal train_instances
+        train_instances, rare_labels = oversample_rare(train_instances, args.oversample_rare_st1)
+        if args.oversample_rare_st1 > 1:
+            log.info(f"oversampled rare st1 labels {sorted(rare_labels)} {args.oversample_rare_st1}x: "
+                     f"train now {len(train_instances)} instances")
+
+    if args.oversample_first:
+        apply_oversample()
+        apply_undersample()
+    else:
+        apply_undersample()
+        apply_oversample()
 
     class_weight = compute_class_weight(train_instances).to(device) if args.class_weight else None
     if class_weight is not None:

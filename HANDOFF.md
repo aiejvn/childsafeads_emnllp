@@ -21,21 +21,60 @@ directions **discarded**, r8/a16/single-LR remains the standing default:
 
 Both logged to `runs/results_st1_classifiers.csv` (rows 6-7) and `runs/runs.log`, committed.
 
-**Follow-up: `--oversample-rare-st1` factor sweep (2 vs 5, vs standing 3) — promising lead
-found.** Ran 2026-08-17 ~21:32-21:40, fresh splits, r8/a16/single-LR held fixed:
-- `--oversample-rare-st1 2`: dev macro_f1=0.580 (best@epoch3, none=0.500), **test
-  macro_f1=0.568, test none_f1=0.400** — beats BOTH oversample=3 baseline replicates
-  (test 0.559/0.553, test none 0.381/0.286) and has the tightest dev/test gap seen for this
-  classifier (0.012). Genuinely promising, but per standing practice (every surprising result
-  this session needed replication) — **not yet replicated, don't promote to standing default
-  until it is.**
-- `--oversample-rare-st1 5`: dev macro_f1=0.553, test macro_f1=0.525, test none_f1=0.296 — below
-  baseline, discarded. Combined with the =2 result, the pattern is LESS oversampling helps this
-  encoder classifier (opposite of what Track 1's generative recipe found, where oversample=3 is
-  part of the winning config — the two tracks' rare-class dynamics differ).
+**Follow-up: `--oversample-rare-st1` factor sweep (2 vs 5, vs standing 3) — initial lead did
+NOT replicate.** Ran 2026-08-17 ~21:32-21:40, fresh splits, r8/a16/single-LR held fixed:
+- `--oversample-rare-st1 2`, run 1: dev=0.580 (none=0.500), test macro_f1=0.568/none_f1=0.400 —
+  looked like it beat the oversample=3 baseline. **Replicate (fresh split) came back
+  test macro_f1=0.532/none_f1=0.160** — a big swing on none specifically (same
+  rotating-test-holdout small-none-count noise flagged elsewhere). Averaged across both
+  replicates (0.568, 0.532), oversample=2 lands in the SAME band as oversample=3's replicates
+  (0.559, 0.553) — **not a confirmed win, do not promote.**
+- `--oversample-rare-st1 5`: dev=0.553, test macro_f1=0.525/none_f1=0.296 — below baseline,
+  discarded, no replicate needed (clear single-direction regression).
 
-Logged to `runs/results_st1_classifiers.csv` (rows 8-9) and `runs/runs.log`, committed.
-**Next action: replicate `--oversample-rare-st1 2` on a fresh split before promoting.**
+Logged to `runs/results_st1_classifiers.csv` (rows 8-10) and `runs/runs.log`, committed
+(`effde85`, `adeceaf`). **Standing default remains `--oversample-rare-st1 3` (unreplaced) —
+oversample factor is a closed question for now, all three values tried land in the same noisy
+band once replicated.**
+
+**Follow-up 2: new `--undersample-majority-st1` lever + before/after order ablation — clean
+negative result, standing default UNCHANGED.** User asked to try undersampling the majority
+classes (`digital_content_or_services`, `physical_goods`) instead of/alongside oversampling the
+rare ones. Added `undersample_majority()` + `--undersample-majority-st1 FACTOR` to
+`lora_train_st1_classifier.py` (drops majority-label instances to 1/FACTOR, same 5% rare/majority
+split point as `oversample_rare`), plus `--oversample-first` to control which of the two levers
+runs first when combined (default: undersample first, matching the order already tested).
+Smoke-tested on GPU (CPU smoke-testing hung past 120s on a full training step — use GPU for this
+script's smoke tests going forward, not CPU). Four fresh-split runs, r8/a16/class-weight held
+fixed:
+| config | dev macro_f1 | dev none_f1 | test macro_f1 | test none_f1 |
+|---|---|---|---|---|
+| undersample=2 alone | 0.574 | 0.378 | 0.476 | 0.214 |
+| undersample=3 alone | 0.518 | 0.316 | 0.521 | 0.222 |
+| undersample=2 + oversample=3, undersample-first | 0.542 | 0.340 | 0.474 | 0.190 |
+| undersample=2 + oversample=3, oversample-first | 0.567 | 0.400 | 0.515 | 0.143 |
+
+**All four land below the oversample-only baseline** (test macro_f1 0.553-0.559) — shrinking
+majority-class training data is a net loss even though it nominally rebalances the label ratio,
+since majority classes count equally toward macro F1. Order DOES have a real, mechanistic effect
+when combining both levers (confirmed, not noise): oversampling first means `none` gets tripled
+before the majority-threshold check runs, so `none` itself crosses 5% and gets swept into the
+undersample step too — oversample-first wins on macro F1 (+0.025 dev, +0.041 test) but loses on
+test none_f1 (0.143 vs 0.190), i.e. the macro gain comes from the majority classes, not the rare
+one either order was meant to help. **Conclusion: don't use `--undersample-majority-st1` for this
+classifier, either alone or combined, in either order.** Logged to
+`runs/results_st1_classifiers.csv` (rows 11-14), committed. Standing default remains
+`--class-weight --oversample-rare-st1 3`, no undersampling.
+
+**Multi-agent coordination note**: 2+ peer Claude Code sessions were confirmed active on this
+same repo/branch during this round (via `ListAgents`) — one caused a real output-dir collision
+(`runs/st1-classifier-roberta-undersample2`, two processes writing the same `best/` checkpoint
+simultaneously; resolved when the peer killed their own duplicate after I flagged it, no
+corruption). Divided the remaining queue by direct message to avoid further collisions: **this
+session covers the oversample/undersample lever space on `lora_train_st1_classifier.py`; the
+peer session ("Pick up handoff documentation") is taking `last_layer_train.py`'s `--st1-only`
+baseline and the legal-bert LR retune** (items 1 and 3 below) — check `ListAgents` /
+message that peer before starting either of those to avoid duplicate work.
 
 Prior job (`legal-bert-base-uncased` 5-way st1 classifier) finished and was logged/committed
 (`281facb`): clearly worse than roberta-base at the same untuned hyperparameters — dev
@@ -135,10 +174,15 @@ best checkpoint by rare-label F1 within a majority-F1 tolerance instead of the d
    `lora_r`, `--oversample-rare-st1` factor, `--head-lr` (separate LR for the classifier head).
 3. If legal-bert is worth a second look, retry with a higher LR (e.g. 5e-4 to 1e-3) before
    fully writing off the architecture — it was never tuned, just run at roberta's LR.
-4. A peer Claude Code session was also active on this repo earlier (helping debug the same
-   none-class problem via a different angle) — the user said "stopping that agent" before
-   redirecting this session. Unclear if that peer session is still around; check
-   `ListAgents` if coordination matters again.
+4. **CONFIRMED (see coordination note above): 2+ peer sessions are active as of 2026-08-17
+   ~22:00.** Items 1 and 3 above are claimed by peer "Pick up handoff documentation" — don't
+   start them without checking `ListAgents`/messaging first. Item 2 (hyperparameter sweep) is
+   substantially done as of this update (r16a32, head-lr=1e-3, oversample factor 2/3/5,
+   undersample-majority factor 2/3, undersample+oversample order ablation — all tried, all
+   discarded or inconclusive except the standing oversample=3-only default). Remaining
+   unexplored angles if this track continues: `--lora-dropout` sweep, alternate
+   `--target-modules` (e.g. adding key/dense to query,value), or accept the current standing
+   config as final and move to `last_layer_train.py`/legal-bert once the peer's results land.
 
 ## Housekeeping notes
 - `git status` will show several **untracked, intentionally-uncommitted** directories: leftover
