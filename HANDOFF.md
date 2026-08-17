@@ -6,30 +6,12 @@ tracks are live; this doc covers current state, confirmed results, and the queue
 
 ## Currently running
 
-`legal-bert-base-uncased` 5-way st1 classifier (PID 1163404, epoch 4/5, started 21:12,
-~1min/epoch — should finish within ~2 minutes of this doc being written).
-Log: `runs/run_20260817_211219_lora_train_st1_classifier_legalbert.log`.
-Command:
-```
-python src/lora/lora_train_st1_classifier.py public_data_dev/train.jsonl public_data_dev/dev.jsonl \
-  --model nlpaueb/legal-bert-base-uncased --context full --max-length 512 \
-  --epochs 5 --batch-size 16 --lr 2e-4 --warmup-ratio 0.06 \
-  --lora-r 8 --lora-alpha 16 --lora-dropout 0.1 --target-modules query,value \
-  --class-weight --oversample-rare-st1 3 \
-  --test-holdout 500 --seed 42 --no-wandb \
-  --output-dir runs/st1-classifier-legalbert-classweight-oversample
-```
-**Early read (through epoch 3): legal-bert is learning much slower than roberta-base at the
-same config** — epoch-1 macro_f1=0.209 vs roberta's 0.370-0.467, train loss barely moving
-(1.48→1.29 by epoch 3 vs roberta's 1.39→0.60). Possibly needs a higher LR or more epochs, or
-legal-domain pretraining just isn't as good a fit for this conversational-transcript task as
-general-domain roberta-base. **Next action: check the finished run's dev/test metrics, log to
-`runs/results_st1_classifiers.csv` (see template below), commit, and decide whether to retune
-legal-bert's LR before writing it off.**
-
-No Monitor/loop is armed on it in a way that survives a fresh session — if you're picking this
-up cold, re-check `ps -p 1163404` and `tail runs/run_20260817_211219_lora_train_st1_classifier_legalbert.log`
-first; if it already finished, just read the log's final `test holdout metrics` line.
+**Nothing.** The last job (`legal-bert-base-uncased` 5-way st1 classifier) finished and was
+logged/committed (`281facb`): clearly worse than roberta-base at the same untuned
+hyperparameters — dev macro_f1=0.394 (still climbing, no plateau by epoch 5), test macro_f1=0.339
+with **test none F1 collapsed to 0.000** (a real generalization failure, not just slow
+convergence). Discarded for now; would need its own LR sweep to get a fair shot. roberta-base
+remains the standing encoder choice for this track. GPU is free — safe to launch the next thing.
 
 ## The big picture: two parallel tracks
 
@@ -114,14 +96,14 @@ best checkpoint by rare-label F1 within a majority-F1 tolerance instead of the d
 `--resume-adapter` continues training from an existing LoRA checkpoint.
 
 ## Next candidates (not yet started)
-1. Finish evaluating the legal-bert run above; if it's genuinely worse, don't pursue legal-bert
-   further (or retry with a higher LR before writing it off — hasn't been tuned at all yet).
-2. `src/last_layer/last_layer_train.py` — frozen-encoder + last-N-layers, no LoRA at all, an
+1. `src/last_layer/last_layer_train.py` — frozen-encoder + last-N-layers, no LoRA at all, an
    even cheaper baseline. Currently trains st1/st2/st3 jointly with no `--st1-only` mode; would
    need that flag added (mirror how it was added to `lora_train_generative.py` — see
    `feedback_st1_focus.md` history for that precedent).
-3. Hyperparameter sweep on the 5-way classifier now that iteration is cheap: `lora_r`,
-   `--oversample-rare-st1` factor, `--head-lr` (separate LR for the classifier head).
+2. Hyperparameter sweep on the roberta-base 5-way classifier now that iteration is cheap:
+   `lora_r`, `--oversample-rare-st1` factor, `--head-lr` (separate LR for the classifier head).
+3. If legal-bert is worth a second look, retry with a higher LR (e.g. 5e-4 to 1e-3) before
+   fully writing off the architecture — it was never tuned, just run at roberta's LR.
 4. A peer Claude Code session was also active on this repo earlier (helping debug the same
    none-class problem via a different angle) — the user said "stopping that agent" before
    redirecting this session. Unclear if that peer session is still around; check
