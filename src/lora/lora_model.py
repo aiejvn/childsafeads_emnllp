@@ -206,10 +206,32 @@ def build_prompt_tuned_causal(
 
 def load_peft_model_causal(
     base_model_name: str, adapter_dir: str, load_in_4bit: bool = False, device: str = "cuda",
-    local_files_only: bool = False, parallelism: str = "none",
+    local_files_only: bool = False, parallelism: str = "none", is_trainable: bool = False,
+    gradient_checkpointing: bool = True,
 ) -> PeftModel:
-    """Rebuild the base causal LM and attach trained LoRA weights from adapter_dir."""
+    """Rebuild the base causal LM and attach trained adapter weights (LoRA or prompt-tuning --
+    PeftModel.from_pretrained reads adapter_dir/adapter_config.json's peft_type and reconstructs
+    whichever it was saved as) from adapter_dir.
+
+    `is_trainable` (default False) matches this function's original eval/inference-only use
+    (lora_train_generative.py's test-holdout reload, lora_predict_generative.py): the adapter
+    loads with requires_grad off. Pass True to continue training it instead (see --resume-adapter
+    in lora_train_generative.py) -- this also applies the same use_cache/gradient-checkpointing/
+    enable_input_require_grads setup build_peft_model_causal/build_prompt_tuned_causal apply to a
+    freshly-initialized adapter, so backprop into the resumed one works identically. LoRA
+    checkpoints only: PEFT's PeftModel.from_pretrained itself refuses is_trainable=True for
+    prompt-learning adapter types (prompt/prefix/p-tuning) with "Cannot set a prompt learning
+    adapter to trainable when loading pretrained adapter" -- callers that need to distinguish
+    should check PeftConfig.from_pretrained(adapter_dir).is_prompt_learning before calling."""
     model = _load_causal_base(
         base_model_name, load_in_4bit, device, local_files_only=local_files_only, parallelism=parallelism,
     )
-    return PeftModel.from_pretrained(model, adapter_dir)
+    if is_trainable:
+        model.config.use_cache = False
+        if load_in_4bit:
+            from peft import prepare_model_for_kbit_training
+            model = prepare_model_for_kbit_training(model, use_gradient_checkpointing=False)
+        if gradient_checkpointing:
+            model.gradient_checkpointing_enable()
+        model.enable_input_require_grads()
+    return PeftModel.from_pretrained(model, adapter_dir, is_trainable=is_trainable)

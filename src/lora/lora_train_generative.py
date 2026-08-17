@@ -47,6 +47,7 @@ from collections import Counter
 from datetime import datetime
 
 import torch
+from peft import PeftConfig
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from transformers import AutoTokenizer, get_linear_schedule_with_warmup
@@ -176,8 +177,16 @@ def main():
                      "compared")
     ap.add_argument("--minority-freq-threshold", type=float, default=0.05, help="--minority-select "
                      "only: a label counts as minority for checkpoint selection if its train-set "
-                     "frequency is below this fraction -- same threshold definition as "
-                     "--oversample-rare-st3/--oversample-rare-st1's default")
+                     "frequency is below this fraction. 0.05 (default) sits in this dataset's "
+                     "natural gap between rare and common labels on every tier: st1's "
+                     "none/other (under 3%%) vs. physical_services (~5%%) vs. "
+                     "physical_goods/digital_content_or_services (~45-49%% each); st2's "
+                     "gambling/toys/gambling_adjacent (under 4%%) vs. financial/education "
+                     "(~5.5-6%%) vs. apps/hardware_electronics (22-34%%); st3's "
+                     "insufficient_context/hfss_food_marketing/age_restricted_or_prohibited_"
+                     "product (under 3.5%%) vs. misleading_claim (~52-54%%) -- and matches the "
+                     "same rare-label sets --oversample-rare-st1/--oversample-rare-st3 already "
+                     "document at their own 5%% default")
     ap.add_argument("--majority-f1-tolerance", type=float, default=0.02, help="--minority-select "
                      "only: an epoch is only eligible to be chosen as best if its majority-class "
                      "mean F1 is within this many absolute F1 points of the best majority-class "
@@ -201,6 +210,20 @@ def main():
     ap.add_argument("--prompt-tuning-init-text", default=None, help="prompt_tuning only: seed "
                      "the virtual tokens by tokenizing this text instead of random init (tends "
                      "to converge faster/more reliably); omit for random init")
+    ap.add_argument("--resume-adapter", default=None, help="path to an existing LoRA adapter "
+                     "checkpoint (e.g. a prior run's <checkpoint-save-path>/best, /last, or a "
+                     "--minority-select epoch_N dir) to continue training from, instead of "
+                     "LoRA-adapting the base model fresh. LoRA checkpoints only -- prompt_tuning "
+                     "checkpoints can't be reloaded as trainable (a PEFT library restriction, "
+                     "checked at startup with a clear error). The checkpoint's own saved rank/"
+                     "alpha/target-modules config is reused as-is -- --lora-r/--lora-alpha/"
+                     "--lora-dropout/--target-modules/--peft-method are all ignored when this is "
+                     "set. Useful for training more epochs past a run that already finished, or "
+                     "for a further phase of training (e.g. a different --lr/--st3-loss-weight/"
+                     "dataset) on top of an already-trained adapter. --oversample-rare-st3/"
+                     "--oversample-rare-st1/--st3-loss-weight/--pos-weight and the train/dev "
+                     "data can all still be changed freely for this phase; only the adapter's "
+                     "own rank/alpha/target-modules (what --resume-adapter loads) is fixed")
     ap.add_argument("--st3-loss-weight", type=float, default=1.0, help="multiply the next-token "
                      "CE loss on the completion's \"st3\":[...] span by this factor (st1/st2 "
                      "tokens are unaffected). st3 is this task's weakest, most class-imbalanced "
@@ -295,6 +318,16 @@ def main():
     if args.few_shot and tier_mode not in FEW_SHOT_BUILDERS:
         ap.error(f"--few-shot has no curated examples for {tier_mode} mode yet (only "
                  f"{sorted(FEW_SHOT_BUILDERS)} are curated -- see lora_few_shot.py)")
+    if args.resume_adapter:
+        # peft.PeftModel.from_pretrained hard-refuses is_trainable=True for prompt-learning
+        # adapter types (raises deep inside its own loading code, not a bug in this script) --
+        # catch it here instead, before any model loading, with an explanation of why
+        if PeftConfig.from_pretrained(args.resume_adapter).is_prompt_learning:
+            ap.error(f"--resume-adapter {args.resume_adapter} is a prompt-tuning (or other "
+                     "prompt-learning) checkpoint: PEFT does not support reloading these as "
+                     "trainable (PeftModel.from_pretrained raises 'Cannot set a prompt learning "
+                     "adapter to trainable when loading pretrained adapter'). --resume-adapter "
+                     "only supports LoRA checkpoints.")
 
     torch.manual_seed(args.seed)
     device = args.device or ("cuda" if torch.cuda.is_available() else "cpu")
@@ -375,7 +408,17 @@ def main():
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
-    if args.peft_method == "prompt_tuning":
+    if args.resume_adapter:
+        log.info(f"--resume-adapter: continuing training from existing LoRA adapter checkpoint "
+                 f"{args.resume_adapter} (its own saved rank/alpha/target-modules config is "
+                 f"reused as-is; --lora-r/--lora-alpha/--lora-dropout/--target-modules/"
+                 f"--peft-method are ignored)")
+        model = load_peft_model_causal(
+            model_path, args.resume_adapter, load_in_4bit=args.load_in_4bit, device=device,
+            local_files_only=True, parallelism=args.parallelism, is_trainable=True,
+            gradient_checkpointing=not args.no_gradient_checkpointing,
+        )
+    elif args.peft_method == "prompt_tuning":
         model = build_prompt_tuned_causal(
             model_path, num_virtual_tokens=args.num_virtual_tokens,
             prompt_tuning_init_text=args.prompt_tuning_init_text, tokenizer_path=model_path,
@@ -464,7 +507,11 @@ def main():
     # input_ids/labels -- pad labels/loss_weight to match (-100/0.0, both ignored by
     # weighted_lm_loss's mask) rather than passing labels= and relying on peft's own
     # internal auto-padding, which we can't route our per-token loss_weight through anyway.
-    virtual_prefix = args.num_virtual_tokens if args.peft_method == "prompt_tuning" else 0
+    # Read the count off the model's own active adapter config rather than args.peft_method/
+    # --num-virtual-tokens: under --resume-adapter those are ignored for model construction (the
+    # checkpoint's own saved config wins), so they could disagree with what was actually built.
+    # LoraConfig has no num_virtual_tokens attribute at all, hence 0 there.
+    virtual_prefix = getattr(model.peft_config[model.active_adapter], "num_virtual_tokens", 0)
     for epoch in range(args.epochs):
         model.train()
         tokenizer.padding_side = "right"  # loss-masked labels must line up token-for-token
