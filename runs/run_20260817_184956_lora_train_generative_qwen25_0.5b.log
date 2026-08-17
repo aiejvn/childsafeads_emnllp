@@ -1,0 +1,31 @@
+2026-08-17 18:50:04,694 | INFO | MainThread | logging to runs/run_20260817_185004_lora_train_generative_Qwen_Qwen2.5-0.5B-Instruct.log
+2026-08-17 18:50:04,694 | INFO | MainThread | config: {'train': 'public_data_dev/train.jsonl', 'dev': 'public_data_dev/dev.jsonl', 'model': 'Qwen/Qwen2.5-0.5B-Instruct', 'model_path': None, 'context': 'full', 'lean_prompt': True, 'df_path': 'emnllp-dialog-flow-dialog-flow.json', 'max_length': 4096, 'epochs': 5, 'batch_size': 1, 'eval_batch_size': 8, 'eval_every': 5, 'minority_select': False, 'minority_freq_threshold': 0.05, 'majority_f1_tolerance': 0.02, 'grad_accum_steps': 4, 'lr': 0.0002, 'warmup_ratio': 0.06, 'lora_r': 8, 'lora_alpha': 16, 'lora_dropout': 0.1, 'target_modules': 'q_proj,v_proj', 'peft_method': 'lora', 'num_virtual_tokens': 20, 'prompt_tuning_init_text': None, 'resume_adapter': None, 'st3_loss_weight': 1.0, 'pos_weight': True, 'oversample_rare_st3': 1, 'oversample_rare_st1': 3, 'st3_only': False, 'st12_only': False, 'st1_only': True, 'few_shot': False, 'no_gradient_checkpointing': True, 'load_in_4bit': False, 'parallelism': 'none', 'max_new_tokens': 128, 'sample_size': None, 'test_holdout': 500, 'split_seed': None, 'seed': 42, 'device': None, 'output_dir': 'runs/lora-qwen25-0.5b-st1-5epoch-poswt-oversample', 'checkpoint_save_path': None} device=cuda
+2026-08-17 18:50:04,829 | INFO | MainThread | train/test-holdout split (fresh random split every run unless --split-seed is pinned): split_seed=254555994 train=1853 test_holdout=500
+2026-08-17 18:50:04,829 | INFO | MainThread | train=1853 dev=504
+2026-08-17 18:50:04,831 | INFO | MainThread | oversampling rare st1 labels ['none', 'other'] 3x: train 1853 -> 1903
+2026-08-17 18:50:04,831 | INFO | MainThread | loading model/tokenizer from local path models/Qwen/Qwen2.5-0.5B-Instruct (no remote download)
+[transformers] `torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/290 [00:00<?, ?it/s]Loading weights:  43%|████▎     | 126/290 [00:00<00:00, 1254.24it/s]Loading weights:  88%|████████▊ | 256/290 [00:00<00:00, 1272.73it/s]Loading weights: 100%|██████████| 290/290 [00:00<00:00, 1245.97it/s]
+2026-08-17 18:50:06,409 | INFO | MainThread | system prompt: lean (1698 chars) + dialog flow from emnllp-dialog-flow-dialog-flow.json (5685 chars)
+2026-08-17 18:50:06,483 | INFO | MainThread | pos_weight st1: {'digital_content_or_services': 2.2817745208740234, 'none': 27.579710006713867, 'other': 50.0, 'physical_goods': 2.1238839626312256, 'physical_services': 19.418367385864258}
+2026-08-17 18:50:06,483 | INFO | MainThread | pos_weight st2: {'apps': 2.7833001613616943, 'creator_community': 7.892523288726807, 'education': 16.458715438842773, 'fashion': 8.420791625976562, 'financial': 16.14414405822754, 'food': 6.995798110961914, 'gambling': 50.0, 'gambling_adjacent': 23.714284896850586, 'hardware_electronics': 3.5309524536132812, 'health': 8.105262756347656, 'other': 4.375706195831299, 'toys': 29.69354820251465}
+2026-08-17 18:50:06,483 | INFO | MainThread | pos_weight st3: {'age_restricted_or_prohibited_product': 35.596153259277344, 'direct_exhortation': 7.02953577041626, 'hfss_food_marketing': 50.0, 'inadequate_disclosure': 2.798403263092041, 'insufficient_context': 50.0, 'misleading_claim': 0.873031497001648, 'no_flag': 3.3646788597106934, 'undisclosed_advertising': 5.772242069244385}
+2026-08-17 18:50:06,483 | INFO | MainThread | --st1-only: completion is {"st1":...} alone; st2/st3 in logged metrics are fixed placeholders, read st1_macro_f1 only; best-checkpoint selection uses st1_macro_f1 instead of mean_macro_f1
+trainable params: 540,672 || all params: 494,573,440 || trainable%: 0.1093
+epoch 1/5:   0%|          | 0/1903 [00:00<?, ?it/s]epoch 1/5:   0%|          | 1/1903 [00:01<45:01,  1.42s/it][W817 18:50:08.915817468 CUDACachingAllocator.cpp:3933] memory allocation failed with OOM on device 0 while trying to allocate 1048576000 bytes (free: 683802624, total: 23686938624).
+[W817 18:50:08.104759666 CUDACachingAllocator.cpp:3933] memory allocation failed with OOM on device 0 while trying to allocate 1048576000 bytes (free: 88211456, total: 23686938624).
+[W817 18:50:08.178743608 CUDACachingAllocator.cpp:3933] memory allocation failed with OOM on device 0 while trying to allocate 1048576000 bytes (free: 929169408, total: 23686938624).
+epoch 1/5:   0%|          | 1/1903 [00:01<56:19,  1.78s/it]
+Traceback (most recent call last):
+  File "/home/ubuntu/Github/childsafeads_emnllp/src/lora/lora_train_generative.py", line 678, in <module>
+    main()
+  File "/home/ubuntu/Github/childsafeads_emnllp/src/lora/lora_train_generative.py", line 532, in main
+    loss.backward()
+  File "/home/ubuntu/Github/childsafeads_emnllp/.venv/lib/python3.12/site-packages/torch/_tensor.py", line 623, in backward
+    torch.autograd.backward(
+  File "/home/ubuntu/Github/childsafeads_emnllp/.venv/lib/python3.12/site-packages/torch/autograd/__init__.py", line 395, in backward
+    _engine_run_backward(
+  File "/home/ubuntu/Github/childsafeads_emnllp/.venv/lib/python3.12/site-packages/torch/autograd/graph.py", line 979, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 1000.00 MiB. GPU 0 has a total capacity of 22.06 GiB of which 886.12 MiB is free. Process 1131636 has 13.82 GiB memory in use. Including non-PyTorch memory, this process has 7.37 GiB memory in use. Of the allocated memory 6.72 GiB is allocated by PyTorch, and 340.32 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
