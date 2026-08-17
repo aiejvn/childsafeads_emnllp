@@ -26,6 +26,13 @@ to write the best/last checkpoints elsewhere (e.g. a scratch disk) while --outpu
 anchors the run's logs. The best checkpoint's dev submission.jsonl and submission_error.jsonl
 (see baseline_gpt.py) are written alongside it.
 
+Pass --minority-select for an alternate best-checkpoint rule: every evaluated epoch is
+checkpointed to <checkpoint-save-path>/epoch_N, and once training finishes, /best is set to
+the epoch with the strongest minority-class (rare-label) F1 that doesn't meaningfully cost
+majority-class F1 -- rather than the epoch with the best mean_macro_f1 (which can quietly pick
+an epoch that overfits to the majority classes). See --minority-select's --help for the exact
+rule and its --minority-freq-threshold/--majority-f1-tolerance knobs.
+
 To download a model:
 
 hf download {author}/{model name} --local-dir ./models/{author}/{model name}
@@ -34,6 +41,7 @@ import argparse
 import logging
 import os
 import random
+import shutil
 import sys
 from collections import Counter
 from datetime import datetime
@@ -82,6 +90,35 @@ def weighted_lm_loss(logits: torch.Tensor, labels: torch.Tensor, loss_weight: to
     return weighted.sum() / (shift_weight * mask).sum().clamp_min(1e-6)
 
 
+def compute_minority_labels(instances: list, tier: str, labels: list, threshold: float) -> set:
+    """Labels among `labels` whose train-set frequency (fraction of instances carrying them) is
+    below `threshold` -- used by --minority-select to define the minority/majority split for
+    per-epoch checkpoint selection. Mirrors the rare-label definition already used by
+    --oversample-rare-st3/--oversample-rare-st1, but computed independently (and always from the
+    pre-oversampling instance list) so oversampling's duplication can't inflate a label's
+    apparent frequency out of "minority" status."""
+    if tier == "st1":
+        freq = Counter(inst["labels"]["st1"] for inst in instances)
+    else:
+        freq = Counter(flag for inst in instances for flag in inst["labels"][tier])
+    n = len(instances)
+    return {label for label in labels if freq.get(label, 0) / n < threshold}
+
+
+def compute_minority_majority_f1(per_label_f1: dict, minority_labels: dict, tiers: tuple) -> tuple:
+    """Mean F1 over minority-labeled vs majority-labeled entries of `per_label_f1` (the
+    metrics["per_label_f1"] dict from lora.evaluate: {tier: {label: f1}}), restricted to `tiers`
+    (diag_tiers -- the tier(s) this run actually trains, so a placeholder tier's constant
+    predictions, e.g. under --st3-only, don't contaminate either average)."""
+    minority_scores, majority_scores = [], []
+    for tier in tiers:
+        for label, f1 in per_label_f1[tier].items():
+            (minority_scores if label in minority_labels.get(tier, set()) else majority_scores).append(f1)
+    minority_f1 = sum(minority_scores) / len(minority_scores) if minority_scores else float("nan")
+    majority_f1 = sum(majority_scores) / len(majority_scores) if majority_scores else float("nan")
+    return minority_f1, majority_f1
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("train", help="training split, e.g. public_data_dev/train.jsonl")
@@ -122,6 +159,29 @@ def main():
                      "evaluated/checkpointed regardless of N, so a best checkpoint always exists. "
                      "1 (default) reproduces the original every-epoch behavior; pass --epochs to "
                      "eval only once, at the end")
+    ap.add_argument("--minority-select", action="store_true", help="alternate best-checkpoint "
+                     "selection rule: save a checkpoint at every evaluated epoch (to "
+                     "<checkpoint-save-path>/epoch_N, in addition to the usual best/last) "
+                     "instead of only when the default selection_metric (mean_macro_f1, or its "
+                     "--st3-only/--st12-only/--st1-only variant) improves, and once training "
+                     "finishes, set <checkpoint-save-path>/best to the epoch with the highest "
+                     "mean F1 over minority-class labels (train frequency below "
+                     "--minority-freq-threshold, computed pre-oversampling) among epochs whose "
+                     "majority-class mean F1 is within --majority-f1-tolerance of the best "
+                     "majority F1 seen across all evaluated epochs -- i.e. the best minority-class "
+                     "performance without meaningfully sacrificing majority-class performance, "
+                     "not necessarily the epoch the default metric would have picked or the last "
+                     "epoch. Compare against --minority-freq-threshold/--majority-f1-tolerance; "
+                     "combine with --epochs/--eval-every to control how many checkpoints are "
+                     "compared")
+    ap.add_argument("--minority-freq-threshold", type=float, default=0.05, help="--minority-select "
+                     "only: a label counts as minority for checkpoint selection if its train-set "
+                     "frequency is below this fraction -- same threshold definition as "
+                     "--oversample-rare-st3/--oversample-rare-st1's default")
+    ap.add_argument("--majority-f1-tolerance", type=float, default=0.02, help="--minority-select "
+                     "only: an epoch is only eligible to be chosen as best if its majority-class "
+                     "mean F1 is within this many absolute F1 points of the best majority-class "
+                     "mean F1 seen across all evaluated epochs")
     ap.add_argument("--grad-accum-steps", type=int, default=4)
     ap.add_argument("--lr", type=float, default=2e-4)
     ap.add_argument("--warmup-ratio", type=float, default=0.06)
@@ -267,6 +327,16 @@ def main():
         dev_instances = rng.sample(dev_instances, min(args.sample_size, len(dev_instances)))
     log.info(f"train={len(train_instances)} dev={len(dev_instances)}")
 
+    minority_labels = {}
+    if args.minority_select:
+        minority_labels = {
+            "st1": compute_minority_labels(train_instances, "st1", ST1_LABELS, args.minority_freq_threshold),
+            "st2": compute_minority_labels(train_instances, "st2", ST2_LABELS, args.minority_freq_threshold),
+            "st3": compute_minority_labels(train_instances, "st3", ST3_LABELS, args.minority_freq_threshold),
+        }
+        log.info(f"--minority-select: minority labels (train freq < {args.minority_freq_threshold}, "
+                 f"pre-oversampling) -- " + ", ".join(f"{tier}={sorted(labels)}" for tier, labels in minority_labels.items()))
+
     if args.oversample_rare_st3 > 1:
         st3_freq = Counter(flag for inst in train_instances for flag in inst["labels"]["st3"])
         rare_st3 = {label for label, c in st3_freq.items() if c / len(train_instances) < 0.05}
@@ -387,6 +457,7 @@ def main():
 
     checkpoint_dir = args.checkpoint_save_path or args.output_dir
     best_f1 = -1.0
+    epoch_records = []  # --minority-select only: one entry per evaluated epoch, see below
     os.makedirs(checkpoint_dir, exist_ok=True)
     # prompt_tuning prepends num_virtual_tokens learned embeddings ahead of every input
     # internally, so the logits this call returns are num_virtual_tokens longer than
@@ -454,7 +525,9 @@ def main():
         if selection_metric > best_f1:
             best_f1 = selection_metric
             best_dev_scalar_metrics = scalar_metrics
-            if is_main:  # avoid every rank racing to write the same adapter dir under --parallelism tensor
+            if is_main and not args.minority_select:  # avoid every rank racing to write the same
+                # adapter dir under --parallelism tensor; under --minority-select, /best is
+                # decided post-hoc below instead, so writing it here would just be overwritten
                 best_dir = os.path.join(checkpoint_dir, "best")
                 model.save_pretrained(best_dir)
                 write_submission(
@@ -466,11 +539,49 @@ def main():
                     "st1_macro_f1" if args.st1_only else "mean_macro_f1"))
                 log.info(f"epoch {epoch + 1}: new best {selection_name}={best_f1:.3f}, saved to {checkpoint_dir}/best")
 
+        if args.minority_select and is_main:
+            epoch_dir = os.path.join(checkpoint_dir, f"epoch_{epoch + 1}")
+            model.save_pretrained(epoch_dir)
+            write_submission(
+                os.path.join(epoch_dir, "submission.jsonl"), os.path.join(epoch_dir, "submission_error.jsonl"),
+                ids, dev_instances, preds,
+            )
+            minority_f1, majority_f1 = compute_minority_majority_f1(metrics["per_label_f1"], minority_labels, diag_tiers)
+            log.info(f"epoch {epoch + 1}: minority_f1={minority_f1:.3f} majority_f1={majority_f1:.3f}, "
+                     f"checkpointed to {epoch_dir}")
+            epoch_records.append({
+                "epoch": epoch + 1, "dir": epoch_dir, "minority_f1": minority_f1, "majority_f1": majority_f1,
+                "scalar_metrics": scalar_metrics,
+            })
+
+    if args.minority_select and is_main:
+        if not epoch_records:
+            log.warning("--minority-select: no epoch was evaluated (check --eval-every/--epochs), "
+                        "falling back to the default selection_metric-chosen best checkpoint")
+        else:
+            best_majority_f1 = max(r["majority_f1"] for r in epoch_records)
+            eligible = [r for r in epoch_records if r["majority_f1"] >= best_majority_f1 - args.majority_f1_tolerance]
+            chosen = max(eligible, key=lambda r: r["minority_f1"])
+            log.info(f"--minority-select: best_majority_f1={best_majority_f1:.3f} across evaluated "
+                     f"epochs {[r['epoch'] for r in epoch_records]}; eligible within "
+                     f"--majority-f1-tolerance {args.majority_f1_tolerance}: "
+                     f"{[(r['epoch'], round(r['minority_f1'], 3)) for r in eligible]}; "
+                     f"chose epoch {chosen['epoch']} (minority_f1={chosen['minority_f1']:.3f}, "
+                     f"majority_f1={chosen['majority_f1']:.3f}) over the default-metric pick "
+                     f"(best_f1={best_f1:.3f})")
+            best_dir = os.path.join(checkpoint_dir, "best")
+            if os.path.exists(best_dir):
+                shutil.rmtree(best_dir)
+            shutil.copytree(chosen["dir"], best_dir)
+            best_f1 = chosen["minority_f1"]
+            best_dev_scalar_metrics = chosen["scalar_metrics"]
+
     if is_main:
         model.save_pretrained(os.path.join(checkpoint_dir, "last"))
-        selection_name = "st3_macro_f1" if args.st3_only else (
+        selection_name = "minority_f1" if args.minority_select else (
+            "st3_macro_f1" if args.st3_only else (
             "mean(st1,st2)_macro_f1" if args.st12_only else (
-            "st1_macro_f1" if args.st1_only else "mean_macro_f1"))
+            "st1_macro_f1" if args.st1_only else "mean_macro_f1")))
         log.info(f"saved final epoch adapter to {checkpoint_dir}/last (best dev {selection_name}={best_f1:.3f})")
         log.info("best dev metrics: " + ", ".join(f"{k}={v:.3f}" for k, v in best_dev_scalar_metrics.items()))
 
