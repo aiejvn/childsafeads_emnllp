@@ -1,0 +1,16 @@
+2026-08-17 21:21:06,436 | INFO | MainThread | logging to runs/run_20260817_212106_lora_train_st1_classifier_FacebookAI_roberta-base.log
+2026-08-17 21:21:06,436 | INFO | MainThread | config: {'train': 'public_data_dev/train.jsonl', 'dev': 'public_data_dev/dev.jsonl', 'model': 'FacebookAI/roberta-base', 'local': False, 'context': 'full', 'max_length': 512, 'epochs': 5, 'batch_size': 16, 'grad_accum_steps': 1, 'lr': 0.0002, 'head_lr': 0.001, 'warmup_ratio': 0.06, 'lora_r': 8, 'lora_alpha': 16, 'lora_dropout': 0.1, 'target_modules': 'query,value', 'class_weight': True, 'oversample_rare_st1': 3, 'sample_size': None, 'test_holdout': 500, 'split_seed': None, 'seed': 42, 'device': None, 'output_dir': 'runs/st1-classifier-roberta-headlr1e-3', 'no_wandb': True} device=cuda
+2026-08-17 21:21:06,575 | INFO | MainThread | train/test-holdout split (fresh random split every run unless --split-seed is pinned): split_seed=1685596315 train=1853 test_holdout=500
+2026-08-17 21:21:06,577 | INFO | MainThread | train=1853 dist=digital_content_or_services=826 (44.6%), none=29 (1.6%), other=2 (0.1%), physical_goods=891 (48.1%), physical_services=105 (5.7%)
+2026-08-17 21:21:06,577 | INFO | MainThread | dev=504 dist=digital_content_or_services=248, none=14, other=0, physical_goods=218, physical_services=24
+2026-08-17 21:21:06,578 | INFO | MainThread | oversampled rare st1 labels ['none', 'other'] 3x: train now 1915 instances
+2026-08-17 21:21:06,803 | INFO | MainThread | class_weight: digital_content_or_services=2.318, none=22.011, other=50.000, physical_goods=2.149, physical_services=18.238
+2026-08-17 21:21:07,682 | INFO | MainThread | using separate LRs: lora=0.0002 head=0.001 (48 lora tensors, 4 head tensors)
+2026-08-17 21:22:26,181 | INFO | MainThread | epoch 1: mean train loss = 1.4255
+2026-08-17 21:22:35,583 | INFO | MainThread | epoch 1 dev metrics: accuracy=0.681, macro_f1=0.462, loss=0.808
+2026-08-17 21:22:35,583 | INFO | MainThread | epoch 1 dev metrics per-label F1: digital_content_or_services=0.731, none=0.194, other=0.000, physical_goods=0.805, physical_services=0.582
+2026-08-17 21:22:35,674 | INFO | MainThread | epoch 1: new best macro_f1=0.462, saved to runs/st1-classifier-roberta-headlr1e-3/best
+2026-08-17 21:23:54,517 | INFO | MainThread | epoch 2: mean train loss = 0.7224
+2026-08-17 21:24:03,923 | INFO | MainThread | epoch 2 dev metrics: accuracy=0.817, macro_f1=0.532, loss=0.526
+2026-08-17 21:24:03,923 | INFO | MainThread | epoch 2 dev metrics per-label F1: digital_content_or_services=0.858, none=0.302, other=0.000, physical_goods=0.849, physical_services=0.649
+2026-08-17 21:24:04,012 | INFO | MainThread | epoch 2: new best macro_f1=0.532, saved to runs/st1-classifier-roberta-headlr1e-3/best

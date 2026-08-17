@@ -1,3 +1,4 @@
+
 # Handoff — childsafeads_emnllp, autoresearch/aug13-qwen06b
 
 **2026-08-17, ~21:15.** Session pivoted mid-stream from the Qwen3-0.6B generative-LLM st1
@@ -6,12 +7,29 @@ tracks are live; this doc covers current state, confirmed results, and the queue
 
 ## Currently running
 
-**Nothing.** The last job (`legal-bert-base-uncased` 5-way st1 classifier) finished and was
-logged/committed (`281facb`): clearly worse than roberta-base at the same untuned
-hyperparameters — dev macro_f1=0.394 (still climbing, no plateau by epoch 5), test macro_f1=0.339
-with **test none F1 collapsed to 0.000** (a real generalization failure, not just slow
-convergence). Discarded for now; would need its own LR sweep to get a fair shot. roberta-base
-remains the standing encoder choice for this track. GPU is free — safe to launch the next thing.
+**Two parallel hyperparameter-sweep jobs** on the roberta-base 5-way st1 classifier (Track 2,
+`lora_train_st1_classifier.py`), started 2026-08-17 ~21:20, picking up HANDOFF item #2
+("Next candidates"). Both use the standing base config (`--class-weight
+--oversample-rare-st1 3 --context full --test-holdout 500`, fresh split each), varying one
+axis each vs. the r8/a16/lr2e-4/single-LR baseline (dev/test macro_f1 0.598/0.559 and
+0.559/0.553 on its two replicates):
+1. `runs/st1-classifier-roberta-r16a32` — capacity bump, `--lora-r 16 --lora-alpha 32`
+   (mirrors Track 1's capacity sweep). Log: `runs/run_20260817_212052_..._r16a32.log`.
+2. `runs/st1-classifier-roberta-headlr1e-3` — `--head-lr 1e-3` (separate, higher LR for the
+   randomly-initialized classifier head vs. `--lr 2e-4` for the LoRA adapters). Log:
+   `runs/run_20260817_212057_..._headlr.log`.
+
+~4.5 min/run expected per prior runs (both fit in VRAM simultaneously, ~10GB combined,
+confirmed at epoch-1 start). Check `nvidia-smi` / `ps aux | grep lora_train_st1_classifier` for
+status; log results to `runs/results_st1_classifiers.csv` + commit when both finish, per
+standing practice.
+
+Prior job (`legal-bert-base-uncased` 5-way st1 classifier) finished and was logged/committed
+(`281facb`): clearly worse than roberta-base at the same untuned hyperparameters — dev
+macro_f1=0.394 (still climbing, no plateau by epoch 5), test macro_f1=0.339 with **test none F1
+collapsed to 0.000** (a real generalization failure, not just slow convergence). Discarded for
+now; would need its own LR sweep to get a fair shot. roberta-base remains the standing encoder
+choice for this track.
 
 ## The big picture: two parallel tracks
 
