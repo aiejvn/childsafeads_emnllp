@@ -1,0 +1,31 @@
+2026-08-17 21:12:27,429 | INFO | MainThread | logging to runs/run_20260817_211227_lora_train_st1_classifier_nlpaueb_legal-bert-base-uncased.log
+2026-08-17 21:12:27,429 | INFO | MainThread | config: {'train': 'public_data_dev/train.jsonl', 'dev': 'public_data_dev/dev.jsonl', 'model': 'nlpaueb/legal-bert-base-uncased', 'local': False, 'context': 'full', 'max_length': 512, 'epochs': 5, 'batch_size': 16, 'grad_accum_steps': 1, 'lr': 0.0002, 'head_lr': None, 'warmup_ratio': 0.06, 'lora_r': 8, 'lora_alpha': 16, 'lora_dropout': 0.1, 'target_modules': 'query,value', 'class_weight': True, 'oversample_rare_st1': 3, 'sample_size': None, 'test_holdout': 500, 'split_seed': None, 'seed': 42, 'device': None, 'output_dir': 'runs/st1-classifier-legalbert-classweight-oversample', 'no_wandb': True} device=cuda
+2026-08-17 21:12:27,565 | INFO | MainThread | train/test-holdout split (fresh random split every run unless --split-seed is pinned): split_seed=1690713473 train=1853 test_holdout=500
+2026-08-17 21:12:27,567 | INFO | MainThread | train=1853 dist=digital_content_or_services=835 (45.1%), none=32 (1.7%), other=2 (0.1%), physical_goods=889 (48.0%), physical_services=95 (5.1%)
+2026-08-17 21:12:27,567 | INFO | MainThread | dev=504 dist=digital_content_or_services=248, none=14, other=0, physical_goods=218, physical_services=24
+2026-08-17 21:12:27,568 | INFO | MainThread | oversampled rare st1 labels ['none', 'other'] 3x: train now 1921 instances
+2026-08-17 21:12:27,689 | INFO | MainThread | class_weight: digital_content_or_services=2.301, none=20.010, other=50.000, physical_goods=2.161, physical_services=20.221
+2026-08-17 21:13:14,792 | INFO | MainThread | epoch 1: mean train loss = 1.4783
+2026-08-17 21:13:20,358 | INFO | MainThread | epoch 1 dev metrics: accuracy=0.468, macro_f1=0.209, loss=1.253
+2026-08-17 21:13:20,358 | INFO | MainThread | epoch 1 dev metrics per-label F1: digital_content_or_services=0.313, none=0.000, other=0.000, physical_goods=0.591, physical_services=0.140
+2026-08-17 21:13:20,472 | INFO | MainThread | epoch 1: new best macro_f1=0.209, saved to runs/st1-classifier-legalbert-classweight-oversample/best
+2026-08-17 21:14:04,300 | INFO | MainThread | epoch 2: mean train loss = 1.4093
+2026-08-17 21:14:09,911 | INFO | MainThread | epoch 2 dev metrics: accuracy=0.486, macro_f1=0.280, loss=1.117
+2026-08-17 21:14:09,911 | INFO | MainThread | epoch 2 dev metrics per-label F1: digital_content_or_services=0.330, none=0.000, other=0.000, physical_goods=0.598, physical_services=0.471
+2026-08-17 21:14:10,081 | INFO | MainThread | epoch 2: new best macro_f1=0.280, saved to runs/st1-classifier-legalbert-classweight-oversample/best
+2026-08-17 21:14:54,107 | INFO | MainThread | epoch 3: mean train loss = 1.2924
+2026-08-17 21:14:59,755 | INFO | MainThread | epoch 3 dev metrics: accuracy=0.464, macro_f1=0.292, loss=1.198
+2026-08-17 21:14:59,755 | INFO | MainThread | epoch 3 dev metrics per-label F1: digital_content_or_services=0.533, none=0.147, other=0.000, physical_goods=0.538, physical_services=0.239
+2026-08-17 21:14:59,888 | INFO | MainThread | epoch 3: new best macro_f1=0.292, saved to runs/st1-classifier-legalbert-classweight-oversample/best
+2026-08-17 21:15:44,037 | INFO | MainThread | epoch 4: mean train loss = 1.0913
+2026-08-17 21:15:49,671 | INFO | MainThread | epoch 4 dev metrics: accuracy=0.637, macro_f1=0.384, loss=0.990
+2026-08-17 21:15:49,671 | INFO | MainThread | epoch 4 dev metrics per-label F1: digital_content_or_services=0.697, none=0.186, other=0.000, physical_goods=0.649, physical_services=0.388
+2026-08-17 21:15:49,773 | INFO | MainThread | epoch 4: new best macro_f1=0.384, saved to runs/st1-classifier-legalbert-classweight-oversample/best
+2026-08-17 21:16:33,819 | INFO | MainThread | epoch 5: mean train loss = 0.9589
+2026-08-17 21:16:39,504 | INFO | MainThread | epoch 5 dev metrics: accuracy=0.655, macro_f1=0.394, loss=0.933
+2026-08-17 21:16:39,504 | INFO | MainThread | epoch 5 dev metrics per-label F1: digital_content_or_services=0.702, none=0.140, other=0.000, physical_goods=0.680, physical_services=0.448
+2026-08-17 21:16:39,619 | INFO | MainThread | epoch 5: new best macro_f1=0.394, saved to runs/st1-classifier-legalbert-classweight-oversample/best
+2026-08-17 21:16:39,722 | INFO | MainThread | saved final epoch adapter to runs/st1-classifier-legalbert-classweight-oversample/last (best dev macro_f1=0.394)
+2026-08-17 21:16:39,722 | INFO | MainThread | reloading best-dev checkpoint from runs/st1-classifier-legalbert-classweight-oversample/best for the test-holdout pass (generalization check, not used for model selection)
+2026-08-17 21:16:46,215 | INFO | MainThread | test holdout metrics: accuracy=0.624, macro_f1=0.339, loss=0.945
+2026-08-17 21:16:46,215 | INFO | MainThread | test holdout metrics per-label F1: digital_content_or_services=0.664, none=0.000, other=0.000, physical_goods=0.673, physical_services=0.358
