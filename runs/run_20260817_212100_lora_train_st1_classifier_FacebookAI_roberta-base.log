@@ -14,3 +14,16 @@
 2026-08-17 21:23:54,114 | INFO | MainThread | epoch 2 dev metrics per-label F1: digital_content_or_services=0.869, none=0.375, other=0.000, physical_goods=0.847, physical_services=0.680
 2026-08-17 21:23:54,219 | INFO | MainThread | epoch 2: new best macro_f1=0.554, saved to runs/st1-classifier-roberta-r16a32/best
 2026-08-17 21:25:13,338 | INFO | MainThread | epoch 3: mean train loss = 0.5468
+2026-08-17 21:25:22,819 | INFO | MainThread | epoch 3 dev metrics: accuracy=0.855, macro_f1=0.586, loss=0.463
+2026-08-17 21:25:22,819 | INFO | MainThread | epoch 3 dev metrics per-label F1: digital_content_or_services=0.880, none=0.400, other=0.000, physical_goods=0.873, physical_services=0.776
+2026-08-17 21:25:22,925 | INFO | MainThread | epoch 3: new best macro_f1=0.586, saved to runs/st1-classifier-roberta-r16a32/best
+2026-08-17 21:26:41,975 | INFO | MainThread | epoch 4: mean train loss = 0.4075
+2026-08-17 21:26:51,532 | INFO | MainThread | epoch 4 dev metrics: accuracy=0.845, macro_f1=0.582, loss=0.464
+2026-08-17 21:26:51,532 | INFO | MainThread | epoch 4 dev metrics per-label F1: digital_content_or_services=0.870, none=0.414, other=0.000, physical_goods=0.855, physical_services=0.772
+2026-08-17 21:28:10,716 | INFO | MainThread | epoch 5: mean train loss = 0.3546
+2026-08-17 21:28:20,143 | INFO | MainThread | epoch 5 dev metrics: accuracy=0.851, macro_f1=0.582, loss=0.459
+2026-08-17 21:28:20,143 | INFO | MainThread | epoch 5 dev metrics per-label F1: digital_content_or_services=0.876, none=0.387, other=0.000, physical_goods=0.864, physical_services=0.784
+2026-08-17 21:28:20,237 | INFO | MainThread | saved final epoch adapter to runs/st1-classifier-roberta-r16a32/last (best dev macro_f1=0.586)
+2026-08-17 21:28:20,238 | INFO | MainThread | reloading best-dev checkpoint from runs/st1-classifier-roberta-r16a32/best for the test-holdout pass (generalization check, not used for model selection)
+2026-08-17 21:28:28,899 | INFO | MainThread | test holdout metrics: accuracy=0.848, macro_f1=0.537, loss=0.493
+2026-08-17 21:28:28,899 | INFO | MainThread | test holdout metrics per-label F1: digital_content_or_services=0.883, none=0.261, other=0.000, physical_goods=0.865, physical_services=0.679

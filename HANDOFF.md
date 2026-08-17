@@ -7,22 +7,22 @@ tracks are live; this doc covers current state, confirmed results, and the queue
 
 ## Currently running
 
-**Two parallel hyperparameter-sweep jobs** on the roberta-base 5-way st1 classifier (Track 2,
-`lora_train_st1_classifier.py`), started 2026-08-17 ~21:20, picking up HANDOFF item #2
-("Next candidates"). Both use the standing base config (`--class-weight
---oversample-rare-st1 3 --context full --test-holdout 500`, fresh split each), varying one
-axis each vs. the r8/a16/lr2e-4/single-LR baseline (dev/test macro_f1 0.598/0.559 and
-0.559/0.553 on its two replicates):
-1. `runs/st1-classifier-roberta-r16a32` — capacity bump, `--lora-r 16 --lora-alpha 32`
-   (mirrors Track 1's capacity sweep). Log: `runs/run_20260817_212052_..._r16a32.log`.
-2. `runs/st1-classifier-roberta-headlr1e-3` — `--head-lr 1e-3` (separate, higher LR for the
-   randomly-initialized classifier head vs. `--lr 2e-4` for the LoRA adapters). Log:
-   `runs/run_20260817_212057_..._headlr.log`.
+**Nothing.** GPU is free. The hyperparameter sweep on the roberta-base 5-way st1 classifier
+(Track 2, HANDOFF next-candidates item #2) ran and finished 2026-08-17 ~21:20-21:28 — both
+directions **discarded**, r8/a16/single-LR remains the standing default:
+1. Capacity bump `--lora-r 16 --lora-alpha 32`: dev macro_f1=0.586 (best@epoch3), test=0.537,
+   test none_f1=0.261 — below the r8/a16 baseline's replicates on both macro and none. Confirms
+   Track 1's inverted-U capacity finding extends to Track 2, and bites one step earlier (already
+   regressing at r16, not just r32).
+2. Separate head LR `--head-lr 1e-3` (LoRA stays at `--lr 2e-4`): dev macro_f1=0.587
+   (best@epoch4), dev none_f1=0.519 (best none score ever seen for this classifier) but **test
+   none_f1 collapsed to 0.200** — the faster-learning head overfits the none class to dev
+   specifically, a real generalization failure masked by a fine-looking macro gap. Do not adopt.
 
-~4.5 min/run expected per prior runs (both fit in VRAM simultaneously, ~10GB combined,
-confirmed at epoch-1 start). Check `nvidia-smi` / `ps aux | grep lora_train_st1_classifier` for
-status; log results to `runs/results_st1_classifiers.csv` + commit when both finish, per
-standing practice.
+Both logged to `runs/results_st1_classifiers.csv` (rows 6-7) and `runs/runs.log`, committed.
+Remaining untried sweep axes from next-candidates item #2: `--oversample-rare-st1` factor
+(currently fixed at 3), and combinations aren't likely worth it given both single-axis moves
+regressed.
 
 Prior job (`legal-bert-base-uncased` 5-way st1 classifier) finished and was logged/committed
 (`281facb`): clearly worse than roberta-base at the same untuned hyperparameters — dev
