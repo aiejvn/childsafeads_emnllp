@@ -1,0 +1,41 @@
+Running on rg21708
+Started: Mon 17 Aug 2026 01:02:47 AM EDT
+Account: rrg-zhu2048_gpu
+Partition: gpubase_bygpu_b2
+---
+Python: /lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/bin/python  Torch: 2.13.0
+---
+Command: python src/lora/lora_predict_generative.py public_data_test/test.jsonl --model Qwen/Qwen3-4B --adapter-dir /scratch/kwang103/runs/8-16-lora-qwen-st12-100epoch-standing --out runs/submission-8-16-lora-qwen-4B-st12-100epoch-standing.jsonl
+2026-08-17 01:04:59,964 | INFO | MainThread | logging to runs/run_20260817_010459_lora_predict_generative_Qwen_Qwen3-4B.log
+2026-08-17 01:04:59,965 | INFO | MainThread | loading model/tokenizer from local path models/Qwen/Qwen3-4B (no remote download)
+[transformers] `torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/398 [00:00<?, ?it/s]Loading weights:   0%|          | 1/398 [00:01<10:57,  1.66s/it]Loading weights:   1%|▏         | 5/398 [00:01<01:52,  3.49it/s]Loading weights:   2%|▏         | 9/398 [00:01<00:56,  6.86it/s]Loading weights:   4%|▎         | 14/398 [00:02<00:34, 11.28it/s]Loading weights:   4%|▍         | 17/398 [00:02<00:41,  9.16it/s]Loading weights:   6%|▋         | 25/398 [00:03<00:30, 12.17it/s]Loading weights:   7%|▋         | 27/398 [00:03<00:33, 10.93it/s]Loading weights:   9%|▉         | 36/398 [00:03<00:19, 18.28it/s]Loading weights:  10%|▉         | 39/398 [00:03<00:24, 14.38it/s]Loading weights:  12%|█▏        | 47/398 [00:04<00:24, 14.57it/s]Loading weights:  14%|█▍        | 56/398 [00:04<00:15, 21.99it/s]Loading weights:  15%|█▌        | 60/398 [00:04<00:17, 18.78it/s]Loading weights:  17%|█▋        | 69/398 [00:05<00:12, 26.38it/s]Loading weights:  19%|█▊        | 74/398 [00:05<00:11, 28.08it/s]Loading weights:  20%|█▉        | 79/398 [00:05<00:10, 31.51it/s]Loading weights:  21%|██        | 84/398 [00:05<00:11, 26.66it/s]Loading weights:  23%|██▎       | 91/398 [00:05<00:09, 32.05it/s]Loading weights:  24%|██▍       | 96/398 [00:05<00:08, 33.96it/s]Loading weights:  25%|██▌       | 101/398 [00:06<00:10, 29.26it/s]Loading weights:  26%|██▋       | 105/398 [00:06<00:11, 26.39it/s]Loading weights:  27%|██▋       | 109/398 [00:06<00:10, 27.76it/s]Loading weights:  28%|██▊       | 113/398 [00:06<00:12, 23.67it/s]Loading weights:  29%|██▉       | 116/398 [00:07<00:23, 11.95it/s]Loading weights:  30%|██▉       | 119/398 [00:07<00:22, 12.19it/s]Loading weights:  31%|███       | 124/398 [00:07<00:16, 16.79it/s]Loading weights:  32%|███▏      | 127/398 [00:07<00:15, 17.14it/s]Loading weights:  33%|███▎      | 131/398 [00:07<00:14, 17.88it/s]Loading weights:  34%|███▍      | 136/398 [00:08<00:12, 20.93it/s]Loading weights:  35%|███▍      | 139/398 [00:08<00:12, 21.45it/s]Loading weights:  37%|███▋      | 146/398 [00:08<00:09, 26.83it/s]Loading weights:  37%|███▋      | 149/398 [00:08<00:11, 21.91it/s]Loading weights:  39%|███▉      | 155/398 [00:08<00:08, 28.10it/s]Loading weights:  40%|███▉      | 159/398 [00:08<00:09, 24.69it/s]Loading weights:  42%|████▏     | 168/398 [00:09<00:07, 29.93it/s]Loading weights:  43%|████▎     | 172/398 [00:09<00:07, 31.15it/s]Loading weights:  45%|████▍     | 179/398 [00:09<00:06, 35.76it/s]Loading weights:  46%|████▌     | 183/398 [00:09<00:07, 29.36it/s]Loading weights:  47%|████▋     | 189/398 [00:09<00:06, 34.72it/s]Loading weights:  48%|████▊     | 193/398 [00:10<00:08, 23.69it/s]Loading weights:  50%|█████     | 199/398 [00:10<00:07, 27.50it/s]Loading weights:  51%|█████     | 203/398 [00:10<00:07, 25.64it/s]Loading weights:  52%|█████▏    | 208/398 [00:10<00:06, 27.84it/s]Loading weights:  54%|█████▎    | 213/398 [00:10<00:06, 29.74it/s]Loading weights:  55%|█████▍    | 217/398 [00:10<00:05, 30.28it/s]Loading weights:  56%|█████▌    | 221/398 [00:11<00:05, 30.24it/s]Loading weights:  57%|█████▋    | 225/398 [00:11<00:06, 28.65it/s]Loading weights:  59%|█████▉    | 235/398 [00:11<00:04, 36.62it/s]Loading weights:  60%|██████    | 240/398 [00:11<00:04, 36.67it/s]Loading weights:  62%|██████▏   | 246/398 [00:11<00:04, 37.02it/s]Loading weights:  63%|██████▎   | 250/398 [00:11<00:04, 36.08it/s]Loading weights:  64%|██████▍   | 254/398 [00:11<00:04, 35.38it/s]Loading weights:  65%|██████▍   | 258/398 [00:12<00:05, 26.59it/s]Loading weights:  67%|██████▋   | 265/398 [00:12<00:03, 34.85it/s]Loading weights:  68%|██████▊   | 270/398 [00:12<00:04, 28.76it/s]Loading weights:  70%|██████▉   | 277/398 [00:12<00:03, 31.82it/s]Loading weights:  71%|███████▏  | 284/398 [00:12<00:02, 38.92it/s]Loading weights:  73%|███████▎  | 291/398 [00:12<00:02, 42.26it/s]Loading weights:  76%|███████▌  | 301/398 [00:13<00:02, 46.75it/s]Loading weights:  77%|███████▋  | 308/398 [00:13<00:01, 48.06it/s]Loading weights:  79%|███████▉  | 314/398 [00:13<00:02, 40.27it/s]Loading weights:  81%|████████  | 322/398 [00:13<00:01, 44.23it/s]Loading weights:  82%|████████▏ | 328/398 [00:13<00:01, 45.44it/s]Loading weights:  84%|████████▎ | 333/398 [00:13<00:01, 41.26it/s]Loading weights:  85%|████████▍ | 338/398 [00:14<00:01, 36.19it/s]Loading weights:  86%|████████▋ | 344/398 [00:14<00:01, 27.99it/s]Loading weights:  88%|████████▊ | 351/398 [00:14<00:01, 31.17it/s]Loading weights:  89%|████████▉ | 356/398 [00:14<00:01, 29.04it/s]Loading weights:  91%|█████████ | 361/398 [00:14<00:01, 31.66it/s]Loading weights:  92%|█████████▏| 367/398 [00:15<00:00, 34.24it/s]Loading weights:  93%|█████████▎| 371/398 [00:15<00:00, 32.95it/s]Loading weights:  94%|█████████▍| 376/398 [00:15<00:00, 30.29it/s]Loading weights:  97%|█████████▋| 385/398 [00:15<00:00, 41.88it/s]Loading weights:  98%|█████████▊| 390/398 [00:15<00:00, 30.77it/s]Loading weights: 100%|██████████| 398/398 [00:15<00:00, 25.11it/s]
+Traceback (most recent call last):
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/peft/config.py", line 317, in _get_peft_type
+    config_file = hf_hub_download(
+                  ^^^^^^^^^^^^^^^^
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/huggingface_hub/utils/_validators.py", line 84, in _inner_fn
+    validate_repo_id(arg_value)
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/huggingface_hub/utils/_validators.py", line 132, in validate_repo_id
+    raise HFValidationError(
+huggingface_hub.errors.HFValidationError: Repo id must be in the form 'repo_name' or 'namespace/repo_name': '/scratch/kwang103/runs/8-16-lora-qwen-st12-100epoch-standing'. Use `repo_type` argument if needed.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/src/lora/lora_predict_generative.py", line 158, in <module>
+    main()
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/src/lora/lora_predict_generative.py", line 107, in main
+    model = load_peft_model_causal(
+            ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/src/lora/../common/../lora/lora_model.py", line 215, in load_peft_model_causal
+    return PeftModel.from_pretrained(model, adapter_dir)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/peft/peft_model.py", line 510, in from_pretrained
+    config = PEFT_TYPE_TO_CONFIG_MAPPING[PeftConfig._get_peft_type(model_id, **hf_kwargs)].from_pretrained(
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/lib/python3.12/site-packages/peft/config.py", line 323, in _get_peft_type
+    raise ValueError(f"Can't find '{CONFIG_NAME}' at '{model_id}'")
+ValueError: Can't find 'adapter_config.json' at '/scratch/kwang103/runs/8-16-lora-qwen-st12-100epoch-standing'
+---
+Finished: Mon 17 Aug 2026 01:05:18 AM EDT
