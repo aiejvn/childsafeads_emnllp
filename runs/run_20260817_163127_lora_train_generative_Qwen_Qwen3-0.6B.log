@@ -15,3 +15,62 @@
 2026-08-17 17:03:05,143 | INFO | MainThread | epoch 2: train input length (tokens, unpadded) -- min=1860 mean=3000 max=4012 n=2089
 2026-08-17 17:18:53,044 | INFO | MainThread | epoch 3: mean train loss = 0.0136
 2026-08-17 17:18:53,044 | INFO | MainThread | epoch 3: train input length (tokens, unpadded) -- min=1860 mean=3000 max=4012 n=2089
+2026-08-17 17:34:40,853 | INFO | MainThread | epoch 4: mean train loss = 0.0022
+2026-08-17 17:34:40,853 | INFO | MainThread | epoch 4: train input length (tokens, unpadded) -- min=1860 mean=3000 max=4012 n=2089
+2026-08-17 17:50:28,519 | INFO | MainThread | epoch 5: mean train loss = 0.0006
+2026-08-17 17:50:28,519 | INFO | MainThread | epoch 5: train input length (tokens, unpadded) -- min=1860 mean=3000 max=4012 n=2089
+2026-08-17 17:53:20,658 | INFO | MainThread | generate_predictions: input length (tokens, unpadded) -- min=1897 mean=2949 max=4000 n=504
+2026-08-17 17:53:20,844 | INFO | MainThread | epoch 5 dev metrics: st1_macro_f1=0.758, st2_macro_f1=0.000, st3_macro_f1=0.050, st3_family_macro_f1=0.105, mean_macro_f1=0.269
+2026-08-17 17:53:20,844 | INFO | MainThread | epoch 5 dev st1 per-label F1: digital_content_or_services=0.931, none=0.444, physical_goods=0.923, physical_services=0.732
+2026-08-17 17:53:20,844 | INFO | MainThread | epoch 5 dev st2 per-label F1: apps=0.000, creator_community=0.000, education=0.000, fashion=0.000, financial=0.000, food=0.000, gambling=0.000, gambling_adjacent=0.000, hardware_electronics=0.000, health=0.000, other=0.000, toys=0.000
+2026-08-17 17:53:20,844 | INFO | MainThread | epoch 5 dev st3 per-label F1: age_restricted_or_prohibited_product=0.000, direct_exhortation=0.000, hfss_food_marketing=0.000, inadequate_disclosure=0.000, insufficient_context=0.000, misleading_claim=0.000, no_flag=0.403, undisclosed_advertising=0.000
+2026-08-17 17:53:20,844 | INFO | MainThread | epoch 5 dev st3_family per-label F1: content=0.000, disclosure=0.000, housekeeping=0.420, product=0.000
+2026-08-17 17:53:20,844 | INFO | MainThread | === Prediction diagnostics ===
+2026-08-17 17:53:20,845 | INFO | MainThread | [st1] label distribution (gold / pred):
+2026-08-17 17:53:20,845 | INFO | MainThread |   digital_content_or_services: gold=248, pred=248
+2026-08-17 17:53:20,845 | INFO | MainThread |   none: gold=14, pred=4
+2026-08-17 17:53:20,845 | INFO | MainThread |   physical_goods: gold=218, pred=235
+2026-08-17 17:53:20,845 | INFO | MainThread |   physical_services: gold=24, pred=17
+2026-08-17 17:53:20,845 | INFO | MainThread | [st1] gold x pred cross-product counts (gold -> pred: count):
+2026-08-17 17:53:20,845 | INFO | MainThread |   digital_content_or_services -> digital_content_or_services: 231
+2026-08-17 17:53:20,845 | INFO | MainThread |   physical_goods -> physical_goods: 209
+2026-08-17 17:53:20,846 | INFO | MainThread |   digital_content_or_services -> physical_goods: 17
+2026-08-17 17:53:20,846 | INFO | MainThread |   physical_services -> physical_services: 15
+2026-08-17 17:53:20,846 | INFO | MainThread |   physical_goods -> digital_content_or_services: 8
+2026-08-17 17:53:20,846 | INFO | MainThread |   none -> digital_content_or_services: 7
+2026-08-17 17:53:20,846 | INFO | MainThread |   physical_services -> physical_goods: 7
+2026-08-17 17:53:20,846 | INFO | MainThread |   none -> none: 4
+2026-08-17 17:53:20,846 | INFO | MainThread |   none -> physical_goods: 2
+2026-08-17 17:53:20,846 | INFO | MainThread |   physical_services -> digital_content_or_services: 2
+2026-08-17 17:53:20,846 | INFO | MainThread |   none -> physical_services: 1
+2026-08-17 17:53:20,846 | INFO | MainThread |   physical_goods -> physical_services: 1
+2026-08-17 17:53:20,907 | INFO | MainThread | epoch 5: new best st1_macro_f1=0.758, saved to runs/lora-qwen-st1-5epoch-poswt-oversample-r32a64/best
+2026-08-17 17:53:20,947 | INFO | MainThread | saved final epoch adapter to runs/lora-qwen-st1-5epoch-poswt-oversample-r32a64/last (best dev st1_macro_f1=0.758)
+2026-08-17 17:53:20,947 | INFO | MainThread | best dev metrics: st1_macro_f1=0.758, st2_macro_f1=0.000, st3_macro_f1=0.050, st3_family_macro_f1=0.105, mean_macro_f1=0.269
+2026-08-17 17:53:20,947 | INFO | MainThread | reloading best-dev checkpoint from runs/lora-qwen-st1-5epoch-poswt-oversample-r32a64/best for the test-holdout pass (generalization check, not used for model selection)
+2026-08-17 17:56:21,764 | INFO | MainThread | generate_predictions: input length (tokens, unpadded) -- min=2016 mean=3016 max=4000 n=500
+2026-08-17 17:56:21,840 | INFO | MainThread | test holdout metrics: st1_macro_f1=0.686, st2_macro_f1=0.000, st3_macro_f1=0.038, st3_family_macro_f1=0.077, mean_macro_f1=0.241
+2026-08-17 17:56:21,841 | INFO | MainThread | st1 per-label F1: digital_content_or_services=0.946, none=0.154, physical_goods=0.951, physical_services=0.694
+2026-08-17 17:56:21,841 | INFO | MainThread | st2 per-label F1: apps=0.000, creator_community=0.000, education=0.000, fashion=0.000, financial=0.000, food=0.000, gambling=0.000, gambling_adjacent=0.000, hardware_electronics=0.000, health=0.000, other=0.000, toys=0.000
+2026-08-17 17:56:21,841 | INFO | MainThread | st3 per-label F1: age_restricted_or_prohibited_product=0.000, direct_exhortation=0.000, hfss_food_marketing=0.000, inadequate_disclosure=0.000, insufficient_context=0.000, misleading_claim=0.000, no_flag=0.302, undisclosed_advertising=0.000
+2026-08-17 17:56:21,841 | INFO | MainThread | st3_family per-label F1: content=0.000, disclosure=0.000, housekeeping=0.308, product=0.000
+2026-08-17 17:56:21,841 | INFO | MainThread | === Prediction diagnostics ===
+2026-08-17 17:56:21,841 | INFO | MainThread | [st1] label distribution (gold / pred):
+2026-08-17 17:56:21,841 | INFO | MainThread |   digital_content_or_services: gold=218, pred=226
+2026-08-17 17:56:21,841 | INFO | MainThread |   none: gold=11, pred=2
+2026-08-17 17:56:21,842 | INFO | MainThread |   physical_goods: gold=241, pred=253
+2026-08-17 17:56:21,842 | INFO | MainThread |   physical_services: gold=30, pred=19
+2026-08-17 17:56:21,842 | INFO | MainThread | [st1] gold x pred cross-product counts (gold -> pred: count):
+2026-08-17 17:56:21,842 | INFO | MainThread |   physical_goods -> physical_goods: 235
+2026-08-17 17:56:21,842 | INFO | MainThread |   digital_content_or_services -> digital_content_or_services: 210
+2026-08-17 17:56:21,842 | INFO | MainThread |   physical_services -> physical_services: 17
+2026-08-17 17:56:21,842 | INFO | MainThread |   physical_services -> digital_content_or_services: 8
+2026-08-17 17:56:21,842 | INFO | MainThread |   none -> physical_goods: 7
+2026-08-17 17:56:21,842 | INFO | MainThread |   digital_content_or_services -> physical_goods: 6
+2026-08-17 17:56:21,842 | INFO | MainThread |   physical_goods -> digital_content_or_services: 6
+2026-08-17 17:56:21,842 | INFO | MainThread |   physical_services -> physical_goods: 5
+2026-08-17 17:56:21,842 | INFO | MainThread |   none -> digital_content_or_services: 2
+2026-08-17 17:56:21,843 | INFO | MainThread |   digital_content_or_services -> none: 1
+2026-08-17 17:56:21,843 | INFO | MainThread |   digital_content_or_services -> physical_services: 1
+2026-08-17 17:56:21,843 | INFO | MainThread |   none -> none: 1
+2026-08-17 17:56:21,843 | INFO | MainThread |   none -> physical_services: 1
