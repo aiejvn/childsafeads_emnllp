@@ -1,0 +1,78 @@
+2026-08-17 17:58:31,688 | INFO | MainThread | logging to runs/run_20260817_175831_lora_train_generative_Qwen_Qwen3-0.6B.log
+2026-08-17 17:58:31,688 | INFO | MainThread | config: {'train': 'public_data_dev/train.jsonl', 'dev': 'public_data_dev/dev.jsonl', 'model': 'Qwen/Qwen3-0.6B', 'model_path': None, 'context': 'transcript', 'lean_prompt': True, 'df_path': 'emnllp-dialog-flow-dialog-flow.json', 'max_length': 4096, 'epochs': 5, 'batch_size': 1, 'eval_batch_size': 8, 'eval_every': 5, 'grad_accum_steps': 4, 'lr': 0.0002, 'warmup_ratio': 0.06, 'lora_r': 8, 'lora_alpha': 16, 'lora_dropout': 0.1, 'target_modules': 'q_proj,v_proj', 'peft_method': 'lora', 'num_virtual_tokens': 20, 'prompt_tuning_init_text': None, 'st3_loss_weight': 1.0, 'pos_weight': True, 'oversample_rare_st3': 1, 'oversample_rare_st1': 3, 'st3_only': False, 'st12_only': False, 'st1_only': True, 'few_shot': False, 'no_gradient_checkpointing': True, 'load_in_4bit': False, 'parallelism': 'none', 'max_new_tokens': 128, 'sample_size': None, 'test_holdout': 500, 'split_seed': None, 'seed': 42, 'device': None, 'output_dir': 'runs/lora-qwen-st1-5epoch-poswt-oversample-transcript', 'checkpoint_save_path': None} device=cuda
+2026-08-17 17:58:31,819 | INFO | MainThread | train/test-holdout split (fresh random split every run unless --split-seed is pinned): split_seed=1013451793 train=1853 test_holdout=500
+2026-08-17 17:58:31,819 | INFO | MainThread | train=1853 dev=504
+2026-08-17 17:58:31,821 | INFO | MainThread | oversampling rare st1 labels ['none', 'other'] 3x: train 1853 -> 1905
+2026-08-17 17:58:31,821 | INFO | MainThread | loading model/tokenizer from local path models/Qwen/Qwen3-0.6B (no remote download)
+2026-08-17 17:58:33,086 | INFO | MainThread | system prompt: lean (1698 chars) + dialog flow from emnllp-dialog-flow-dialog-flow.json (5685 chars)
+2026-08-17 17:58:33,159 | INFO | MainThread | pos_weight st1: {'digital_content_or_services': 2.2517731189727783, 'none': 26.45833396911621, 'other': 50.0, 'physical_goods': 2.1647727489471436, 'physical_services': 18.861385345458984}
+2026-08-17 17:58:33,159 | INFO | MainThread | pos_weight st2: {'apps': 2.6285715103149414, 'creator_community': 7.619909286499023, 'education': 16.971698760986328, 'fashion': 9.132978439331055, 'financial': 16.31818199157715, 'food': 7.282608509063721, 'gambling': 50.0, 'gambling_adjacent': 24.743244171142578, 'hardware_electronics': 3.568345308303833, 'health': 7.985848903656006, 'other': 4.351123809814453, 'toys': 28.765625}
+2026-08-17 17:58:33,159 | INFO | MainThread | pos_weight st3: {'age_restricted_or_prohibited_product': 36.35293960571289, 'direct_exhortation': 6.807376861572266, 'hfss_food_marketing': 50.0, 'inadequate_disclosure': 2.8023951053619385, 'insufficient_context': 50.0, 'misleading_claim': 0.8603515625, 'no_flag': 3.5142180919647217, 'undisclosed_advertising': 5.392617225646973}
+2026-08-17 17:58:33,159 | INFO | MainThread | --st1-only: completion is {"st1":...} alone; st2/st3 in logged metrics are fixed placeholders, read st1_macro_f1 only; best-checkpoint selection uses st1_macro_f1 instead of mean_macro_f1
+2026-08-17 18:07:38,730 | INFO | MainThread | epoch 1: mean train loss = 0.6489
+2026-08-17 18:07:38,730 | INFO | MainThread | epoch 1: train input length (tokens, unpadded) -- min=1670 mean=1933 max=4012 n=1905
+2026-08-17 18:16:43,504 | INFO | MainThread | epoch 2: mean train loss = 0.0988
+2026-08-17 18:16:43,505 | INFO | MainThread | epoch 2: train input length (tokens, unpadded) -- min=1670 mean=1933 max=4012 n=1905
+2026-08-17 18:25:47,848 | INFO | MainThread | epoch 3: mean train loss = 0.0630
+2026-08-17 18:25:47,848 | INFO | MainThread | epoch 3: train input length (tokens, unpadded) -- min=1670 mean=1933 max=4012 n=1905
+2026-08-17 18:34:52,157 | INFO | MainThread | epoch 4: mean train loss = 0.0345
+2026-08-17 18:34:52,157 | INFO | MainThread | epoch 4: train input length (tokens, unpadded) -- min=1670 mean=1933 max=4012 n=1905
+2026-08-17 18:43:56,602 | INFO | MainThread | epoch 5: mean train loss = 0.0200
+2026-08-17 18:43:56,602 | INFO | MainThread | epoch 5: train input length (tokens, unpadded) -- min=1670 mean=1933 max=4012 n=1905
+2026-08-17 18:45:32,892 | INFO | MainThread | generate_predictions: input length (tokens, unpadded) -- min=1661 mean=1921 max=2896 n=504
+2026-08-17 18:45:33,015 | INFO | MainThread | epoch 5 dev metrics: st1_macro_f1=0.574, st2_macro_f1=0.000, st3_macro_f1=0.050, st3_family_macro_f1=0.105, mean_macro_f1=0.208
+2026-08-17 18:45:33,015 | INFO | MainThread | epoch 5 dev st1 per-label F1: digital_content_or_services=0.823, none=0.000, physical_goods=0.804, physical_services=0.667
+2026-08-17 18:45:33,015 | INFO | MainThread | epoch 5 dev st2 per-label F1: apps=0.000, creator_community=0.000, education=0.000, fashion=0.000, financial=0.000, food=0.000, gambling=0.000, gambling_adjacent=0.000, hardware_electronics=0.000, health=0.000, other=0.000, toys=0.000
+2026-08-17 18:45:33,015 | INFO | MainThread | epoch 5 dev st3 per-label F1: age_restricted_or_prohibited_product=0.000, direct_exhortation=0.000, hfss_food_marketing=0.000, inadequate_disclosure=0.000, insufficient_context=0.000, misleading_claim=0.000, no_flag=0.403, undisclosed_advertising=0.000
+2026-08-17 18:45:33,015 | INFO | MainThread | epoch 5 dev st3_family per-label F1: content=0.000, disclosure=0.000, housekeeping=0.420, product=0.000
+2026-08-17 18:45:33,016 | INFO | MainThread | === Prediction diagnostics ===
+2026-08-17 18:45:33,016 | INFO | MainThread | [st1] label distribution (gold / pred):
+2026-08-17 18:45:33,016 | INFO | MainThread |   digital_content_or_services: gold=248, pred=238
+2026-08-17 18:45:33,016 | INFO | MainThread |   none: gold=14, pred=3
+2026-08-17 18:45:33,016 | INFO | MainThread |   physical_goods: gold=218, pred=242
+2026-08-17 18:45:33,016 | INFO | MainThread |   physical_services: gold=24, pred=21
+2026-08-17 18:45:33,017 | INFO | MainThread | [st1] gold x pred cross-product counts (gold -> pred: count):
+2026-08-17 18:45:33,017 | INFO | MainThread |   digital_content_or_services -> digital_content_or_services: 200
+2026-08-17 18:45:33,017 | INFO | MainThread |   physical_goods -> physical_goods: 185
+2026-08-17 18:45:33,017 | INFO | MainThread |   digital_content_or_services -> physical_goods: 42
+2026-08-17 18:45:33,017 | INFO | MainThread |   physical_goods -> digital_content_or_services: 30
+2026-08-17 18:45:33,017 | INFO | MainThread |   physical_services -> physical_services: 15
+2026-08-17 18:45:33,017 | INFO | MainThread |   none -> physical_goods: 10
+2026-08-17 18:45:33,017 | INFO | MainThread |   physical_services -> physical_goods: 5
+2026-08-17 18:45:33,017 | INFO | MainThread |   digital_content_or_services -> physical_services: 4
+2026-08-17 18:45:33,017 | INFO | MainThread |   none -> digital_content_or_services: 4
+2026-08-17 18:45:33,017 | INFO | MainThread |   physical_services -> digital_content_or_services: 4
+2026-08-17 18:45:33,017 | INFO | MainThread |   digital_content_or_services -> none: 2
+2026-08-17 18:45:33,017 | INFO | MainThread |   physical_goods -> physical_services: 2
+2026-08-17 18:45:33,017 | INFO | MainThread |   physical_goods -> none: 1
+2026-08-17 18:45:33,066 | INFO | MainThread | epoch 5: new best st1_macro_f1=0.574, saved to runs/lora-qwen-st1-5epoch-poswt-oversample-transcript/best
+2026-08-17 18:45:33,099 | INFO | MainThread | saved final epoch adapter to runs/lora-qwen-st1-5epoch-poswt-oversample-transcript/last (best dev st1_macro_f1=0.574)
+2026-08-17 18:45:33,100 | INFO | MainThread | best dev metrics: st1_macro_f1=0.574, st2_macro_f1=0.000, st3_macro_f1=0.050, st3_family_macro_f1=0.105, mean_macro_f1=0.208
+2026-08-17 18:45:33,100 | INFO | MainThread | reloading best-dev checkpoint from runs/lora-qwen-st1-5epoch-poswt-oversample-transcript/best for the test-holdout pass (generalization check, not used for model selection)
+2026-08-17 18:47:11,117 | INFO | MainThread | generate_predictions: input length (tokens, unpadded) -- min=1661 mean=1920 max=3115 n=500
+2026-08-17 18:47:11,172 | INFO | MainThread | test holdout metrics: st1_macro_f1=0.573, st2_macro_f1=0.000, st3_macro_f1=0.047, st3_family_macro_f1=0.096, mean_macro_f1=0.207
+2026-08-17 18:47:11,172 | INFO | MainThread | st1 per-label F1: digital_content_or_services=0.835, none=0.125, physical_goods=0.859, physical_services=0.474
+2026-08-17 18:47:11,172 | INFO | MainThread | st2 per-label F1: apps=0.000, creator_community=0.000, education=0.000, fashion=0.000, financial=0.000, food=0.000, gambling_adjacent=0.000, hardware_electronics=0.000, health=0.000, other=0.000, toys=0.000
+2026-08-17 18:47:11,172 | INFO | MainThread | st3 per-label F1: age_restricted_or_prohibited_product=0.000, direct_exhortation=0.000, hfss_food_marketing=0.000, inadequate_disclosure=0.000, insufficient_context=0.000, misleading_claim=0.000, no_flag=0.379, undisclosed_advertising=0.000
+2026-08-17 18:47:11,172 | INFO | MainThread | st3_family per-label F1: content=0.000, disclosure=0.000, housekeeping=0.384, product=0.000
+2026-08-17 18:47:11,172 | INFO | MainThread | === Prediction diagnostics ===
+2026-08-17 18:47:11,173 | INFO | MainThread | [st1] label distribution (gold / pred):
+2026-08-17 18:47:11,173 | INFO | MainThread |   digital_content_or_services: gold=223, pred=225
+2026-08-17 18:47:11,173 | INFO | MainThread |   none: gold=11, pred=5
+2026-08-17 18:47:11,173 | INFO | MainThread |   physical_goods: gold=245, pred=253
+2026-08-17 18:47:11,173 | INFO | MainThread |   physical_services: gold=21, pred=17
+2026-08-17 18:47:11,174 | INFO | MainThread | [st1] gold x pred cross-product counts (gold -> pred: count):
+2026-08-17 18:47:11,174 | INFO | MainThread |   physical_goods -> physical_goods: 214
+2026-08-17 18:47:11,174 | INFO | MainThread |   digital_content_or_services -> digital_content_or_services: 187
+2026-08-17 18:47:11,174 | INFO | MainThread |   digital_content_or_services -> physical_goods: 29
+2026-08-17 18:47:11,174 | INFO | MainThread |   physical_goods -> digital_content_or_services: 27
+2026-08-17 18:47:11,174 | INFO | MainThread |   physical_services -> physical_services: 9
+2026-08-17 18:47:11,174 | INFO | MainThread |   physical_services -> digital_content_or_services: 7
+2026-08-17 18:47:11,174 | INFO | MainThread |   none -> physical_goods: 6
+2026-08-17 18:47:11,174 | INFO | MainThread |   digital_content_or_services -> physical_services: 4
+2026-08-17 18:47:11,174 | INFO | MainThread |   none -> digital_content_or_services: 4
+2026-08-17 18:47:11,174 | INFO | MainThread |   physical_goods -> physical_services: 4
+2026-08-17 18:47:11,174 | INFO | MainThread |   physical_services -> physical_goods: 4
+2026-08-17 18:47:11,174 | INFO | MainThread |   digital_content_or_services -> none: 3
+2026-08-17 18:47:11,174 | INFO | MainThread |   none -> none: 1
+2026-08-17 18:47:11,174 | INFO | MainThread |   physical_services -> none: 1
