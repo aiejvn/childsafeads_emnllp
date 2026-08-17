@@ -1,0 +1,22 @@
+2026-08-17 21:03:00,323 | INFO | MainThread | logging to runs/run_20260817_210300_lora_train_st1_none_FacebookAI_roberta-base.log
+2026-08-17 21:03:00,324 | INFO | MainThread | config: {'train': 'public_data_dev/train.jsonl', 'dev': 'public_data_dev/dev.jsonl', 'model': 'FacebookAI/roberta-base', 'local': False, 'context': 'full', 'max_length': 512, 'epochs': 5, 'batch_size': 16, 'grad_accum_steps': 1, 'lr': 0.0002, 'head_lr': None, 'warmup_ratio': 0.06, 'lora_r': 8, 'lora_alpha': 16, 'lora_dropout': 0.1, 'target_modules': 'query,value', 'class_weight': True, 'oversample_none': 3, 'threshold': 0.5, 'sample_size': None, 'test_holdout': 500, 'split_seed': None, 'seed': 42, 'device': None, 'output_dir': 'runs/st1-none-roberta-classweight-oversample-rep2', 'no_wandb': True} device=cuda
+2026-08-17 21:03:00,470 | INFO | MainThread | train/test-holdout split (fresh random split every run unless --split-seed is pinned): split_seed=1240987286 train=1853 test_holdout=500
+2026-08-17 21:03:00,471 | INFO | MainThread | train=1853 (none=26, 1.4%) dev=504 (none=14, 2.8%)
+2026-08-17 21:03:00,472 | INFO | MainThread | oversampled none 3x: train now 1905 instances
+2026-08-17 21:03:00,599 | INFO | MainThread | class_weight: not_none=1.043 none=24.423
+2026-08-17 21:04:17,885 | INFO | MainThread | epoch 1: mean train loss = 0.6607
+2026-08-17 21:04:27,073 | INFO | MainThread | epoch 1 dev metrics (threshold=0.10): accuracy=0.972, none_precision=0.500, none_recall=0.357, none_f1=0.417, not_none_f1=0.986, macro_f1=0.701, tp=5, fp=5, fn=9, tn=485, loss=0.108
+2026-08-17 21:04:27,187 | INFO | MainThread | epoch 1: new best macro_f1=0.701, saved to runs/st1-none-roberta-classweight-oversample-rep2/best
+2026-08-17 21:05:46,620 | INFO | MainThread | epoch 2: mean train loss = 0.8297
+2026-08-17 21:05:55,747 | INFO | MainThread | epoch 2 dev metrics (threshold=0.40): accuracy=0.972, none_precision=0.500, none_recall=0.357, none_f1=0.417, not_none_f1=0.986, macro_f1=0.701, tp=5, fp=5, fn=9, tn=485, loss=0.092
+2026-08-17 21:07:14,768 | INFO | MainThread | epoch 3: mean train loss = 0.5178
+2026-08-17 21:07:23,980 | INFO | MainThread | epoch 3 dev metrics (threshold=0.75): accuracy=0.980, none_precision=0.833, none_recall=0.357, none_f1=0.500, not_none_f1=0.990, macro_f1=0.745, tp=5, fp=1, fn=9, tn=489, loss=0.081
+2026-08-17 21:07:24,102 | INFO | MainThread | epoch 3: new best macro_f1=0.745, saved to runs/st1-none-roberta-classweight-oversample-rep2/best
+2026-08-17 21:08:43,107 | INFO | MainThread | epoch 4: mean train loss = 0.3926
+2026-08-17 21:08:52,367 | INFO | MainThread | epoch 4 dev metrics (threshold=0.85): accuracy=0.982, none_precision=1.000, none_recall=0.357, none_f1=0.526, not_none_f1=0.991, macro_f1=0.759, tp=5, fp=0, fn=9, tn=490, loss=0.097
+2026-08-17 21:08:52,466 | INFO | MainThread | epoch 4: new best macro_f1=0.759, saved to runs/st1-none-roberta-classweight-oversample-rep2/best
+2026-08-17 21:10:11,390 | INFO | MainThread | epoch 5: mean train loss = 0.2807
+2026-08-17 21:10:20,730 | INFO | MainThread | epoch 5 dev metrics (threshold=0.80): accuracy=0.982, none_precision=1.000, none_recall=0.357, none_f1=0.526, not_none_f1=0.991, macro_f1=0.759, tp=5, fp=0, fn=9, tn=490, loss=0.104
+2026-08-17 21:10:20,846 | INFO | MainThread | saved final epoch adapter to runs/st1-none-roberta-classweight-oversample-rep2/last (best dev macro_f1=0.759)
+2026-08-17 21:10:20,846 | INFO | MainThread | reloading best-dev checkpoint from runs/st1-none-roberta-classweight-oversample-rep2/best for the test-holdout pass (generalization check, not used for model selection)
+2026-08-17 21:10:29,560 | INFO | MainThread | test holdout metrics (threshold=0.85, from best dev checkpoint): accuracy=0.984, none_precision=0.667, none_recall=0.222, none_f1=0.333, not_none_f1=0.992, macro_f1=0.663, tp=2, fp=1, fn=7, tn=490, loss=0.071
