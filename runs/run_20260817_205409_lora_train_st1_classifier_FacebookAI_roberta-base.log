@@ -1,0 +1,15 @@
+2026-08-17 20:54:09,197 | INFO | MainThread | logging to runs/run_20260817_205409_lora_train_st1_classifier_FacebookAI_roberta-base.log
+2026-08-17 20:54:09,197 | INFO | MainThread | config: {'train': 'public_data_dev/train.jsonl', 'dev': 'public_data_dev/dev.jsonl', 'model': 'FacebookAI/roberta-base', 'local': False, 'context': 'full', 'max_length': 512, 'epochs': 1, 'batch_size': 4, 'grad_accum_steps': 1, 'lr': 0.0002, 'head_lr': None, 'warmup_ratio': 0.06, 'lora_r': 8, 'lora_alpha': 16, 'lora_dropout': 0.1, 'target_modules': 'query,value', 'class_weight': True, 'oversample_rare_st1': 3, 'sample_size': 16, 'test_holdout': 8, 'split_seed': None, 'seed': 42, 'device': 'cpu', 'output_dir': '/tmp/claude-1000/-home-ubuntu-Github-childsafeads-emnllp/3c100e31-1461-430f-b7d9-d3edde578fa7/scratchpad/lora_st1_classifier_smoke', 'no_wandb': True} device=cpu
+2026-08-17 20:54:09,335 | INFO | MainThread | train/test-holdout split (fresh random split every run unless --split-seed is pinned): split_seed=1331023743 train=2345 test_holdout=8
+2026-08-17 20:54:09,336 | INFO | MainThread | train=16 dist=digital_content_or_services=4 (25.0%), none=0 (0.0%), other=0 (0.0%), physical_goods=10 (62.5%), physical_services=2 (12.5%)
+2026-08-17 20:54:09,336 | INFO | MainThread | dev=16 dist=digital_content_or_services=8, none=0, other=0, physical_goods=7, physical_services=1
+2026-08-17 20:54:09,337 | INFO | MainThread | oversampled rare st1 labels ['none', 'other'] 3x: train now 16 instances
+2026-08-17 20:54:09,337 | INFO | MainThread | class_weight: digital_content_or_services=4.000, none=16.000, other=16.000, physical_goods=1.600, physical_services=8.000
+2026-08-17 20:55:02,513 | INFO | MainThread | epoch 1: mean train loss = 1.5839
+2026-08-17 20:55:18,788 | INFO | MainThread | epoch 1 dev metrics: accuracy=0.500, macro_f1=0.133, loss=1.505
+2026-08-17 20:55:18,788 | INFO | MainThread | epoch 1 dev metrics per-label F1: digital_content_or_services=0.667, none=0.000, other=0.000, physical_goods=0.000, physical_services=0.000
+2026-08-17 20:55:18,896 | INFO | MainThread | epoch 1: new best macro_f1=0.133, saved to /tmp/claude-1000/-home-ubuntu-Github-childsafeads-emnllp/3c100e31-1461-430f-b7d9-d3edde578fa7/scratchpad/lora_st1_classifier_smoke/best
+2026-08-17 20:55:18,999 | INFO | MainThread | saved final epoch adapter to /tmp/claude-1000/-home-ubuntu-Github-childsafeads-emnllp/3c100e31-1461-430f-b7d9-d3edde578fa7/scratchpad/lora_st1_classifier_smoke/last (best dev macro_f1=0.133)
+2026-08-17 20:55:18,999 | INFO | MainThread | reloading best-dev checkpoint from /tmp/claude-1000/-home-ubuntu-Github-childsafeads-emnllp/3c100e31-1461-430f-b7d9-d3edde578fa7/scratchpad/lora_st1_classifier_smoke/best for the test-holdout pass (generalization check, not used for model selection)
+2026-08-17 20:55:28,147 | INFO | MainThread | test holdout metrics: accuracy=0.625, macro_f1=0.154, loss=1.494
+2026-08-17 20:55:28,147 | INFO | MainThread | test holdout metrics per-label F1: digital_content_or_services=0.769, none=0.000, other=0.000, physical_goods=0.000, physical_services=0.000

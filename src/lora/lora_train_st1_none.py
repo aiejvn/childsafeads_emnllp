@@ -17,6 +17,11 @@ Usage (run from the repo root):
 Saves the best-dev-macro-F1 adapter+head to <output-dir>/best and the final epoch's
 to <output-dir>/last, plus that epoch's dev predictions.jsonl and the tuned
 none-class decision threshold (thresholds.json).
+
+Pass --test-holdout N (default 500, matching lora_train_generative.py) to carve a random
+generalization-check split out of `train` -- evaluated once at the end with the best-dev
+checkpoint's already-tuned threshold (not re-tuned on holdout, to avoid leaking holdout gold
+into model selection).
 """
 import argparse
 import json
@@ -33,7 +38,7 @@ from tqdm import tqdm
 from transformers import AutoModelForSequenceClassification, AutoTokenizer, get_linear_schedule_with_warmup
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))  # so `import lora` resolves src/lora as a package
-from peft import LoraConfig, TaskType, get_peft_model  # noqa: E402
+from peft import LoraConfig, PeftModel, TaskType, get_peft_model  # noqa: E402
 from lora import CONTEXT_CHOICES, load_split, render_context, setup_logging  # noqa: E402
 
 NONE_LABEL = "none"
@@ -117,15 +122,18 @@ def to_device(batch: dict, device: str) -> dict:
 
 @torch.no_grad()
 def run_inference(model, loader, device) -> tuple:
-    """Returns (instanceIDs, none_probs) over the whole split -- none_probs is
-    softmax(logits)[:, 1], the model's probability that st1 == "none"."""
-    ids, probs = [], []
+    """Returns (instanceIDs, none_probs, logits) over the whole split -- none_probs is
+    softmax(logits)[:, 1], the model's probability that st1 == "none"; logits is the raw
+    2-class output (for computing an unweighted eval CE loss against gold, comparable across
+    dev/holdout regardless of --class-weight)."""
+    ids, probs, all_logits = [], [], []
     for batch in tqdm(loader, desc="predicting", leave=False):
         batch = to_device(batch, device)
         logits = model(input_ids=batch["input_ids"], attention_mask=batch["attention_mask"]).logits
         ids.extend(batch["instanceID"])
         probs.append(F.softmax(logits, dim=-1)[:, 1].cpu())
-    return ids, torch.cat(probs)
+        all_logits.append(logits.cpu())
+    return ids, torch.cat(probs), torch.cat(all_logits)
 
 
 def tune_threshold(none_probs: torch.Tensor, gold: torch.Tensor, default: float = 0.5, grid=None) -> float:
@@ -169,6 +177,23 @@ def binary_metrics(gold: list, pred: list) -> dict:
         "macro_f1": (none_f1 + not_none_f1) / 2,
         "tp": tp, "fp": fp, "fn": fn, "tn": tn,
     }
+
+
+def evaluate_split(model, loader, instances: list, device: str, threshold: float, tune: bool,
+                    default_threshold: float) -> tuple:
+    """Runs inference over `loader`/`instances`, computes binary_metrics (+ unweighted eval
+    loss), and returns (metrics, ids, gold, pred, none_probs, threshold_used). When `tune` is
+    True the none-threshold is re-swept on this split's own gold (dev, during training); when
+    False, `threshold` (the already-tuned value from the best dev checkpoint) is used as-is --
+    holdout must never tune its own threshold, that would leak holdout gold into selection."""
+    ids, none_probs, logits = run_inference(model, loader, device)
+    gold = [st1_binary_label(inst) for inst in instances]
+    gold_t = torch.tensor(gold, dtype=torch.float)
+    used_threshold = tune_threshold(none_probs, gold_t, default=default_threshold) if tune else threshold
+    pred = (none_probs >= used_threshold).long().tolist()
+    metrics = binary_metrics(gold, pred)
+    metrics["loss"] = F.cross_entropy(logits, torch.tensor(gold, dtype=torch.long)).item()
+    return metrics, ids, gold, pred, none_probs, used_threshold
 
 
 def write_predictions(path: str, ids: list, gold: list, pred: list, none_probs: torch.Tensor) -> None:
@@ -223,6 +248,12 @@ def main():
     ap.add_argument("--threshold", type=float, default=0.5, help="fallback none-class probability "
                      "threshold for epochs where tune_threshold can't tune one (no gold none in dev)")
     ap.add_argument("--sample-size", type=int, default=None, help="sample N train and N dev instances (seeded smoke test)")
+    ap.add_argument("--test-holdout", type=int, default=500, help="hold out this many instances from "
+                     "`train` (disjoint from what's trained on) for a one-time generalization check "
+                     "with the best-dev checkpoint's tuned threshold, evaluated after training finishes. "
+                     "0 disables it.")
+    ap.add_argument("--split-seed", type=int, default=None, help="seed for the train/test-holdout split; "
+                     "omit for a fresh random split every run (logged either way)")
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--device", default=None, help="defaults to cuda if available, else cpu")
     ap.add_argument("--output-dir", required=True)
@@ -252,6 +283,18 @@ def main():
 
     train_instances = list(load_split(args.train))
     dev_instances = list(load_split(args.dev))
+
+    test_holdout_instances = []
+    if args.test_holdout:
+        split_seed = args.split_seed if args.split_seed is not None else random.SystemRandom().randint(0, 2**31 - 1)
+        shuffled = train_instances[:]
+        random.Random(split_seed).shuffle(shuffled)
+        test_holdout_instances = shuffled[:args.test_holdout]
+        train_instances = shuffled[args.test_holdout:]
+        log.info(f"train/test-holdout split (fresh random split every run unless --split-seed is "
+                 f"pinned): split_seed={split_seed} train={len(train_instances)} "
+                 f"test_holdout={len(test_holdout_instances)}")
+
     if args.sample_size:
         rng = random.Random(args.seed)
         train_instances = rng.sample(train_instances, min(args.sample_size, len(train_instances)))
@@ -324,12 +367,10 @@ def main():
         log.info(f"epoch {epoch + 1}: mean train loss = {train_loss:.4f}")
 
         model.eval()
-        ids, none_probs = run_inference(model, dev_loader, device)
-        gold = [st1_binary_label(inst) for inst in dev_instances]
-        gold_t = torch.tensor(gold, dtype=torch.float)
-        threshold = tune_threshold(none_probs, gold_t, default=args.threshold)
-        pred = (none_probs >= threshold).long().tolist()
-        metrics = binary_metrics(gold, pred)
+        metrics, ids, gold, pred, none_probs, threshold = evaluate_split(
+            model, dev_loader, dev_instances, device, threshold=args.threshold, tune=True,
+            default_threshold=args.threshold,
+        )
         log.info(f"epoch {epoch + 1} dev metrics (threshold={threshold:.2f}): "
                  + ", ".join(f"{k}={v:.3f}" if isinstance(v, float) else f"{k}={v}" for k, v in metrics.items()))
         wandb.log({"epoch": epoch + 1, "train_loss": train_loss, "none_threshold": threshold,
@@ -350,6 +391,33 @@ def main():
     log.info(f"saved final epoch adapter to {args.output_dir}/last (best dev macro_f1={best_f1:.3f})")
     wandb.summary.update({f"final_dev_{k}": v for k, v in metrics.items()})
     wandb.summary["best_macro_f1"] = best_f1
+
+    if test_holdout_instances:
+        best_dir = os.path.join(args.output_dir, "best")
+        log.info(f"reloading best-dev checkpoint from {best_dir} for the test-holdout pass "
+                 f"(generalization check, not used for model selection)")
+        del model  # free the training model before loading a second full copy for holdout eval
+        torch.cuda.empty_cache()
+        with open(os.path.join(best_dir, "thresholds.json"), encoding="utf-8") as f:
+            best_threshold = json.load(f)["none_threshold"]
+        test_base = AutoModelForSequenceClassification.from_pretrained(model_path, num_labels=2)
+        test_model = PeftModel.from_pretrained(test_base, best_dir).to(device)
+        test_model.eval()
+        test_loader = DataLoader(
+            BinaryDataset(test_holdout_instances, tokenizer, args.context, args.max_length),
+            batch_size=args.batch_size, shuffle=False, collate_fn=collate,
+        )
+        test_metrics, test_ids, test_gold, test_pred, test_probs, _ = evaluate_split(
+            test_model, test_loader, test_holdout_instances, device,
+            threshold=best_threshold, tune=False, default_threshold=best_threshold,
+        )
+        del test_model
+        torch.cuda.empty_cache()
+        log.info(f"test holdout metrics (threshold={best_threshold:.2f}, from best dev checkpoint): "
+                 + ", ".join(f"{k}={v:.3f}" if isinstance(v, float) else f"{k}={v}" for k, v in test_metrics.items()))
+        write_predictions(os.path.join(best_dir, "test_predictions.jsonl"), test_ids, test_gold, test_pred, test_probs)
+        wandb.summary.update({f"test_holdout_{k}": v for k, v in test_metrics.items()})
+
     wandb.finish()
 
 
