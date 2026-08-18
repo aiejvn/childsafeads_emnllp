@@ -25,13 +25,13 @@ The shared task decomposes into three subtasks, Subtask 1 (ST1), Subtask 2 (ST2)
 Each subtask's score is macro-averaged F1 over its own label set $\mathcal{L}$,
 
 $$
-F1_{\text{macro}} = \frac{1}{|\mathcal{L}|} \sum_{\ell \in \mathcal{L}} \frac{2\,P_\ell R_\ell}{P_\ell + R_\ell},
+F1_{\text{macro}} = \frac{1}{|\mathcal{L}|} \sum_{\ell \in \mathcal{L}} \frac{2 P_\ell R_\ell}{P_\ell + R_\ell},
 $$
 
-and the three subtask scores combine into the shared task's headline metric,
+and the three subtask scores combine into the shared task's headline metric, denoted $M$ (`mean_macro_f1`),
 
 $$
-\text{mean\_macro\_f1} = \frac{1}{3}\Big(F1_{\text{macro}}^{\text{ST1}} + F1_{\text{macro}}^{\text{ST2}} + F1_{\text{macro}}^{\text{ST3}}\Big).
+M = \frac{1}{3}\Big(F1_{\text{macro}}^{\text{ST1}} + F1_{\text{macro}}^{\text{ST2}} + F1_{\text{macro}}^{\text{ST3}}\Big).
 $$
 
 ## 2. Methods
@@ -72,7 +72,7 @@ We adapt GreaseLM (Zhang et al., 2022), which fuses a pretrained language model 
 
 ### 2.9 Qwen3-4B Joint Generative Model
 
-To establish our own approach, we formulate all three subtasks as a single sequence-generation problem: given an instance's rendered context and a fixed instruction prompt, a decoder-only Transformer (Vaswani et al., 2017) is trained to generate the target label set $\{\text{st1}, \text{st2}[\,], \text{st3}[\,]\}$ as one structured JSON completion, rather than training a dedicated classification head per subtask as in §2.2–2.4. Our base model is Qwen3-4B (Qwen Team, 2025), adapted with Low-Rank Adaptation (Hu et al., 2021) via the Hugging Face PEFT library (Mangrulkar et al., 2022). Concretely, LoRA reparameterizes the update to each adapted projection matrix $W_0 \in \mathbb{R}^{d\times k}$ as a low-rank delta,
+To establish our own approach, we formulate all three subtasks as a single sequence-generation problem: given an instance's rendered context and a fixed instruction prompt, a decoder-only Transformer (Vaswani et al., 2017) is trained to generate the target label set $\{\text{st1}, \text{st2}[], \text{st3}[]\}$ as one structured JSON completion, rather than training a dedicated classification head per subtask as in §2.2–2.4. Our base model is Qwen3-4B (Qwen Team, 2025), adapted with Low-Rank Adaptation (Hu et al., 2021) via the Hugging Face PEFT library (Mangrulkar et al., 2022). Concretely, LoRA reparameterizes the update to each adapted projection matrix $W_0 \in \mathbb{R}^{d\times k}$ as a low-rank delta,
 
 $$
 W' = W_0 + \Delta W = W_0 + \frac{\alpha}{r}BA, \qquad B \in \mathbb{R}^{d\times r},\ A \in \mathbb{R}^{r\times k},\ r \ll \min(d,k),
@@ -148,34 +148,15 @@ flowchart TB
 
 **Structure:** A dialog flow is a small typed state machine. Our flow comprises 14 nodes and 13 edges spanning five node types: a `start` node; a `fact`-gathering node that binds the segment text; `reasoning` nodes, each a bounded question with an explicit answer set and free-text instructions for resolving it; a `switch` node implementing conditional branching; and `outcome` nodes specifying a structured response template. The flow encodes the exact decision sequence a human annotator would follow: an initial assessability check determines whether the segment supports a reliable ST3 judgment at all, routing to a dedicated `insufficient_context` outcome that still requires ST1 and ST2 to be assigned normally, since the taxonomy defines insufficient context as affecting ST3 only; this is followed, for assessable segments, by a commercial-type question (ST1), a product-category question (ST2), and then a strictly ordered sequence of six binary reasoning questions, one per Tier-1 ST3 flag other than the two housekeeping labels (`no_flag`, `insufficient_context`): `undisclosed_advertising`, `inadequate_disclosure`, `direct_exhortation`, `misleading_claim`, `age_restricted_or_prohibited_product`, and `hfss_food_marketing`, in the taxonomy's own dependency order. Each node's instructions state the taxonomy's mutual-exclusivity constraints explicitly: for instance, the `inadequate_disclosure` node is instructed not to fire if `undisclosed_advertising` has already fired, mirroring the taxonomy rule that the two are mutually exclusive. The flow terminates in an outcome node specifying the exact structured-response format the model should produce.
 
-```mermaid
-flowchart TD
-    S["start"]:::visited --> F["fact node<br/>binds segment text"]:::visited
-    F --> Q0{"Is the segment assessable<br/>enough to classify?"}:::visited
-    Q0 -->|sufficient context| Q1{"What commercial type is<br/>being promoted? (ST1)"}:::visited
-    Q0 -->|insufficient context| O0["outcome: insufficient_context<br/>(ST1, ST2 still assigned)"]:::skipped
-    Q1 --> Q2{"Which product categories<br/>apply to the segment? (ST2)"}:::visited
-    Q2 --> Q3{"Is the commercial nature left<br/>completely undisclosed?<br/>(undisclosed_advertising)"}:::visited
-    Q3 --> Q4{"If a disclosure exists, is it<br/>inadequate for a child audience?<br/>(inadequate_disclosure, exclusive with Q3)"}:::visited
-    Q4 --> Q5{"Does the segment directly appeal<br/>for children to buy, or persuade<br/>adults to buy for them? (direct_exhortation)"}:::visited
-    Q5 --> Q6{"Does it make an unsubstantiated or<br/>high-risk claim about the product?<br/>(misleading_claim)"}:::visited
-    Q6 --> Q7{"Is the promoted product age-restricted<br/>or prohibited? (age_restricted_or_prohibited_product)"}:::visited
-    Q7 --> Q8{"Does it clearly market food high in<br/>fat, salt, or sugar? (hfss_food_marketing)"}:::visited
-    Q8 --> O1["outcome node<br/>structured response template"]:::visited
-    O1 --> R["{st1, st2[], st3[]}<br/>rendered via flow_to_text(G)"]:::output
-    classDef visited fill:#d9ead3,stroke:#333
-    classDef skipped fill:#cfe2f3,stroke:#333
-    classDef output fill:#fff2cc,stroke:#333
-```
 
 **Figure 3: Toy example of the dialog-flow reasoning structure encoded by our scaffold.** Green nodes represent the strictly ordered sequence every instance's prompt encodes (an assessability check, ST1, ST2, then six binary Tier-1 ST3 reasoning questions in taxonomy dependency order), while the blue outcome node shows the alternate branch taken only when a segment is judged unassessable for ST3. For readability, each question node here is drawn as a bare yes/no branch; in the actual flow, every one of these nodes also carries free-text, expert-authored instructions for resolving it (its decision rule and its exclusivity relationship to neighboring tests, per the `inadequate_disclosure` example below), so the model is guided by considerably more than the branch label alone. The flow itself is static prompt pre-context, not an execution trace: no traversal happens at inference time, since the model conditions on the full rendered graph and generates all labels directly.
 
 **Motivation:** We include this scaffold as prompt pre-context because it operationalizes the labeling taxonomy as an explicit reasoning chain rather than leaving the order and dependencies of its constituent legal tests implicit in prose, in a manner conceptually related to chain-of-thought prompting (Wei et al., 2022): rather than requiring the model to discover, for each novel segment, the correct sequence in which to apply the taxonomy's tests, the flow supplies that sequence directly, together with each test's decision rule and its exclusivity relationship to neighboring tests. Because the taxonomy is shared across every subtask and every baseline in this project, the flow is authored once and consumed by two independent renderers that we verified agree on structure: `src/common/dialog_flow.py`, the text renderer used for our prompts, and `src/greaselm/kg/build_kg.py`, the graph renderer used to construct the GreaseLM baseline's knowledge graph (§2.8); both interpret a switch node's branches identically (as `branch:<compare-value>` and `branch:default` relations), so the encoded reasoning structure is invariant to which system consumes it.
 
-**Formalization:** We express the dialog flow as a directed graph $G = (V, E)$ with node set $V = V_{\text{start}} \cup V_{\text{fact}} \cup V_{\text{reasoning}} \cup V_{\text{switch}} \cup V_{\text{outcome}}$, and edges $E$ encoding the fixed traversal order described above. Each reasoning node $v \in V_{\text{reasoning}}$ carries a bounded answer set $\mathcal{A}_v$ and a free-text decision rule $\rho_v$. Rather than executing $G$ at inference time, we render it once with a fixed serialization function $\mathrm{flow\_to\_text}: G \to \Sigma^*$ (`src/common/dialog_flow.py`) and prepend the result as static pre-context to every prompt. The trained model is thus a conditional generator
+**Formalization:** We express the dialog flow as a directed graph $G = (V, E)$ with node set $V = V_{\text{start}} \cup V_{\text{fact}} \cup V_{\text{reasoning}} \cup V_{\text{switch}} \cup V_{\text{outcome}}$, and edges $E$ encoding the fixed traversal order described above. Each reasoning node $v \in V_{\text{reasoning}}$ carries a bounded answer set $\mathcal{A}_v$ and a free-text decision rule $\rho_v$. Rather than executing $G$ at inference time, we render it once with a fixed serialization function, denoted $\phi: G \to \Sigma^*$ (`flow_to_text`, `src/common/dialog_flow.py`), and prepend the result as static pre-context to every prompt. The trained model is thus a conditional generator
 
 $$
-p_\theta\big(y \mid x,\ \mathrm{flow\_to\_text}(G)\big), \qquad y = \{\text{st1},\ \text{st2}[\,],\ \text{st3}[\,]\},
+p_\theta\big(y \mid x, \phi(G)\big), \qquad y = \{\text{st1}, \text{st2}[], \text{st3}[]\},
 $$
 
 where $x$ is the rendered instance context (§2.11) and $\theta$ are the LoRA parameters of §2.9. This differs from graph-*executing* approaches such as our GreaseLM baseline (§2.8), which consumes the same $G$ as structural input to a graph neural network rather than as serialized text.
@@ -187,13 +168,13 @@ where $x$ is the rendered instance context (§2.11) and $\theta$ are the LoRA pa
 Class imbalance across both ST2 and ST3 is addressed via per-label, inverse-frequency loss weighting applied to completion tokens (`--pos-weight`); the rarest labels (`hfss_food_marketing`, `insufficient_context`) receive a weight of $50\times$. Formally, training minimizes a per-token, per-label-weighted negative log-likelihood over completion tokens,
 
 $$
-\theta^\star = \arg\min_\theta \; -\sum_{i=1}^{N}\sum_{j=1}^{|y_i|} w(y_{i,j}) \, \log p_\theta\big(y_{i,j} \mid y_{i,<j},\, x_i,\, \mathrm{flow\_to\_text}(G)\big),
+\theta^\star = \arg\min_\theta \quad -\sum_{i=1}^{N}\sum_{j=1}^{|y_i|} w(y_{i,j}) \log p_\theta\big(y_{i,j} \mid y_{i,<j}, x_i, \phi(G)\big),
 $$
 
 where the per-label weight
 
 $$
-w(\ell) = \min\!\left(\frac{n_{\max}}{n_\ell},\ 50\right), \qquad \ell \in \mathcal{L}_{\text{ST2}} \cup \mathcal{L}_{\text{ST3}},
+w(\ell) = \min\left(\frac{n_{\max}}{n_\ell}, 50\right), \qquad \ell \in \mathcal{L}_{\text{ST2}} \cup \mathcal{L}_{\text{ST3}},
 $$
 
 is the inverse-frequency weight applied to completion tokens belonging to label $\ell$, capped so that the rarest labels reach the reported $50\times$ ceiling. Model selection across epochs uses `mean_macro_f1` computed via free-form generation (`model.generate()`) against a held-out split, rather than teacher-forced loss, so that the selection criterion matches the deployed inference procedure. Our best-performing configuration is:
@@ -226,7 +207,7 @@ $$
 and read the deployed prediction for subtask $t$ from that adapter alone,
 
 $$
-\hat y_t = f\big(x,\ \mathrm{flow\_to\_text}(G);\ \theta_0,\ a(t)\big),
+\hat y_t = f\big(x, \phi(G); \theta_0, a(t)\big),
 $$
 
 with the base model $\theta_0$ loaded once and shared across both selections. The ST3 adapter reached the highest development-set ST3 score observed for any Qwen3-4B configuration in this project (`st3_macro_f1 = 0.588`, alongside `st1_macro_f1 = 0.842` and `st2_macro_f1 = 0.709` at the same checkpoint), exceeding the single-adapter configuration reported as our headline result in §1 (`st3_macro_f1 = 0.555`). The ST1/ST2 adapter was trained with additional oversampling of instances carrying rare ST3 labels, one of several class-imbalance interventions explored to address the ST3 rare-label failure mode (§2.13, §3.2). Taken together, this per-tier composition outperforms every other Qwen3-4B and Qwen3-0.6B configuration tested over the course of this project on `mean_macro_f1`, across both the base-model-selection sweep (§2.10) and every subsequent hyperparameter and loss-weighting iteration (`runs/lora-qwen/results.csv`).
@@ -239,11 +220,11 @@ We note a limitation of this design: the per-tier assignment $a(t)$ reflects whi
 
 Table 1 restricts to systems reporting the full three-subtask `mean_macro_f1`, the metric directly comparable to our headline result.
 
-**Table 1: Comparison against baselines reporting a full 3-subtask mean_macro_f1.**
+**Table 1: Comparison against baselines reporting a full 3-subtask `mean_macro_f1`.**
 
 | System | Best score | Evaluation split | Source |
 |---|---|---|---|
-| **Qwen3-4B, joint LoRA (this work)** | **0.706 dev / 0.746 test** | dev $n=504$ / test\_holdout $n=500$ | `slurm_logs/8-17-runs/results_summary.md` |
+| **Qwen3-4B, joint LoRA (this work)** | **0.706 dev / 0.746 test** | dev $n=504$ / `test_holdout` $n=500$ | `slurm_logs/8-17-runs/results_summary.md` |
 | GPT-5.4, zero-shot (§2.7) | 0.641 | dev $n=504$ (not evaluated on test) | `runs/run_20260801_205209_full_gpt-5.4.log` |
 | Agentic RAG, GPT-5.4 (§2.7) | 0.637 | dev $n=504$ (not evaluated on test) | `runs/run_20260802_004514_agentic_rag_full_gpt-5.4.log` |
 | Frozen-encoder RoBERTa (§2.5) | 0.618 | dev only | `runs/run_20260808_202345_last_layer_train_...log` |
@@ -266,8 +247,27 @@ Our joint model outperforms the best independently trained classifier on all thr
 The label `hfss_food_marketing` scores $F_1 = 0.000$ at our selected checkpoint despite a $50\times$ loss weight, having reached $F_1 = 0.143$ at epoch 10 before regressing to zero by epoch 20: additional training past near-zero training loss actively erased this rare label rather than leaving its performance flat. Manual review of this label's annotations (`st3_findings.md`) found near-identical templated advertising copy from the same channel labeled inconsistently across videos, and positive instances that explicitly state "sugar-free," which is difficult to reconcile with a high-fat/salt/sugar rationale, evidence that the achievable ceiling for this label may be constrained by annotation noise rather than by model capacity alone.
 
 ### 3.3 Shared-task test submission
+```mermaid
+flowchart TD
+    S["start"]:::visited --> F["fact node<br/>binds segment text"]:::visited
+    F --> Q0{"Is the segment assessable<br/>enough to classify?"}:::visited
+    Q0 -->|sufficient context| Q1{"What commercial type is<br/>being promoted? (ST1)"}:::visited
+    Q0 -->|insufficient context| O0["outcome: insufficient_context<br/>(ST1, ST2 still assigned)"]:::skipped
+    Q1 --> Q2{"Which product categories<br/>apply to the segment? (ST2)"}:::visited
+    Q2 --> Q3{"Is the commercial nature left<br/>completely undisclosed?<br/>(undisclosed_advertising)"}:::visited
+    Q3 --> Q4{"If a disclosure exists, is it<br/>inadequate for a child audience?<br/>(inadequate_disclosure, exclusive with Q3)"}:::visited
+    Q4 --> Q5{"Does the segment directly appeal<br/>for children to buy, or persuade<br/>adults to buy for them? (direct_exhortation)"}:::visited
+    Q5 --> Q6{"Does it make an unsubstantiated or<br/>high-risk claim about the product?<br/>(misleading_claim)"}:::visited
+    Q6 --> Q7{"Is the promoted product age-restricted<br/>or prohibited? (age_restricted_or_prohibited_product)"}:::visited
+    Q7 --> Q8{"Does it clearly market food high in<br/>fat, salt, or sugar? (hfss_food_marketing)"}:::visited
+    Q8 --> O1["outcome node<br/>structured response template"]:::visited
+    O1 --> R["{st1, st2[], st3[]}<br/>rendered via flow_to_text(G)"]:::output
+    classDef visited fill:#d9ead3,stroke:#333,color:#000
+    classDef skipped fill:#cfe2f3,stroke:#333,color:#000
+    classDef output fill:#fff2cc,stroke:#333,color:#000
+```
 
-We generated predictions over the official, unlabeled test split ($n=503$) twice: first from the single joint adapter underlying the headline results in §1, and subsequently from the per-tier adapter composition of §2.15, which we consider the final submission. Neither is independently scorable, as the official test split ships without gold labels. As a sanity check, both submissions' label distributions fall within the ranges established across every development and held-out-test run reported in this document, including the persistent near-absence of `hfss_food_marketing` and `insufficient_context` documented in §3.2.
+We generated predictions over the official, unlabeled test split ($n=503$) twice: first from the single joint adapter underlying the headline results in §1, and subsequently from the per-tier adapter composition of §2.15, our final submission, in which both tier-specific adapters are loaded into memory alongside the shared frozen Qwen3-4B base and swapped in per subtask as each example is routed to its tier. Neither is independently scorable, as the official test split ships without gold labels. As a sanity check, both submissions' label distributions fall within the ranges established across every development and held-out-test run reported in this document, including the persistent near-absence of `hfss_food_marketing` and `insufficient_context` documented in §3.2.
 
 Once organizer-side scoring against the held-out gold labels was released on the shared task's competition website, our submission ranked 2nd on ST2 (product category) and 3rd on ST3 (advertising-compliance flags) among all participating systems.
 
@@ -299,7 +299,7 @@ Table 4 operationalizes the cost-and-generalizability question directly. Dev/tes
 | System | Training cost | Models required for full coverage | Inference | Accuracy | Dev/test agreement |
 |---|---|---|---|---|---|
 | Qwen3-4B, joint (this work) | 3h46m, 1 GPU, single run | 1 | Local generation, one pass/instance | 0.706 dev / 0.746 test | Measured: test $>$ dev, no overfitting signal |
-| Longformer, per-stage | $\sim$15–20 min/epoch $\times$ 5 configurations $\times$ 3 subtasks | 3–5 | Local, classification head | ST1 = 0.629 / ST2 = 0.808 / ST3 = 0.486 (test) | Measured per subtask |
+| Longformer, per-stage | ~15–20 min/epoch × 5 configurations × 3 subtasks | 3–5 | Local, classification head | ST1 = 0.629 / ST2 = 0.808 / ST3 = 0.486 (test) | Measured per subtask |
 | GPT-5.4, zero-shot | None | 1 prompt | Per-instance API call, cost scales with volume | 0.641 dev | Unmeasured |
 | Agentic RAG | None | 1 pipeline + retrieval index | API + retrieval per instance | 0.637 dev | Unmeasured |
 | GreaseLM | Graph construction + training | 1 model + graph-construction pipeline | Local, graph-dependent | 0.489 dev (300-instance subsample) | Unmeasured, non-standard data split |
@@ -353,32 +353,6 @@ The architectural choices in §2 are largely dataset-agnostic: a frozen base mod
 - **Rare ST3 labels remain difficult to learn.** `insufficient_context`, `hfss_food_marketing`, and `age_restricted_or_prohibited_product` (15–75 training instances each) are resistant to loss reweighting; §3.2 presents evidence that `hfss_food_marketing` specifically may face an annotation-noise ceiling rather than a purely representational limitation.
 - **No external legal-provisions retrieval is integrated into this system** (§3.4): the model relies on the taxonomy's own behavioral definitions rather than on retrieved statutory text, and we did not test whether supplying richer legal context improves flag prediction.
 - **Tier-2 destination-transaction flags are out of scope for this system**, consistent with the shared task's framing of Tier 2 as an opt-in track requiring off-platform data collection.
-- **The final submission's per-tier adapter assignment (§2.15) is not independently verified.** We do not have a controlled, side-by-side development-set comparison of both adapters recorded together, so the assignment is reported as deployed rather than as a verified result.
-- **Reported results are individual, noisy samples.** Given the 0.07–0.22 `mean_macro_f1` variation observed between identically configured runs on different random splits (§2.14), our headline result should be interpreted as one plausible outcome, not a precise estimate, pending replication.
-
-## 6. Reproducibility
-
-**Environment** (`requirements.txt`): `torch==2.13.0`, `transformers==5.14.1`, `peft==0.20.0`, `accelerate==1.14.0`. No `vllm`, `unsloth`, or `bitsandbytes` dependency is used; inference relies solely on the standard `transformers.generate()` API.
-
-**Command to reproduce the reported training run:**
-```
-python src/lora/lora_train_generative.py public_data_dev/train.jsonl public_data_dev/dev.jsonl \
-  --model Qwen/Qwen3-4B --context full --lean-prompt \
-  --df-path emnllp-dialog-flow-dialog-flow.json \
-  --epochs 20 --batch-size 1 --grad-accum-steps 4 --eval-every 10 \
-  --lora-r 8 --lora-alpha 16 --target-modules q_proj,k_proj,v_proj,o_proj \
-  --pos-weight --test-holdout 500 --eval-batch-size 16
-```
-
-**Command to compose the two adapters into the final submission (§2.15), given each adapter's standalone predictions:**
-```
-python src/combine_submissions.py public_data_test/test.jsonl \
-  --st1 <st1_st2_adapter_predictions>.jsonl --st2 <st1_st2_adapter_predictions>.jsonl \
-  --st3 <st3_adapter_predictions>.jsonl \
-  --out runs/submission_hybrid.jsonl
-```
-
-**Raw results for independent verification:** `runs/lora-qwen/results.csv` (Qwen ablation history), `runs/results_st1_classifiers.csv` (encoder-classifier track), `runs/baseline_decision_tree/results.csv` (classical ML baselines), `slurm_logs/8-17-runs/results_summary.md` (cross-system comparison), `st3_findings.md` (per-label context-sensitivity analysis).
 
 ## References
 
