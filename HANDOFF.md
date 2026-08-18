@@ -18,9 +18,13 @@ note below), r8/a16 LoRA on `query,value` only (Longformer's *global* attention 
 follow-up if this run looks promising). `--batch-size 2` (batch=4 OOM'd, batch=1 and 2 both fit;
 picked 2 for throughput — Longformer's HF eager sliding-window attention implementation is much
 more memory-hungry than its "linear attention" reputation suggests, no flash-attention kernel
-available for it). ~1.3-1.5 it/s, 956 steps/epoch, ETA ~50-60 min for all 5 epochs + evals —
-check `runs/run_20260818_012406_lora_train_st1_classifier_longformer.log` or `ps -p 1220782` for
+available for it). ~1.3-1.5 it/s, 956 steps/epoch — **revised ETA ~2h15m total** (per-epoch dev
+eval overhead is larger than expected; ~27 min/epoch observed once eval is included, not the
+~11 min/epoch training-only rate). Started 01:24, so expect completion ~03:40. Check
+`runs/run_20260818_012406_lora_train_st1_classifier_longformer.log` or `ps -p 1220782` for
 status. **This is the most important pending result — report it before starting anything else.**
+While waiting, also running a replicate of the ambiguous `--lora-dropout 0.2` result (see
+below) — `runs/st1-classifier-roberta-dropout2-rep2`.
 
 **Context-window sizing (answers "how much context would we need for everything"):** measured
 across all 2857 train+dev instances tokenized with `full_context`: median 1253 tokens, mean
