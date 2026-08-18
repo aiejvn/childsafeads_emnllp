@@ -1,32 +1,42 @@
-"""Train a LoRA-adapted BERT-family encoder (roBERTa/legal-bert) as a full 5-way
-classifier over st1 ("what kind of commercial offer, if any, does this transcript
-present?"): digital_content_or_services / none / other / physical_goods /
-physical_services.
+"""Train a LoRA-adapted BERT-family encoder (roBERTa/legal-bert) as a dedicated
+multi-label classifier over st3 ("which compliance risk flags apply to this
+transcript?", one or more of the 8 ST3_LABELS).
 
-Sibling of lora_train_st1_none.py, generalized from that script's binary none-vs-not
-probe to the full st1 taxonomy. Motivation: the childsafeads_emnllp autoresearch
-track (see lora_train_generative.py --st1-only) found a smaller, simpler
-encoder+MLP classifier is worth trying against the generative-LLM approach for st1,
-particularly because st1's minority classes (none/other, each well under 3%% of
-train) are prone to being ignored by a model optimizing overall accuracy -- the
-same "collapse to majority" failure mode lora_train_st1_none.py's docstring names
-for its binary probe, generalized here to the full 5-way task via --class-weight
-(inverse-train-frequency per-class CE weighting) and --oversample-rare-st1
-(duplicate rare-class train instances), both optional but recommended together.
+Sibling of lora_train_st1_classifier.py / lora_train_st2_classifier.py, generalized to
+st3's multi-label taxonomy the same way lora_train_st2_classifier.py was: BCE-with-logits
+in place of CE (--pos-weight, common.train_utils.compute_pos_weight, in place of
+--class-weight), per-label threshold tuning in place of argmax
+(common.predict_utils.tune_per_label_thresholds), and rare/majority oversampling that
+keys off "does this instance carry any rare label". Also applies st3's two
+submission-validity rules at decode time -- the same post-processing
+lora_train.py's joint model applies each dev epoch via common.predict_utils.decode --
+since without them, independent per-label thresholding can output invalid combinations
+that check_submission.py rejects and that would otherwise be scored as wrong for no
+good reason:
+  - resolve_disclosure_conflict: undisclosed_advertising and inadequate_disclosure are
+    mutually exclusive (see labels_taxonomy.md); keeps whichever the model is more
+    confident about.
+  - sanitize_st3: no_flag/insufficient_context must stand alone (enforced by
+    check_submission.py); collapses to whichever of those fired if either did, else
+    falls back to insufficient_context when nothing crossed threshold at all.
+Carries over every other lora_train_st1_classifier.py feature: --context/--max-length/
+--truncation-side/--page-token-budget, --test-holdout with a fresh-by-default random
+split, best/last checkpoint saving, and wandb logging.
 
 Usage (run from the repo root):
-    python src/lora/lora_train_st1_classifier.py public_data_dev/train.jsonl public_data_dev/dev.jsonl \\
-        --model FacebookAI/roberta-base --epochs 5 --batch-size 16 --class-weight \\
-        --oversample-rare-st1 3 --output-dir runs/lora_st1_classifier_roberta
-    python src/lora/lora_train_st1_classifier.py public_data_dev/train.jsonl public_data_dev/dev.jsonl \\
+    python src/lora/lora_train_st3_classifier.py public_data_dev/train.jsonl public_data_dev/dev.jsonl \\
+        --model FacebookAI/roberta-base --epochs 5 --batch-size 16 --pos-weight \\
+        --oversample-rare-st3 3 --output-dir runs/lora_st3_classifier_roberta
+    python src/lora/lora_train_st3_classifier.py public_data_dev/train.jsonl public_data_dev/dev.jsonl \\
         --sample-size 16 --epochs 1 --batch-size 4 --output-dir runs/lora_smoke  # smoke test
 
-Saves the best-dev-macro-F1 adapter+head to <output-dir>/best and the final epoch's
-to <output-dir>/last, plus that epoch's dev predictions.jsonl.
+Saves the best-dev-macro-F1 adapter+head to <output-dir>/best (plus that epoch's dev
+predictions.jsonl and tuned thresholds.json) and the final epoch's to <output-dir>/last.
 
-Pass --test-holdout N (default 500, matching lora_train_generative.py) to carve a random
+Pass --test-holdout N (default 500, matching lora_train_st1_classifier.py) to carve a random
 generalization-check split out of `train` -- evaluated once at the end with the best-dev
-checkpoint.
+checkpoint, decoded with the best-dev thresholds (not re-tuned on the holdout, which
+would leak its gold labels into threshold selection).
 """
 import argparse
 import json
@@ -43,12 +53,15 @@ from torch.utils.data import DataLoader, Dataset
 from tqdm import tqdm
 from transformers import AutoModelForSequenceClassification, AutoTokenizer, get_linear_schedule_with_warmup
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))  # so `import lora` resolves src/lora as a package
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))  # so `import lora`/`common` resolve src/lora, src/common as packages
 from peft import LoraConfig, PeftModel, TaskType, get_peft_model  # noqa: E402
-from lora import CONTEXT_CHOICES, ST1_LABELS, load_split, render_context, setup_logging  # noqa: E402
+from common.classification_data import ST3_INDEX, multi_hot  # noqa: E402
+from common.predict_utils import multi_hot_matrix, resolve_disclosure_conflict, tune_per_label_thresholds  # noqa: E402
+from common.train_utils import compute_pos_weight  # noqa: E402
+from lora import CONTEXT_CHOICES, ST3_LABELS, load_split, render_context, sanitize_st3, setup_logging  # noqa: E402
 
 
-class ST1Dataset(Dataset):
+class ST3Dataset(Dataset):
     def __init__(self, instances: list, tokenizer, context: str = "full", max_length: int = 512,
                  page_token_budget: int = None):
         self.instances = instances
@@ -86,7 +99,7 @@ class ST1Dataset(Dataset):
             input_ids, attention_mask = enc["input_ids"], enc["attention_mask"]
         item = {"instanceID": inst["instanceID"], "input_ids": input_ids, "attention_mask": attention_mask}
         if inst.get("labels"):
-            item["label"] = ST1_LABELS.index(inst["labels"]["st1"])
+            item["label"] = multi_hot(inst["labels"]["st3"], ST3_INDEX)
         return item
 
 
@@ -99,26 +112,31 @@ class Collator:
         padded = self.tokenizer.pad(encodings, return_tensors="pt")
         out = {"instanceID": [b["instanceID"] for b in batch], **padded}
         if "label" in batch[0]:
-            out["labels"] = torch.tensor([b["label"] for b in batch], dtype=torch.long)
+            out["labels"] = torch.tensor([b["label"] for b in batch], dtype=torch.float)
         return out
+
+
+def label_frequency(instances: list) -> dict:
+    n = len(instances)
+    counts = Counter(flag for inst in instances for flag in inst["labels"]["st3"])
+    return {label: counts.get(label, 0) / n for label in ST3_LABELS}
 
 
 def compute_minority_labels(instances: list, threshold: float) -> set:
     """Labels whose train-set frequency is below `threshold` -- same rare-label definition
     oversample_rare/undersample_majority use, but computed once from the pristine
-    pre-oversampling train split and held fixed for the run, so --oversample-rare-st1's
+    pre-oversampling train split and held fixed for the run, so --oversample-rare-st3's
     duplication can't inflate a label's apparent frequency out of "minority" status
     partway through training. Mirrors lora_train_generative.py's --minority-select
-    compute_minority_labels, single-label form."""
-    freq = Counter(inst["labels"]["st1"] for inst in instances)
-    n = len(instances)
-    return {label for label in ST1_LABELS if freq.get(label, 0) / n < threshold}
+    compute_minority_labels."""
+    freq = label_frequency(instances)
+    return {label for label in ST3_LABELS if freq[label] < threshold}
 
 
 def minority_majority_f1(per_label_f1: dict, minority_labels: set) -> tuple:
     """Mean F1 over minority-labeled vs majority-labeled entries of `per_label_f1` -- surfaces
-    whether a checkpoint that looks good on mean/macro F1 is actually still failing the rare
-    classes optimizing for overall accuracy tends to collapse onto (see module docstring)."""
+    whether a checkpoint that looks good on macro F1 is actually still failing the rare
+    flags optimizing for overall accuracy tends to under-serve."""
     minority_scores = [f1 for label, f1 in per_label_f1.items() if label in minority_labels]
     majority_scores = [f1 for label, f1 in per_label_f1.items() if label not in minority_labels]
     minority_f1 = sum(minority_scores) / len(minority_scores) if minority_scores else float("nan")
@@ -126,58 +144,45 @@ def minority_majority_f1(per_label_f1: dict, minority_labels: set) -> tuple:
     return minority_f1, majority_f1
 
 
-def compute_class_weight(instances: list) -> torch.Tensor:
-    """Inverse-train-frequency weight per st1 label (total / count[c], clamped to 50 like
-    common.train_utils.compute_class_weight) -- without it, unweighted CE mostly ignores
-    none/other (each well under 3%% of train) in favor of the two majority classes."""
-    counts = torch.zeros(len(ST1_LABELS))
-    for inst in instances:
-        counts[ST1_LABELS.index(inst["labels"]["st1"])] += 1
-    total = len(instances)
-    return (total / counts.clamp(min=1)).clamp(max=50.0)
-
-
 def oversample_rare(instances: list, factor: int, threshold: float = 0.05) -> tuple:
-    """Duplicate every train instance whose gold st1 falls under `threshold` train-frequency
-    `factor` times over -- same rare-label definition lora_train_generative.py's
-    --oversample-rare-st1 uses, computed pre-oversampling so the rare set can't shift under
-    its own duplication. Returns (oversampled_instances, rare_labels) for logging."""
+    """Duplicate every train instance that carries at least one gold st3 label under
+    `threshold` train-frequency `factor` times over. An instance can carry several st3
+    flags at once, so "rare" is decided per-label and an instance qualifies for
+    duplication if any one of its flags is rare. Returns (oversampled_instances,
+    rare_labels) for logging."""
     if factor <= 1:
         return instances, set()
-    freq = Counter(inst["labels"]["st1"] for inst in instances)
-    n = len(instances)
-    rare = {label for label in ST1_LABELS if freq.get(label, 0) / n < threshold}
+    freq = label_frequency(instances)
+    rare = {label for label in ST3_LABELS if freq[label] < threshold}
     out = []
     for inst in instances:
         out.append(inst)
-        if inst["labels"]["st1"] in rare:
+        if rare & set(inst["labels"]["st3"]):
             out += [inst] * (factor - 1)
     return out, rare
 
 
 def undersample_majority(instances: list, factor: int, seed: int, threshold: float = 0.05) -> tuple:
-    """Randomly drop train instances whose gold st1 is at/above `threshold` train-frequency down
-    to 1/factor of their original count -- the complementary lever to oversample_rare (shrinking
-    the majority classes instead of duplicating the rare ones). Same rare/majority split point
-    (computed pre-undersampling) as oversample_rare uses. Returns (instances, majority_labels)."""
+    """Randomly drops instances whose gold st3 flags are ALL at/above `threshold`
+    train-frequency (i.e. carry no rare flag) down to 1/factor of that group's original
+    count -- the complementary lever to oversample_rare. Instances carrying any rare
+    flag are always kept, since dropping them would double-penalize the rare classes
+    this function isn't meant to touch. Same rare/majority split point (computed
+    pre-undersampling) as oversample_rare uses. Returns (instances, majority_labels)."""
     if factor <= 1:
         return instances, set()
-    freq = Counter(inst["labels"]["st1"] for inst in instances)
-    n = len(instances)
-    majority = {label for label in ST1_LABELS if freq.get(label, 0) / n >= threshold}
+    freq = label_frequency(instances)
+    majority = {label for label in ST3_LABELS if freq[label] >= threshold}
+    majority_only = [inst for inst in instances if set(inst["labels"]["st3"]) <= majority]
+    rare_bearing = [inst for inst in instances if not (set(inst["labels"]["st3"]) <= majority)]
     rng = random.Random(seed)
-    out = []
-    for label in ST1_LABELS:
-        label_instances = [inst for inst in instances if inst["labels"]["st1"] == label]
-        if label in majority:
-            keep_n = max(1, len(label_instances) // factor)
-            label_instances = rng.sample(label_instances, keep_n)
-        out.extend(label_instances)
-    return out, majority
+    keep_n = max(1, len(majority_only) // factor)
+    majority_only = rng.sample(majority_only, keep_n)
+    return rare_bearing + majority_only, majority
 
 
 def build_model(model_path: str, lora_r: int, lora_alpha: int, lora_dropout: float, target_modules: list):
-    model = AutoModelForSequenceClassification.from_pretrained(model_path, num_labels=len(ST1_LABELS))
+    model = AutoModelForSequenceClassification.from_pretrained(model_path, num_labels=len(ST3_LABELS))
     lora_config = LoraConfig(
         task_type=TaskType.SEQ_CLS,  # peft auto-adds the classifier head to modules_to_save for this task type
         target_modules=target_modules,
@@ -194,54 +199,98 @@ def to_device(batch: dict, device: str) -> dict:
 
 @torch.no_grad()
 def run_inference(model, loader, device) -> tuple:
-    """Returns (instanceIDs, pred_indices, logits) over the whole split -- pred_indices is
-    argmax(logits, dim=-1), the model's single most-likely st1 label per instance (standard
-    multi-class decoding, no per-class threshold needed unlike the binary none-probe's
-    tuned-threshold approach)."""
-    ids, preds, all_logits = [], [], []
+    """Returns (instanceIDs, probs) over the whole split -- probs is sigmoid(logits),
+    one probability per st3 label per instance."""
+    ids, all_probs = [], []
     for batch in tqdm(loader, desc="predicting", leave=False):
         batch = to_device(batch, device)
         logits = model(input_ids=batch["input_ids"], attention_mask=batch["attention_mask"]).logits
         ids.extend(batch["instanceID"])
-        preds.append(logits.argmax(dim=-1).cpu())
-        all_logits.append(logits.cpu())
-    return ids, torch.cat(preds), torch.cat(all_logits)
+        all_probs.append(torch.sigmoid(logits).cpu())
+    return ids, torch.cat(all_probs)
 
 
-def multiclass_metrics(gold: list, pred: list) -> dict:
-    """Per-label F1 (one-vs-rest TP/FP/FN over ST1_LABELS) + their macro average --
-    the same computation lora_train_generative.py's per-label st1 F1 logging does, kept
-    self-contained here rather than importing sklearn."""
+def decode(probs: torch.Tensor, thresholds: torch.Tensor) -> list:
+    """Per-label threshold decode + the two st3 submission-validity rules (see module
+    docstring): resolve_disclosure_conflict, then sanitize_st3. Returns a list of flag
+    lists, one per instance."""
+    preds = []
+    for i in range(probs.shape[0]):
+        flags = [ST3_LABELS[j] for j in range(len(ST3_LABELS)) if probs[i, j] >= thresholds[j]]
+        flags = sanitize_st3(resolve_disclosure_conflict(flags, probs[i]))
+        preds.append(flags)
+    return preds
+
+
+def flags_to_multihot(flags_list: list) -> torch.Tensor:
+    mat = torch.zeros(len(flags_list), len(ST3_LABELS))
+    for i, flags in enumerate(flags_list):
+        for f in flags:
+            mat[i, ST3_LABELS.index(f)] = 1.0
+    return mat
+
+
+def multilabel_metrics(pred: torch.Tensor, gold: torch.Tensor) -> dict:
+    """Per-label F1 (independent binary decision per label, on the sanitized prediction)
+    + their macro average, plus exact_match (subset accuracy: every flag correct for
+    the instance) -- the multi-label analogue of lora_train_st1_classifier.py's
+    multiclass_metrics."""
     per_label_f1 = {}
-    for idx, label in enumerate(ST1_LABELS):
-        tp = sum(1 for g, p in zip(gold, pred) if g == idx and p == idx)
-        fp = sum(1 for g, p in zip(gold, pred) if g != idx and p == idx)
-        fn = sum(1 for g, p in zip(gold, pred) if g == idx and p != idx)
+    for j, label in enumerate(ST3_LABELS):
+        tp = (pred[:, j] * gold[:, j]).sum().item()
+        fp = (pred[:, j] * (1 - gold[:, j])).sum().item()
+        fn = ((1 - pred[:, j]) * gold[:, j]).sum().item()
         precision = tp / (tp + fp) if (tp + fp) else 0.0
         recall = tp / (tp + fn) if (tp + fn) else 0.0
         per_label_f1[label] = 2 * precision * recall / (precision + recall + 1e-9) if (tp + fp + fn) else 0.0
-    accuracy = sum(1 for g, p in zip(gold, pred) if g == p) / len(gold) if gold else 0.0
+    exact_match = (pred == gold).all(dim=1).float().mean().item() if len(gold) else 0.0
     return {
-        "accuracy": accuracy,
+        "exact_match": exact_match,
         "macro_f1": sum(per_label_f1.values()) / len(per_label_f1),
         "per_label_f1": per_label_f1,
     }
 
 
-def evaluate_split(model, loader, instances: list, device: str) -> tuple:
-    ids, pred, logits = run_inference(model, loader, device)
-    gold = [ST1_LABELS.index(inst["labels"]["st1"]) for inst in instances]
-    pred_list = pred.tolist()
-    metrics = multiclass_metrics(gold, pred_list)
-    metrics["loss"] = F.cross_entropy(logits, torch.tensor(gold, dtype=torch.long)).item()
-    return metrics, ids, gold, pred_list
+def evaluate_split(model, loader, instances: list, device: str, thresholds: torch.Tensor = None) -> tuple:
+    """If `thresholds` is None, tunes per-label thresholds against this split's own gold
+    labels (dev, per epoch) on the raw (pre-sanitize) sigmoid outputs, same as
+    lora_train.py's tune_and_decode. If given (the best-dev checkpoint's saved
+    thresholds), reuses them as-is instead of re-tuning -- required for the
+    test-holdout pass, since tuning on the holdout's own gold would leak it into
+    threshold selection."""
+    ids, probs = run_inference(model, loader, device)
+    gold = multi_hot_matrix(instances, "st3", ST3_LABELS)
+    if thresholds is None:
+        thresholds = tune_per_label_thresholds(probs, gold)
+    pred_flags = decode(probs, thresholds)
+    pred = flags_to_multihot(pred_flags)
+    metrics = multilabel_metrics(pred, gold)
+    metrics["loss"] = F.binary_cross_entropy(probs.clamp(1e-6, 1 - 1e-6), gold).item()
+    return metrics, ids, gold, pred, thresholds
 
 
-def write_predictions(path: str, ids: list, gold: list, pred: list) -> None:
+def write_predictions(path: str, ids: list, gold: torch.Tensor, pred: torch.Tensor) -> None:
     os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
         for iid, g, p in zip(ids, gold, pred):
-            f.write(json.dumps({"instanceID": iid, "gold_st1": ST1_LABELS[g], "pred_st1": ST1_LABELS[p]}) + "\n")
+            gold_labels = [ST3_LABELS[j] for j in range(len(ST3_LABELS)) if g[j] == 1]
+            pred_labels = [ST3_LABELS[j] for j in range(len(ST3_LABELS)) if p[j] == 1]
+            f.write(json.dumps({"instanceID": iid, "gold_st3": gold_labels, "pred_st3": pred_labels}) + "\n")
+
+
+def save_thresholds(output_dir: str, thresholds: torch.Tensor) -> None:
+    os.makedirs(output_dir, exist_ok=True)
+    with open(os.path.join(output_dir, "thresholds.json"), "w", encoding="utf-8") as f:
+        json.dump({label: t for label, t in zip(ST3_LABELS, thresholds.tolist())}, f, indent=2)
+
+
+def load_thresholds(checkpoint_dir: str):
+    path = os.path.join(checkpoint_dir, "thresholds.json")
+    if not os.path.exists(path):
+        return None
+    with open(path, encoding="utf-8") as f:
+        data = json.load(f)
+    return torch.tensor([data[label] for label in ST3_LABELS])
 
 
 def log_metrics(log, prefix: str, metrics: dict) -> None:
@@ -295,37 +344,42 @@ def main():
     ap.add_argument(
         "--head-lr", type=float, default=None,
         help="separate LR for the randomly-initialized classifier head (modules_to_save); "
-        "defaults to --lr (one param group) when omitted, same idea as lora_train_st1_none.py's --head-lr",
+        "defaults to --lr (one param group) when omitted, same idea as lora_train_st1_classifier.py's --head-lr",
     )
     ap.add_argument("--warmup-ratio", type=float, default=0.06)
     ap.add_argument("--lora-r", type=int, default=8)
     ap.add_argument("--lora-alpha", type=int, default=16)
     ap.add_argument("--lora-dropout", type=float, default=0.1)
     ap.add_argument("--target-modules", default="query,value", help="comma-separated module names to LoRA-adapt")
-    ap.add_argument("--class-weight", action="store_true", help="reweight CE by inverse train-set "
-                     "frequency per st1 label -- recommended, since none/other are each under 3%% "
-                     "of train and unweighted CE tends to collapse to only the majority classes")
-    ap.add_argument("--oversample-rare-st1", type=int, default=1, help="duplicate each train instance "
-                     "whose gold st1 is under 5%% train frequency this many times over. 1 (default) "
-                     "disables oversampling; composes with --class-weight (different mechanisms -- "
-                     "this changes how often the model sees rare examples per epoch, class-weight "
-                     "scales their loss)")
-    ap.add_argument("--undersample-majority-st1", type=int, default=1, help="randomly drop train "
-                     "instances whose gold st1 is at/above 5%% train frequency down to 1/factor of "
-                     "their original count -- complementary lever to --oversample-rare-st1 (shrinks "
-                     "the majority classes instead of duplicating the rare ones). 1 (default) "
-                     "disables it; can be combined with --oversample-rare-st1")
+    ap.add_argument("--pos-weight", action="store_true", help="reweight BCE by inverse train-set "
+                     "frequency per st3 label (common.train_utils.compute_pos_weight) -- the "
+                     "multi-label analogue of lora_train_st1_classifier.py's --class-weight")
+    ap.add_argument(
+        "--threshold", type=float, default=0.5,
+        help="fallback per-label threshold for labels tune_per_label_thresholds can't tune "
+        "(only bites on tiny --sample-size smoke tests where a label has zero gold positives)",
+    )
+    ap.add_argument("--oversample-rare-st3", type=int, default=1, help="duplicate each train instance "
+                     "carrying a gold st3 label under 5%% train frequency this many times over. 1 "
+                     "(default) disables oversampling; composes with --pos-weight (different "
+                     "mechanisms -- this changes how often the model sees rare labels per epoch, "
+                     "pos-weight scales their loss)")
+    ap.add_argument("--undersample-majority-st3", type=int, default=1, help="randomly drop train "
+                     "instances whose gold st3 labels are all at/above 5%% train frequency down to "
+                     "1/factor of their original count -- complementary lever to "
+                     "--oversample-rare-st3 (shrinks the majority-only instances instead of "
+                     "duplicating the rare-bearing ones). 1 (default) disables it; can be combined "
+                     "with --oversample-rare-st3")
     ap.add_argument("--oversample-first", action="store_true", help="when combining both levers, "
-                     "apply --oversample-rare-st1 before --undersample-majority-st1 instead of the "
-                     "default order (undersample majority first, then oversample rare) -- changes "
-                     "both the exact instance counts (oversample_rare's factor multiplies whatever "
-                     "count the rare labels have at that point) and which labels cross the 5%% "
+                     "apply --oversample-rare-st3 before --undersample-majority-st3 instead of the "
+                     "default order (undersample majority-only first, then oversample rare-bearing) "
+                     "-- changes both the exact instance counts and which labels cross the 5%% "
                      "rare/majority threshold, since that split is recomputed on whatever "
                      "distribution exists when each function runs")
     ap.add_argument("--minority-freq-threshold", type=float, default=0.05, help="labels under this "
                      "train frequency (computed once from the pristine pre-oversampling train split) "
                      "count as 'minority' for the per-epoch minority/majority F1 log split -- same "
-                     "definition --oversample-rare-st1/--undersample-majority-st1 use, but tracked "
+                     "definition --oversample-rare-st3/--undersample-majority-st3 use, but tracked "
                      "independently of them so it stays meaningful even with both levers disabled")
     ap.add_argument("--sample-size", type=int, default=None, help="sample N train and N dev instances (seeded smoke test)")
     ap.add_argument("--test-holdout", type=int, default=500, help="hold out this many instances from "
@@ -350,12 +404,12 @@ def main():
         model_path = local_path
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    log = setup_logging("runs", "lora_train_st1_classifier", args.model.replace("/", "_"), timestamp)
+    log = setup_logging("runs", "lora_train_st3_classifier", args.model.replace("/", "_"), timestamp)
     log.info(f"config: {vars(args)} device={device}")
 
     wandb.init(
         project="childsafeads-emnllp",
-        name=f"lora_st1_classifier_{args.model.replace('/', '_')}_{timestamp}",
+        name=f"lora_st3_classifier_{args.model.replace('/', '_')}_{timestamp}",
         config=vars(args),
         mode="disabled" if args.no_wandb else "online",
     )
@@ -379,29 +433,29 @@ def main():
         train_instances = rng.sample(train_instances, min(args.sample_size, len(train_instances)))
         dev_instances = rng.sample(dev_instances, min(args.sample_size, len(dev_instances)))
 
-    train_dist = Counter(inst["labels"]["st1"] for inst in train_instances)
-    dev_dist = Counter(inst["labels"]["st1"] for inst in dev_instances)
+    train_freq = label_frequency(train_instances)
+    dev_dist = Counter(flag for inst in dev_instances for flag in inst["labels"]["st3"])
     log.info(f"train={len(train_instances)} dist=" + ", ".join(
-        f"{label}={train_dist.get(label, 0)} ({train_dist.get(label, 0) / len(train_instances):.1%})" for label in ST1_LABELS))
-    log.info(f"dev={len(dev_instances)} dist=" + ", ".join(f"{label}={dev_dist.get(label, 0)}" for label in ST1_LABELS))
+        f"{label}={train_freq[label] * len(train_instances):.0f} ({train_freq[label]:.1%})" for label in ST3_LABELS))
+    log.info(f"dev={len(dev_instances)} dist=" + ", ".join(f"{label}={dev_dist.get(label, 0)}" for label in ST3_LABELS))
 
     minority_labels = compute_minority_labels(train_instances, args.minority_freq_threshold)
-    log.info(f"minority st1 labels (train freq < {args.minority_freq_threshold}, fixed for the run): "
+    log.info(f"minority st3 labels (train freq < {args.minority_freq_threshold}, fixed for the run): "
              f"{sorted(minority_labels)}")
 
     def apply_undersample():
         nonlocal train_instances
-        train_instances, majority_labels = undersample_majority(train_instances, args.undersample_majority_st1, args.seed)
-        if args.undersample_majority_st1 > 1:
-            log.info(f"undersampled majority st1 labels {sorted(majority_labels)} to 1/{args.undersample_majority_st1}: "
-                     f"train now {len(train_instances)} instances")
+        train_instances, majority_labels = undersample_majority(train_instances, args.undersample_majority_st3, args.seed)
+        if args.undersample_majority_st3 > 1:
+            log.info(f"undersampled majority-only st3 instances (labels {sorted(majority_labels)}) to "
+                     f"1/{args.undersample_majority_st3}: train now {len(train_instances)} instances")
 
     def apply_oversample():
         nonlocal train_instances
-        train_instances, rare_labels = oversample_rare(train_instances, args.oversample_rare_st1)
-        if args.oversample_rare_st1 > 1:
-            log.info(f"oversampled rare st1 labels {sorted(rare_labels)} {args.oversample_rare_st1}x: "
-                     f"train now {len(train_instances)} instances")
+        train_instances, rare_labels = oversample_rare(train_instances, args.oversample_rare_st3)
+        if args.oversample_rare_st3 > 1:
+            log.info(f"oversampled rare-bearing st3 instances (labels {sorted(rare_labels)}) "
+                     f"{args.oversample_rare_st3}x: train now {len(train_instances)} instances")
 
     if args.oversample_first:
         apply_oversample()
@@ -410,14 +464,14 @@ def main():
         apply_undersample()
         apply_oversample()
 
-    class_weight = compute_class_weight(train_instances).to(device) if args.class_weight else None
-    if class_weight is not None:
-        log.info("class_weight: " + ", ".join(f"{label}={w:.3f}" for label, w in zip(ST1_LABELS, class_weight.tolist())))
+    pos_weight = compute_pos_weight(train_instances, "st3", ST3_LABELS).to(device) if args.pos_weight else None
+    if pos_weight is not None:
+        log.info("pos_weight: " + ", ".join(f"{label}={w:.3f}" for label, w in zip(ST3_LABELS, pos_weight.tolist())))
 
     tokenizer = AutoTokenizer.from_pretrained(model_path)
     tokenizer.truncation_side = args.truncation_side
-    train_ds = ST1Dataset(train_instances, tokenizer, args.context, args.max_length, args.page_token_budget)
-    dev_ds = ST1Dataset(dev_instances, tokenizer, args.context, args.max_length, args.page_token_budget)
+    train_ds = ST3Dataset(train_instances, tokenizer, args.context, args.max_length, args.page_token_budget)
+    dev_ds = ST3Dataset(dev_instances, tokenizer, args.context, args.max_length, args.page_token_budget)
     collate = Collator(tokenizer)
     train_loader = DataLoader(train_ds, batch_size=args.batch_size, shuffle=True, collate_fn=collate)
     dev_loader = DataLoader(dev_ds, batch_size=args.batch_size, shuffle=False, collate_fn=collate)
@@ -446,6 +500,7 @@ def main():
     )
 
     best_f1 = -1.0
+    thresholds = None
     os.makedirs(args.output_dir, exist_ok=True)
     for epoch in range(args.epochs):
         model.train()
@@ -453,7 +508,7 @@ def main():
         for step, batch in enumerate(tqdm(train_loader, desc=f"epoch {epoch + 1}/{args.epochs}")):
             batch = to_device(batch, device)
             logits = model(input_ids=batch["input_ids"], attention_mask=batch["attention_mask"]).logits
-            loss = F.cross_entropy(logits, batch["labels"], weight=class_weight)
+            loss = F.binary_cross_entropy_with_logits(logits, batch["labels"], pos_weight=pos_weight)
             (loss / args.grad_accum_steps).backward()
             running_loss += loss.item()
             if (step + 1) % args.grad_accum_steps == 0 or step + 1 == len(train_loader):
@@ -465,7 +520,7 @@ def main():
         log.info(f"epoch {epoch + 1}: mean train loss = {train_loss:.4f}")
 
         model.eval()
-        metrics, ids, gold, pred = evaluate_split(model, dev_loader, dev_instances, device)
+        metrics, ids, gold, pred, thresholds = evaluate_split(model, dev_loader, dev_instances, device)
         log_metrics(log, f"epoch {epoch + 1} dev metrics", metrics)
         minority_f1, majority_f1 = log_minority_f1(
             log, f"epoch {epoch + 1} dev minority/majority F1", metrics["per_label_f1"], minority_labels,
@@ -478,11 +533,13 @@ def main():
             best_f1 = metrics["macro_f1"]
             best_dir = os.path.join(args.output_dir, "best")
             model.save_pretrained(best_dir)
+            save_thresholds(best_dir, thresholds)
             write_predictions(os.path.join(best_dir, "predictions.jsonl"), ids, gold, pred)
             log.info(f"epoch {epoch + 1}: new best macro_f1={best_f1:.3f}, saved to {args.output_dir}/best")
 
     last_dir = os.path.join(args.output_dir, "last")
     model.save_pretrained(last_dir)
+    save_thresholds(last_dir, thresholds)
     write_predictions(os.path.join(last_dir, "predictions.jsonl"), ids, gold, pred)
     log.info(f"saved final epoch adapter to {args.output_dir}/last (best dev macro_f1={best_f1:.3f})")
     wandb.summary.update({f"final_dev_{k}": v for k, v in metrics.items() if k != "per_label_f1"})
@@ -491,18 +548,22 @@ def main():
 
     if test_holdout_instances:
         best_dir = os.path.join(args.output_dir, "best")
+        best_thresholds = load_thresholds(best_dir)
         log.info(f"reloading best-dev checkpoint from {best_dir} for the test-holdout pass "
-                 f"(generalization check, not used for model selection)")
+                 f"(generalization check, not used for model selection); reusing its dev-tuned "
+                 f"thresholds rather than re-tuning on the holdout, which would leak its gold labels")
         del model  # free the training model before loading a second full copy for holdout eval
         torch.cuda.empty_cache()
-        test_base = AutoModelForSequenceClassification.from_pretrained(model_path, num_labels=len(ST1_LABELS))
+        test_base = AutoModelForSequenceClassification.from_pretrained(model_path, num_labels=len(ST3_LABELS))
         test_model = PeftModel.from_pretrained(test_base, best_dir).to(device)
         test_model.eval()
         test_loader = DataLoader(
-            ST1Dataset(test_holdout_instances, tokenizer, args.context, args.max_length, args.page_token_budget),
+            ST3Dataset(test_holdout_instances, tokenizer, args.context, args.max_length, args.page_token_budget),
             batch_size=args.batch_size, shuffle=False, collate_fn=collate,
         )
-        test_metrics, test_ids, test_gold, test_pred = evaluate_split(test_model, test_loader, test_holdout_instances, device)
+        test_metrics, test_ids, test_gold, test_pred, _ = evaluate_split(
+            test_model, test_loader, test_holdout_instances, device, thresholds=best_thresholds,
+        )
         del test_model
         torch.cuda.empty_cache()
         log_metrics(log, "test holdout metrics", test_metrics)

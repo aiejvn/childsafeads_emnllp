@@ -13,3 +13,10 @@
 2026-08-18 02:10:38,411 | INFO | MainThread | epoch 2 dev metrics: accuracy=0.883, macro_f1=0.615, loss=0.649
 2026-08-18 02:10:38,412 | INFO | MainThread | epoch 2 dev metrics per-label F1: digital_content_or_services=0.895, none=0.593, other=0.000, physical_goods=0.909, physical_services=0.681
 2026-08-18 02:10:38,430 | INFO | MainThread | epoch 2: new best macro_f1=0.615, saved to runs/st1-classifier-longformer/best
+2026-08-18 02:24:35,161 | INFO | MainThread | epoch 3: mean train loss = 0.3086
+2026-08-18 02:25:54,559 | INFO | MainThread | epoch 3 dev metrics: accuracy=0.879, macro_f1=0.594, loss=0.772
+2026-08-18 02:25:54,560 | INFO | MainThread | epoch 3 dev metrics per-label F1: digital_content_or_services=0.895, none=0.462, other=0.000, physical_goods=0.901, physical_services=0.714
+2026-08-18 02:39:55,321 | INFO | MainThread | epoch 4: mean train loss = 0.2388
+2026-08-18 02:41:21,234 | INFO | MainThread | epoch 4 dev metrics: accuracy=0.889, macro_f1=0.587, loss=0.715
+2026-08-18 02:41:21,234 | INFO | MainThread | epoch 4 dev metrics per-label F1: digital_content_or_services=0.907, none=0.400, other=0.000, physical_goods=0.912, physical_services=0.714
+2026-08-18 02:55:27,226 | INFO | MainThread | epoch 5: mean train loss = 0.1646
