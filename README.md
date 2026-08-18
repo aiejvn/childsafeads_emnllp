@@ -168,7 +168,7 @@ where $x$ is the rendered instance context (§2.11) and $\theta$ are the LoRA pa
 Class imbalance across both ST2 and ST3 is addressed via per-label, inverse-frequency loss weighting applied to completion tokens (`--pos-weight`); the rarest labels (`hfss_food_marketing`, `insufficient_context`) receive a weight of $50\times$. Formally, training minimizes a per-token, per-label-weighted negative log-likelihood over completion tokens,
 
 $$
-\theta^\star = \arg\min_\theta \quad -\sum_{i=1}^{N}\sum_{j=1}^{|y_i|} w(y_{i,j}) \log p_\theta\big(y_{i,j} \mid y_{i,<j}, x_i, \phi(G)\big),
+\theta^\star = \arg\min_\theta \quad -\sum_{i=1}^{N}\sum_{j=1}^{|y_i|} w(y_{i,j}) \log p_\theta\big(y_{i,j} \mid y_{i,\lt j}, x_i, \phi(G)\big),
 $$
 
 where the per-label weight
