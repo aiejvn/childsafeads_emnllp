@@ -2,7 +2,7 @@
 
 ## Abstract
 
-We describe a system for the ChildSafeAds shared task that fine-tunes Qwen3-4B (Qwen Team, 2025) with Low-Rank Adaptation (LoRA; Hu et al., 2021) to generate all three subtask labels, namely commercial type (ST1), product category (ST2), and advertising-compliance flags (ST3), as a single structured completion per instance, conditioned on an expert-authored reasoning scaffold we term a *dialog flow*. This joint, generation-based formulation outperforms every alternative architecture we evaluated on the shared macro-F1 metric, including frontier LLMs like GPT-5.4, both zero-shot and as a frontier agent augmented with retrieval-augmented generation against a legal knowledge base (Lewis et al., 2020), five independently trained per-stage Longformer classifiers (Beltagy et al., 2020), and a graph-reasoning baseline built on GreaseLM (Zhang et al., 2022):
+On the official ChildSafeAds leaderboard, our submission placed 4th ovrerall, 2nd on Subtask 2, and 3rd on Subtask 3 among all participating systems. We achieve this by fine-tuning Qwen3-4B (Qwen Team, 2025) with Low-Rank Adaptation (LoRA; Hu et al., 2021) to generate all three subtask labels, namely commercial type (Subtask 1), product category (Subtask 2), and advertising-compliance flags (Subtask 3), as a single structured completion per instance, conditioned on an expert-authored reasoning scaffold we term a **dialog flow**: a directed-graph encoding of the labeling taxonomy's own decision procedure, where each node pairs a legal test with an explicit answer set and free-text, expert-authored instructions for resolving it, including how it relates to and excludes neighboring tests, authored by a legal domain expert and rendered as compact plain-text pre-context prepended to every prompt (§2.12). This scaffold is the central novel contribution of our system: it lets the model condition on the taxonomy's reasoning structure directly rather than infer it from prose, and it doubles as a portable representation, since the same flow, unchanged, is also rendered as a knowledge graph to build our GreaseLM baseline (§2.8), so every system in this report reasons over one shared, expert-authored decision procedure rather than each re-deriving it from the task description. This joint, generation-based formulation outperforms every alternative architecture we evaluated on the shared macro-F1 metric, including frontier LLMs like GPT-5.4, both zero-shot and as a frontier agent augmented with retrieval-augmented generation against a legal knowledge base (Lewis et al., 2020), five independently trained per-stage Longformer classifiers (Beltagy et al., 2020), and a graph-reasoning baseline built on GreaseLM (Zhang et al., 2022):
 
 | System | dev ST1 | dev ST2 | dev ST3 | dev ST3-family | dev mean |
 |---|---|---|---|---|---|
@@ -12,11 +12,11 @@ We describe a system for the ChildSafeAds shared task that fine-tunes Qwen3-4B (
 | GPT-5.4, agentic RAG against a legal knowledge base | 0.723 | **0.726** | 0.463 | 0.616 | 0.637 |
 | GreaseLM (300-instance dev subsample) | 0.671 | 0.450 | 0.346 | 0.491 | 0.489 |
 
-The deployed final submission refines this single-adapter result further: it composes predictions from two independently trained instances of the same architecture, selected per subtask (§2.15), rather than from one checkpoint alone. On the official shared-task leaderboard, this submission placed 2nd on ST2 and 3rd on ST3 among all participating systems (§3.3). The remainder of this report specifies the method, its training and evaluation protocol, the comparison against every alternative system we implemented, and its cost/generalization trade-offs and limitations.
+The deployed final submission refines this single-adapter result further: it composes predictions from two independently trained instances of the same architecture, selected per subtask (§2.15), rather than from one checkpoint alone; see §3.3 for the leaderboard result. The remainder of this report specifies the method, its training and evaluation protocol, the comparison against every alternative system we implemented, and its cost/generalization trade-offs and limitations.
 
 ## 1. Task Formulation
 
-The shared task decomposes into three subtasks over child-facing commercial video segments, each scored by macro-averaged F1 (Sokolova and Lapalme, 2009) and combined into a single `mean_macro_f1`:
+The shared task decomposes into three subtasks, Subtask 1 (ST1), Subtask 2 (ST2), and Subtask 3 (ST3), over child-facing commercial video segments, each scored by macro-averaged F1 (Sokolova and Lapalme, 2009) and combined into a single `mean_macro_f1`:
 
 - **ST1** (single-label): commercial type, one of `physical_goods`, `digital_content_or_services`, `physical_services`, `none`, `other`.
 - **ST2** (multi-label): product category, 12 labels (e.g. `apps`, `gambling`, `gambling_adjacent`).
@@ -56,7 +56,7 @@ Of the three encoder architectures we evaluate as per-stage classifiers, Longfor
 
 ### 2.5 Frozen-Encoder RoBERTa Baseline
 
-A RoBERTa-base encoder with only its final layers unfrozen and no adapter-based fine-tuning (`src/last_layer/`), evaluated on the development set only.
+A RoBERTa-base encoder with only its final layer unfrozen and no adapter-based fine-tuning (`src/last_layer/`), evaluated on the development set only.
 
 ### 2.6 Span-Based Disclosure Tagger
 
@@ -64,7 +64,7 @@ A RoBERTa-base token-classification model trained to tag disclosure-relevant spa
 
 ### 2.7 Zero-Shot and Retrieval-Augmented Prompting
 
-We evaluate zero-shot prompting of GPT-5.4 (OpenAI, 2026) against the task's full taxonomy prompt, and an agentic retrieval-augmented variant (Lewis et al., 2020) that iteratively queries OpenJustice's hosted vector store before producing a final prediction (`src/baseline_agentic_rag.py`). Neither was evaluated against the held-out test split.
+We evaluate zero-shot prompting of GPT-5.4 (OpenAI, 2026) against the task's full taxonomy prompt, and an agentic retrieval-augmented generation (agentic RAG; Lewis et al., 2020) variant that iteratively queries a public legal vector knowledge database before producing a final prediction (`src/baseline_agentic_rag.py`). Neither was evaluated against the held-out test split.
 
 ### 2.8 Graph-Reasoning Baseline: GreaseLM
 
@@ -82,7 +82,6 @@ with $W_0$ kept frozen and only $B$ and $A$ trained. We use rank $r=8$, scaling 
 
 The end-to-end system is shown in Figure 1.
 
-**Figure 1: System architecture.**
 ```mermaid
 flowchart TD
     A["Raw instance<br/>(transcript, video_context, product_page)"] --> B["Context renderer<br/>4 rungs: transcript / no_product_page /<br/>st2_page / full; src/common/__init__.py"]
@@ -94,6 +93,8 @@ flowchart TD
     G --> H["{st1, st2[], st3[]} prediction"]
     H --> I["macro-F1 evaluation<br/>src/st3_eval.py, shared across all systems compared in this section"]
 ```
+
+**Figure 1: System architecture.**
 
 Model weights are loaded exclusively from local storage (`local_files_only=True`); no runtime download from the Hugging Face Hub occurs. Training and inference are conducted in bfloat16 full precision, following the mixed-precision training regime of Micikevicius et al. (2018); a 4-bit quantized (QLoRA-style) code path is implemented but was not exercised in any reported run, as it was not required to fit training within our compute budget (§2.13).
 
@@ -117,25 +118,23 @@ A finer-grained, per-label analysis (`st3_findings.md`) found that context sensi
 
 ### 2.12 Dialog-Flow-Augmented Prompting
 
-In addition to a compact natural-language statement of the label taxonomy, every prompt is prepended with a structured, expert-authored reasoning scaffold that we refer to, following the terminology of its authoring platform, as a **dialog flow**. Dialog flows are authored in OpenJustice, a browser-based legal-reasoning authoring and hosted-execution platform developed by the Conflict Analytics Lab, used elsewhere in this project for the agentic-RAG (`src/baseline_agentic_rag.py`) and dialog-flow-execution (`src/baseline_df.py`) baselines; the flow used here (`emnllp-dialog-flow-dialog-flow.json`) encodes the shared task's own labeling procedure as an explicit directed graph, authored by a domain collaborator with reference to `public_data_dev/labels_taxonomy.md`. Figure 2 situates this scaffold within our two adapter-based designs (§2.9 and §2.15); Figure 3 walks through a toy example of the reasoning structure it encodes.
-
-**Figure 2: Training and composition process for our two adapter-based designs.** Blue boxes represent frozen model weights, green boxes represent trainable LoRA parameters, yellow boxes represent data and outputs, and dotted arrows represent the training method (LoRA prefix tuning applied to `q_proj, k_proj, v_proj, o_proj`). Notice that (a) joint single-adapter training and (b) per-tier adapter composition share the same frozen base model and training method, but (b) trains two independently configured adapters and selects between them per subtask (§2.15).
+In addition to a compact natural-language statement of the label taxonomy, every prompt is prepended with a structured, expert-authored reasoning scaffold that we refer to, following the terminology of its authoring platform, as a **dialog flow**. Dialog flows are authored in OpenJustice, a browser-based legal-reasoning authoring and hosted-execution platform developed by the Conflict Analytics Lab; the flow used here (`emnllp-dialog-flow-dialog-flow.json`) encodes the shared task's own labeling procedure as an explicit directed graph, authored by a domain collaborator with reference to `public_data_dev/labels_taxonomy.md`. Figure 2 situates this scaffold within our two adapter-based designs (§2.9 and §2.15); Figure 3 walks through a toy example of the reasoning structure it encodes.
 
 ```mermaid
 flowchart TB
     subgraph a["a) Joint Single-Adapter Training (§2.9, §2.12)"]
     direction TB
         A1["Train + dev instances<br/>(transcript, context, product page)"]:::data --> A3["Qwen3-4B base<br/>(frozen)"]:::frozen
-        A2["Dialog-flow scaffold<br/>flow_to_text(G)"]:::data --> A3
+        A2["Dialog-flow <br/>flow_to_text(G)"]:::data --> A3
         A3 -. "LoRA prefix tuning<br/>q/k/v/o_proj, r=8" .-> A4["Single LoRA adapter θ_joint"]:::trainable
         A4 --> A5["{st1, st2[], st3[]}<br/>joint completion"]:::data
     end
     subgraph b["b) Per-Tier Adapter Composition (§2.15)"]
     direction TB
-        B1["Same train + dev instances"]:::data --> B3a["Qwen3-4B base<br/>(frozen, shared)"]:::frozen
-        B1 --> B3b["Qwen3-4B base<br/>(frozen, shared)"]:::frozen
-        B3a -. "LoRA prefix tuning<br/>+ rare-ST3 oversampling" .-> B4a["Adapter θ1<br/>(ST1, ST2)"]:::trainable
-        B3b -. "LoRA prefix tuning<br/>ST3-tuned config" .-> B4b["Adapter θ2<br/>(ST3)"]:::trainable
+        B1["Same train + dev instances"]:::data --> B3["Qwen3-4B base<br/>(frozen, one shared copy θ0)"]:::frozen
+        B2["Dialog-flow <br/>flow_to_text(G)"]:::data --> B3
+        B3 -. "LoRA prefix tuning<br/>+ rare-ST3 oversampling" .-> B4a["Adapter θ1<br/>(ST1, ST2)"]:::trainable
+        B3 -. "LoRA prefix tuning<br/>ST3-tuned config" .-> B4b["Adapter θ2<br/>(ST3)"]:::trainable
         B4a --> B5["Per-subtask selection<br/>a(t) = argmax F1_t_dev(θ)"]:::data
         B4b --> B5
         B5 --> B6["Composed prediction<br/>st1,st2 from θ1; st3 from θ2"]:::data
@@ -145,23 +144,23 @@ flowchart TB
     classDef data fill:#fff2cc,stroke:#333
 ```
 
-**Structure.** A dialog flow is a small typed state machine. Our flow comprises 14 nodes and 13 edges spanning five node types: a `start` node; a `fact`-gathering node that binds the segment text; `reasoning` nodes, each a bounded question with an explicit answer set and free-text instructions for resolving it; a `switch` node implementing conditional branching; and `outcome` nodes specifying a structured response template. The flow encodes the exact decision sequence a human annotator would follow: an initial assessability check determines whether the segment supports a reliable ST3 judgment at all, routing to a dedicated `insufficient_context` outcome that still requires ST1 and ST2 to be assigned normally, since the taxonomy defines insufficient context as affecting ST3 only; this is followed, for assessable segments, by a commercial-type question (ST1), a product-category question (ST2), and then a strictly ordered sequence of six binary reasoning questions, one per Tier-1 ST3 flag other than the two housekeeping labels (`no_flag`, `insufficient_context`): `undisclosed_advertising`, `inadequate_disclosure`, `direct_exhortation`, `misleading_claim`, `age_restricted_or_prohibited_product`, and `hfss_food_marketing`, in the taxonomy's own dependency order. Each node's instructions state the taxonomy's mutual-exclusivity constraints explicitly: for instance, the `inadequate_disclosure` node is instructed not to fire if `undisclosed_advertising` has already fired, mirroring the taxonomy rule that the two are mutually exclusive. The flow terminates in an outcome node specifying the exact structured-response format the model should produce.
+**Figure 2: Training and composition process for our two adapter-based designs.** Blue boxes represent frozen model weights, green boxes represent trainable LoRA parameters, yellow boxes represent data and outputs, and dotted arrows represent the training method (LoRA prefix tuning applied to `q_proj, k_proj, v_proj, o_proj`). Notice that (a) joint single-adapter training and (b) per-tier adapter composition share the same frozen base model and training method, but (b) trains two independently configured adapters and selects between them per subtask (§2.15).
 
-**Figure 3: Toy example of the dialog-flow reasoning structure encoded by our scaffold.** Green nodes represent the strictly ordered sequence every instance's prompt encodes (an assessability check, ST1, ST2, then six binary Tier-1 ST3 reasoning questions in taxonomy dependency order), while the blue outcome node shows the alternate branch taken only when a segment is judged unassessable for ST3. The flow itself is static prompt pre-context, not an execution trace: no traversal happens at inference time, since the model conditions on the full rendered graph and generates all labels directly.
+**Structure:** A dialog flow is a small typed state machine. Our flow comprises 14 nodes and 13 edges spanning five node types: a `start` node; a `fact`-gathering node that binds the segment text; `reasoning` nodes, each a bounded question with an explicit answer set and free-text instructions for resolving it; a `switch` node implementing conditional branching; and `outcome` nodes specifying a structured response template. The flow encodes the exact decision sequence a human annotator would follow: an initial assessability check determines whether the segment supports a reliable ST3 judgment at all, routing to a dedicated `insufficient_context` outcome that still requires ST1 and ST2 to be assigned normally, since the taxonomy defines insufficient context as affecting ST3 only; this is followed, for assessable segments, by a commercial-type question (ST1), a product-category question (ST2), and then a strictly ordered sequence of six binary reasoning questions, one per Tier-1 ST3 flag other than the two housekeeping labels (`no_flag`, `insufficient_context`): `undisclosed_advertising`, `inadequate_disclosure`, `direct_exhortation`, `misleading_claim`, `age_restricted_or_prohibited_product`, and `hfss_food_marketing`, in the taxonomy's own dependency order. Each node's instructions state the taxonomy's mutual-exclusivity constraints explicitly: for instance, the `inadequate_disclosure` node is instructed not to fire if `undisclosed_advertising` has already fired, mirroring the taxonomy rule that the two are mutually exclusive. The flow terminates in an outcome node specifying the exact structured-response format the model should produce.
 
 ```mermaid
 flowchart TD
     S["start"]:::visited --> F["fact node<br/>binds segment text"]:::visited
-    F --> Q0{"assessability check"}:::visited
-    Q0 -->|sufficient context| Q1{"ST1: commercial type?"}:::visited
+    F --> Q0{"Is the segment assessable<br/>enough to classify?"}:::visited
+    Q0 -->|sufficient context| Q1{"What commercial type is<br/>being promoted? (ST1)"}:::visited
     Q0 -->|insufficient context| O0["outcome: insufficient_context<br/>(ST1, ST2 still assigned)"]:::skipped
-    Q1 --> Q2{"ST2: product category?"}:::visited
-    Q2 --> Q3{"undisclosed_advertising?"}:::visited
-    Q3 --> Q4{"inadequate_disclosure?<br/>(exclusive with Q3)"}:::visited
-    Q4 --> Q5{"direct_exhortation?"}:::visited
-    Q5 --> Q6{"misleading_claim?"}:::visited
-    Q6 --> Q7{"age_restricted_or_prohibited_product?"}:::visited
-    Q7 --> Q8{"hfss_food_marketing?"}:::visited
+    Q1 --> Q2{"Which product categories<br/>apply to the segment? (ST2)"}:::visited
+    Q2 --> Q3{"Is the commercial nature left<br/>completely undisclosed?<br/>(undisclosed_advertising)"}:::visited
+    Q3 --> Q4{"If a disclosure exists, is it<br/>inadequate for a child audience?<br/>(inadequate_disclosure, exclusive with Q3)"}:::visited
+    Q4 --> Q5{"Does the segment directly appeal<br/>for children to buy, or persuade<br/>adults to buy for them? (direct_exhortation)"}:::visited
+    Q5 --> Q6{"Does it make an unsubstantiated or<br/>high-risk claim about the product?<br/>(misleading_claim)"}:::visited
+    Q6 --> Q7{"Is the promoted product age-restricted<br/>or prohibited? (age_restricted_or_prohibited_product)"}:::visited
+    Q7 --> Q8{"Does it clearly market food high in<br/>fat, salt, or sugar? (hfss_food_marketing)"}:::visited
     Q8 --> O1["outcome node<br/>structured response template"]:::visited
     O1 --> R["{st1, st2[], st3[]}<br/>rendered via flow_to_text(G)"]:::output
     classDef visited fill:#d9ead3,stroke:#333
@@ -169,9 +168,11 @@ flowchart TD
     classDef output fill:#fff2cc,stroke:#333
 ```
 
-**Motivation.** We include this scaffold as prompt pre-context because it operationalizes the labeling taxonomy as an explicit reasoning chain rather than leaving the order and dependencies of its constituent legal tests implicit in prose, in a manner conceptually related to chain-of-thought prompting (Wei et al., 2022): rather than requiring the model to discover, for each novel segment, the correct sequence in which to apply the taxonomy's tests, the flow supplies that sequence directly, together with each test's decision rule and its exclusivity relationship to neighboring tests. Because the taxonomy is shared across every subtask and every baseline in this project, the flow is authored once and consumed by two independent renderers that we verified agree on structure: `src/common/dialog_flow.py`, the text renderer used for our prompts, and `src/greaselm/kg/build_kg.py`, the graph renderer used to construct the GreaseLM baseline's knowledge graph (§2.8); both interpret a switch node's branches identically (as `branch:<compare-value>` and `branch:default` relations), so the encoded reasoning structure is invariant to which system consumes it.
+**Figure 3: Toy example of the dialog-flow reasoning structure encoded by our scaffold.** Green nodes represent the strictly ordered sequence every instance's prompt encodes (an assessability check, ST1, ST2, then six binary Tier-1 ST3 reasoning questions in taxonomy dependency order), while the blue outcome node shows the alternate branch taken only when a segment is judged unassessable for ST3. For readability, each question node here is drawn as a bare yes/no branch; in the actual flow, every one of these nodes also carries free-text, expert-authored instructions for resolving it (its decision rule and its exclusivity relationship to neighboring tests, per the `inadequate_disclosure` example below), so the model is guided by considerably more than the branch label alone. The flow itself is static prompt pre-context, not an execution trace: no traversal happens at inference time, since the model conditions on the full rendered graph and generates all labels directly.
 
-**Formalization.** We express the dialog flow as a directed graph $G = (V, E)$ with node set $V = V_{\text{start}} \cup V_{\text{fact}} \cup V_{\text{reasoning}} \cup V_{\text{switch}} \cup V_{\text{outcome}}$, and edges $E$ encoding the fixed traversal order described above. Each reasoning node $v \in V_{\text{reasoning}}$ carries a bounded answer set $\mathcal{A}_v$ and a free-text decision rule $\rho_v$. Rather than executing $G$ at inference time, we render it once with a fixed serialization function $\mathrm{flow\_to\_text}: G \to \Sigma^*$ (`src/common/dialog_flow.py`) and prepend the result as static pre-context to every prompt. The trained model is thus a conditional generator
+**Motivation:** We include this scaffold as prompt pre-context because it operationalizes the labeling taxonomy as an explicit reasoning chain rather than leaving the order and dependencies of its constituent legal tests implicit in prose, in a manner conceptually related to chain-of-thought prompting (Wei et al., 2022): rather than requiring the model to discover, for each novel segment, the correct sequence in which to apply the taxonomy's tests, the flow supplies that sequence directly, together with each test's decision rule and its exclusivity relationship to neighboring tests. Because the taxonomy is shared across every subtask and every baseline in this project, the flow is authored once and consumed by two independent renderers that we verified agree on structure: `src/common/dialog_flow.py`, the text renderer used for our prompts, and `src/greaselm/kg/build_kg.py`, the graph renderer used to construct the GreaseLM baseline's knowledge graph (§2.8); both interpret a switch node's branches identically (as `branch:<compare-value>` and `branch:default` relations), so the encoded reasoning structure is invariant to which system consumes it.
+
+**Formalization:** We express the dialog flow as a directed graph $G = (V, E)$ with node set $V = V_{\text{start}} \cup V_{\text{fact}} \cup V_{\text{reasoning}} \cup V_{\text{switch}} \cup V_{\text{outcome}}$, and edges $E$ encoding the fixed traversal order described above. Each reasoning node $v \in V_{\text{reasoning}}$ carries a bounded answer set $\mathcal{A}_v$ and a free-text decision rule $\rho_v$. Rather than executing $G$ at inference time, we render it once with a fixed serialization function $\mathrm{flow\_to\_text}: G \to \Sigma^*$ (`src/common/dialog_flow.py`) and prepend the result as static pre-context to every prompt. The trained model is thus a conditional generator
 
 $$
 p_\theta\big(y \mid x,\ \mathrm{flow\_to\_text}(G)\big), \qquad y = \{\text{st1},\ \text{st2}[\,],\ \text{st3}[\,]\},
@@ -179,7 +180,7 @@ $$
 
 where $x$ is the rendered instance context (§2.11) and $\theta$ are the LoRA parameters of §2.9. This differs from graph-*executing* approaches such as our GreaseLM baseline (§2.8), which consumes the same $G$ as structural input to a graph neural network rather than as serialized text.
 
-**Implementation.** The raw OpenJustice export is a UI-authoring artifact, not a prompt: on our flow, 81% of its content by token count (3,228 of 4,003 tokens, measured with the Qwen3.5 tokenizer) is editor chrome: node canvas positions, pixel dimensions, selection state, CSS class names, and the exporting user's OAuth subject identifier, none of which carries task meaning, and the last of which must not appear in a prompt or training corpus for privacy reasons. We strip this chrome and remap every node's opaque UUID reference to a human-readable label slug (`strip_flow`, `src/common/dialog_flow.py`), then render the result as compact plain text (`flow_to_text`): for our flow this yields 5,685 characters (943 tokens on the same tokenizer, 24% of the raw export's token count) that preserve every question, answer set, branch condition, and outcome template while eliminating editor chrome entirely. This matters operationally because the flow is prepended as fixed pre-context to every training and inference instance under a shared `--max-length` budget, so every chrome token displaces a token of the labeled segment itself once truncation applies. The unstripped, minified-JSON form of the export is retained in the codebase only as an ablation counterpart to this design (obtained by disabling `--lean-prompt`), at approximately four times the token cost for identical semantic content.
+**Implementation:** The raw OpenJustice export is a UI-authoring artifact, not a prompt: on our flow, 81% of its content by token count (3,228 of 4,003 tokens, measured with the Qwen3.5 tokenizer) is editor chrome: node canvas positions, pixel dimensions, selection state, CSS class names, and the exporting user's OAuth subject identifier, none of which carries task meaning, and the last of which must not appear in a prompt or training corpus for privacy reasons. We strip this chrome and remap every node's opaque UUID reference to a human-readable label slug (`strip_flow`, `src/common/dialog_flow.py`), then render the result as compact plain text (`flow_to_text`): for our flow this yields 5,685 characters (943 tokens on the same tokenizer, 24% of the raw export's token count) that preserve every question, answer set, branch condition, and outcome template while eliminating editor chrome entirely. This matters operationally because the flow is prepended as fixed pre-context to every training and inference instance under a shared `--max-length` budget, so every chrome token displaces a token of the labeled segment itself once truncation applies. The unstripped, minified-JSON form of the export is retained in the codebase only as an ablation counterpart to this design (obtained by disabling `--lean-prompt`), at approximately four times the token cost for identical semantic content.
 
 ### 2.13 Training Procedure
 
@@ -214,7 +215,7 @@ Every training run draws a fresh, randomly re-split 500-instance `test_holdout` 
 
 ### 2.15 Per-Tier Adapter Composition
 
-Our deployed system loads a single frozen Qwen3-4B base model and applies one of two LoRA adapters depending on which subtask is being predicted: one adapter produces ST1 and ST2, and a second, independently trained adapter produces ST3. Both adapters share the base model, prompt design, and joint completion format of §2.9–2.12; they differ only in the training configuration used to reach them. Because a LoRA adapter is a small set of low-rank weight deltas rather than a modification of the base model itself, composing two adapters at inference time requires no architectural change and no joint retraining: the base model is loaded once, and predictions for each subtask are read from whichever adapter was selected for it. This is a small-scale instance of the same general principle behind serving systems for concurrent LoRA adapters, such as S-LoRA (Sheng et al., 2023), which keeps many independently trained adapters resident against one shared frozen base and routes each query to the adapter it needs; our setting differs mainly in scale (two adapters, selected per subtask, rather than thousands routed per query) and in not requiring S-LoRA's dynamic loading and batched-kernel machinery, since both of our adapters fit resident in memory simultaneously.
+Our deployed system loads a single frozen Qwen3-4B base and switches between two independently trained LoRA adapters, one for ST1/ST2 and one for ST3, sharing the architecture and prompt design of §2.9–2.12. Both final adapters were trained on a single H100 GPU (hyperparameter iteration in §2.13 used a separate A10G), following the same shared-base, per-query adapter-swap principle as LoRA-serving systems like S-LoRA (Sheng et al., 2023), but at much smaller scale.
 
 This design follows from an observation made over the course of development: no single training run we evaluated maximized development-set performance on all three subtasks simultaneously, and ST3 in particular showed a persistent sensitivity to how rare-label handling was configured (§3.2). Rather than committing to one checkpoint as a compromise across all three subtasks, we assign each subtask to whichever trained adapter scored best on it during development. Formally, let $\theta_1$ and $\theta_2$ denote the two independently trained adapter sets sharing the frozen base $\theta_0$ (§2.9), and let $F1^{\text{dev}}_t(\theta)$ denote the development-set macro-F1 of adapter $\theta$ on subtask $t \in \{\text{ST1}, \text{ST2}, \text{ST3}\}$. We assign each subtask to whichever adapter scored best on it during development,
 
@@ -303,7 +304,6 @@ Table 4 operationalizes the cost-and-generalizability question directly. Dev/tes
 | Agentic RAG | None | 1 pipeline + retrieval index | API + retrieval per instance | 0.637 dev | Unmeasured |
 | GreaseLM | Graph construction + training | 1 model + graph-construction pipeline | Local, graph-dependent | 0.489 dev (300-instance subsample) | Unmeasured, non-standard data split |
 
-**Figure 4: Accuracy versus training cost (qualitative axes; costs are not in comparable units across systems; see Table 4 for measured figures).**
 ```mermaid
 quadrantChart
     title Accuracy vs. training cost
@@ -319,6 +319,8 @@ quadrantChart
     Agentic RAG: [0.20, 0.64]
     GreaseLM: [0.35, 0.49]
 ```
+
+**Figure 4: Accuracy versus training cost (qualitative axes; costs are not in comparable units across systems; see Table 4 for measured figures).**
 
 ### 4.2 Reliability
 
@@ -449,11 +451,11 @@ Xikun Zhang, Antoine Bosselut, Michihiro Yasunaga, Hongyu Ren, Percy Liang, Chri
    unzip public_data_test.zip -d public_data_test   # official test split, if you have it
    ```
 
-4. **Place base model weights locally** under `models/<org>/<model>` (e.g. `models/Qwen/Qwen3-4B`). All training and inference here load with `local_files_only=True` — no runtime Hugging Face Hub download occurs, so weights must be downloaded ahead of time, e.g.:
+4. **Place base model weights locally** under `models/<org>/<model>` (e.g. `models/Qwen/Qwen3-4B`). All training and inference here load with `local_files_only=True`; no runtime Hugging Face Hub download occurs, so weights must be downloaded ahead of time, e.g.:
    ```
    huggingface-cli download Qwen/Qwen3-4B --local-dir models/Qwen/Qwen3-4B
    ```
 
-5. **Configure API keys** — only needed for the GPT-5.4 / agentic-RAG baselines or W&B logging, not for the core Qwen3-4B LoRA pipeline. Create a `.env` file in the repo root with whichever of these you need: `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `AWS_BEARER_TOKEN_BEDROCK` (+ `AWS_REGION`), `OJ_API_KEY` / `PRIVATE_OJ_API_KEY` (OpenJustice), `WANDB_API_KEY`.
+5. **Configure API keys**: only needed for the GPT-5.4 / agentic-RAG baselines or W&B logging, not for the core Qwen3-4B LoRA pipeline. Create a `.env` file in the repo root with whichever of these you need: `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `AWS_BEARER_TOKEN_BEDROCK` (+ `AWS_REGION`), `OJ_API_KEY` / `PRIVATE_OJ_API_KEY` (OpenJustice), `WANDB_API_KEY`.
 
-6. **Train and predict** — see the Reproducibility section above for the exact commands to reproduce the reported training run and to compose the final per-tier submission.
+6. **Train and predict**: see the Reproducibility section above for the exact commands to reproduce the reported training run and to compose the final per-tier submission.
