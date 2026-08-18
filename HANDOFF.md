@@ -7,7 +7,42 @@ tracks are live; this doc covers current state, confirmed results, and the queue
 
 ## Currently running
 
-**Nothing.** GPU is free. The hyperparameter sweep on the roberta-base 5-way st1 classifier
+**Nothing. GPU is free.**
+
+**MAJOR FINDING 2026-08-18, CONFIRMED + PROMOTED: `--truncation-side left` is the new standing
+default for `lora_train_st1_classifier.py`.** roberta-base's 512-token position-embedding
+ceiling silently drops the product PAGE block for ~78%% of instances: `render_context(...,
+"full")` puts TRANSCRIPT first and PAGE last (`src/common/__init__.py`), and at `--max-length
+512`, HF's default right-truncation (keep start, drop end) cuts the PAGE block entirely for
+234/300 (78%) of a sampled train set (median full-context length: 1268 tokens vs the 512
+budget). The PAGE block was already confirmed decisive for st1 in Track 1 (full context vs
+transcript-only, `feedback_st1_focus.md`) — every Track-2 roberta run all session has silently
+been running closer to transcript-only than genuine "full" context. Added `--truncation-side
+{left,right}` (`left` keeps the END of the text instead, preserving PAGE at the cost of the
+transcript's tail). Two fresh-split replicates, standing recipe otherwise unchanged:
+| run | dev macro_f1 | dev none_f1 | test macro_f1 | test none_f1 |
+|---|---|---|---|---|
+| left, run 1 | 0.622 | 0.500 | 0.546 | 0.316 |
+| left, run 2 (replicate) | **0.645** | 0.562 | 0.538 | 0.222 |
+| right (this session's control run) | 0.543 | 0.276 | 0.491 | 0.190 |
+| right (original historical baseline, 2 replicates) | 0.598 / 0.559 | 0.452 / 0.370 | 0.559 / 0.553 | 0.381 / 0.286 |
+
+Both `left` dev scores (0.622, 0.645) clear every other config tried in this classifier's
+history (previous best 0.598) with good dev>=test agreement both times (gaps 0.076, 0.107).
+Test macro_f1 (0.546, 0.538) lands roughly in/near the historical baseline test band
+(0.553-0.559) — not a test-side win the way dev is, but not a regression either, and dev is the
+cleaner/less noisy signal per `feedback_rotating_test_holdout.md`. **New standing config**:
+`--model FacebookAI/roberta-base --context full --max-length 512 --truncation-side left
+--lora-r 8 --lora-alpha 16 --target-modules query,value --class-weight --oversample-rare-st1 3`.
+Logged to `runs/results_st1_classifiers.csv` (3 rows), commit pending.
+
+**Next natural follow-up**: none of this session's other hyperparameter sweeps (capacity,
+head-lr, oversample factor, undersample-majority) were tried ON TOP of `--truncation-side left`
+— they were all run under the old (truncated) baseline. Worth re-checking whether any of those
+previously-discarded levers behave differently now that the model can actually see the page
+content, before assuming they're still closed questions.
+
+Prior state (superseded by the above): the hyperparameter sweep on the roberta-base 5-way st1 classifier
 (Track 2, HANDOFF next-candidates item #2) ran and finished 2026-08-17 ~21:20-21:28 — both
 directions **discarded**, r8/a16/single-LR remains the standing default:
 1. Capacity bump `--lora-r 16 --lora-alpha 32`: dev macro_f1=0.586 (best@epoch3), test=0.537,
