@@ -217,6 +217,14 @@ def main():
     ap.add_argument("--context", choices=CONTEXT_CHOICES, default="full",
                     help="which rungs of the instance the model sees, see lora_train.py's --context")
     ap.add_argument("--max-length", type=int, default=512)
+    ap.add_argument("--truncation-side", choices=["left", "right"], default="right",
+                     help="which end to cut when the rendered context exceeds --max-length. "
+                     "HF default is 'right' (keep the start, drop the end) -- for --context full, "
+                     "render_context puts TRANSCRIPT first and the product PAGE block last, so at "
+                     "roberta-base's 512-token ceiling, right-truncation silently drops the PAGE "
+                     "block entirely for most instances (measured: ~78%% of a 300-instance train "
+                     "sample). 'left' keeps the end instead, preserving PAGE content at the cost "
+                     "of the tail of a long transcript.")
     ap.add_argument("--epochs", type=int, default=5)
     ap.add_argument("--batch-size", type=int, default=16)
     ap.add_argument("--grad-accum-steps", type=int, default=1)
@@ -335,6 +343,7 @@ def main():
         log.info("class_weight: " + ", ".join(f"{label}={w:.3f}" for label, w in zip(ST1_LABELS, class_weight.tolist())))
 
     tokenizer = AutoTokenizer.from_pretrained(model_path)
+    tokenizer.truncation_side = args.truncation_side
     train_ds = ST1Dataset(train_instances, tokenizer, args.context, args.max_length)
     dev_ds = ST1Dataset(dev_instances, tokenizer, args.context, args.max_length)
     collate = Collator(tokenizer)
