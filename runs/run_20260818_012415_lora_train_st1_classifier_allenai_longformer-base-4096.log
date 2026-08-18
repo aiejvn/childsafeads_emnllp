@@ -20,3 +20,9 @@
 2026-08-18 02:41:21,234 | INFO | MainThread | epoch 4 dev metrics: accuracy=0.889, macro_f1=0.587, loss=0.715
 2026-08-18 02:41:21,234 | INFO | MainThread | epoch 4 dev metrics per-label F1: digital_content_or_services=0.907, none=0.400, other=0.000, physical_goods=0.912, physical_services=0.714
 2026-08-18 02:55:27,226 | INFO | MainThread | epoch 5: mean train loss = 0.1646
+2026-08-18 02:56:46,532 | INFO | MainThread | epoch 5 dev metrics: accuracy=0.893, macro_f1=0.601, loss=0.708
+2026-08-18 02:56:46,532 | INFO | MainThread | epoch 5 dev metrics per-label F1: digital_content_or_services=0.909, none=0.400, other=0.000, physical_goods=0.914, physical_services=0.783
+2026-08-18 02:56:46,559 | INFO | MainThread | saved final epoch adapter to runs/st1-classifier-longformer/last (best dev macro_f1=0.615)
+2026-08-18 02:56:46,559 | INFO | MainThread | reloading best-dev checkpoint from runs/st1-classifier-longformer/best for the test-holdout pass (generalization check, not used for model selection)
+2026-08-18 02:58:13,935 | INFO | MainThread | test holdout metrics: accuracy=0.906, macro_f1=0.618, loss=0.445
+2026-08-18 02:58:13,936 | INFO | MainThread | test holdout metrics per-label F1: digital_content_or_services=0.903, none=0.471, other=0.000, physical_goods=0.933, physical_services=0.783

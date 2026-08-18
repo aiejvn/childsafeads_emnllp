@@ -7,24 +7,40 @@ tracks are live; this doc covers current state, confirmed results, and the queue
 
 ## Currently running
 
-**One job: `allenai/longformer-base-4096` 5-way st1 classifier**, `runs/st1-classifier-longformer`,
-launched 2026-08-18 ~01:24. First test of a genuinely-long-context encoder (4096 native position
-embeddings, vs roberta-base's 512 ceiling that motivated the truncation-side fix below) — user
-provided the model locally at `./models/allenai/longformer-base-4096`. Config: `--context full
---max-length 4096 --truncation-side left` (still set for the rare >4096-token tail, but at this
-length only ~14/2857 instances (0.5%) need any truncation at all — see the context-window sizing
-note below), r8/a16 LoRA on `query,value` only (Longformer's *global* attention projections,
-`query_global`/`value_global`/`key_global`, are NOT LoRA-adapted this round — a candidate
-follow-up if this run looks promising). `--batch-size 2` (batch=4 OOM'd, batch=1 and 2 both fit;
-picked 2 for throughput — Longformer's HF eager sliding-window attention implementation is much
-more memory-hungry than its "linear attention" reputation suggests, no flash-attention kernel
-available for it). ~1.3-1.5 it/s, 956 steps/epoch — **revised ETA ~2h15m total** (per-epoch dev
-eval overhead is larger than expected; ~27 min/epoch observed once eval is included, not the
-~11 min/epoch training-only rate). Started 01:24, so expect completion ~03:40. Check
-`runs/run_20260818_012406_lora_train_st1_classifier_longformer.log` or `ps -p 1220782` for
-status. **This is the most important pending result — report it before starting anything else.**
-While waiting, also running a replicate of the ambiguous `--lora-dropout 0.2` result (see
-below) — `runs/st1-classifier-roberta-dropout2-rep2`.
+**Nothing locally.** GPU is free. **User is separately dispatching 15 Longformer jobs to an
+H100 Slurm cluster** via `slurm_dispatch_st_classifiers.txt` (repo root) — 5 experiments each
+for st1/st2/st3 (baseline/replicate, global-attention LoRA, `--max-length 2048`, capacity r16/a32,
+oversample factor=2). Check back with the user for those results; not tracked by this session's
+process list. Local wall-clock for the st1 baseline (A10G, batch=2) was 1h33m58s — see below;
+expect faster on H100 with batch=8, roughly 20-40 min/job for the 4096-length ones, half that
+for the 2048 ones (rough estimate, not benchmarked on H100 directly, see commit message for
+reasoning).
+
+**MAJOR RESULT 2026-08-18 ~02:58: `allenai/longformer-base-4096` clearly beats roberta-base on
+the 5-way st1 classifier — the biggest single win of this whole encoder track.** First test of
+a genuinely-long-context encoder (4096 native position embeddings, vs roberta-base's 512 ceiling
+that motivated the truncation-side fix below) — user provided the model locally at
+`./models/allenai/longformer-base-4096`. Config: `--context full --max-length 4096
+--truncation-side left` (only ~14/2857 instances (0.5%) need any truncation at all at this
+length — see context-window sizing note below), r8/a16 LoRA on `query,value` only (global
+attention projections `query_global`/`value_global` NOT adapted this round — likely the single
+best untried follow-up, see dispatch file). `--batch-size 2` (batch=4 OOM'd on the local 23GB
+A10G; Longformer's HF eager sliding-window attention, a hand-rolled einsum-based chunked
+implementation with no flash-attention kernel, is much more memory-hungry than its "linear
+attention" reputation suggests). Wall-clock 1h33m58s total, steady-state ~15-20 min/epoch after
+a slower first epoch (~26 min, likely warmup).
+| model | dev macro_f1 | dev none_f1 | test macro_f1 | test none_f1 |
+|---|---|---|---|---|
+| **Longformer-4096** (best@epoch2) | 0.615 | **0.593** | **0.618** | 0.471 |
+| roberta-base + truncation-left (2 replicates) | 0.622 / 0.645 | 0.500 / 0.562 | 0.538 / 0.546 | 0.316 / 0.222 |
+
+Longformer's test macro_f1 (0.618) is the **best test score seen anywhere in this classifier's
+entire history**, dev none_f1 (0.593) is also a new best, and dev/test are essentially tied (gap
+0.003 — about as clean an agreement as this noisy small-test-holdout task produces). Confirms the
+hypothesis behind sourcing a longer-context model: genuine access to the context Track 1 already
+showed matters (vs roberta's 2.5%% coverage) is a real, substantial win, not just noise. **NOT
+yet replicated** — a replicate is queued in the H100 dispatch (experiment #1 for st1). Logged to
+`runs/results_st1_classifiers.csv`, commit pending.
 
 **Context-window sizing (answers "how much context would we need for everything"):** measured
 across all 2857 train+dev instances tokenized with `full_context`: median 1253 tokens, mean
