@@ -1,0 +1,6 @@
+2026-08-18 15:55:46,612 | INFO | MainThread | logging to runs/run_20260818_155546_combine_submissions_hybrid.log
+2026-08-18 15:55:46,613 | INFO | MainThread | sources: st1<-slurm_logs/8-17-runs/8-18-submissions/submission-8-18-qwen-improve-oversample-st3-3.jsonl  st2<-slurm_logs/8-17-runs/8-18-submissions/submission-8-18-qwen-improve-oversample-st3-3.jsonl  st3<-slurm_logs/8-17-runs/8-18-submissions/submission_lora_qwen3-4B-8-14.jsonl
+2026-08-18 15:55:46,614 | INFO | MainThread | loaded 503 predictions from slurm_logs/8-17-runs/8-18-submissions/submission_lora_qwen3-4B-8-14.jsonl
+2026-08-18 15:55:46,615 | INFO | MainThread | loaded 503 predictions from slurm_logs/8-17-runs/8-18-submissions/submission-8-18-qwen-improve-oversample-st3-3.jsonl
+2026-08-18 15:55:46,633 | INFO | MainThread | wrote 503 merged predictions to runs/submission_hybrid.jsonl
+2026-08-18 15:55:46,663 | INFO | MainThread | target has no gold labels (or only partial coverage) -- skipping evaluation
