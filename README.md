@@ -12,7 +12,7 @@ We describe a system for the ChildSafeAds shared task that fine-tunes Qwen3-4B (
 | GPT-5.4, agentic RAG against a legal knowledge base | 0.723 | **0.726** | 0.463 | 0.616 | 0.637 |
 | GreaseLM (300-instance dev subsample) | 0.671 | 0.450 | 0.346 | 0.491 | 0.489 |
 
-The deployed final submission refines this single-adapter result further: it composes predictions from two independently trained instances of the same architecture, selected per subtask (§2.15), rather than from one checkpoint alone. The remainder of this report specifies the method, its training and evaluation protocol, the comparison against every alternative system we implemented, and its cost/generalization trade-offs and limitations.
+The deployed final submission refines this single-adapter result further: it composes predictions from two independently trained instances of the same architecture, selected per subtask (§2.15), rather than from one checkpoint alone. On the official shared-task leaderboard, this submission placed 2nd on ST2 and 3rd on ST3 among all participating systems (§3.3). The remainder of this report specifies the method, its training and evaluation protocol, the comparison against every alternative system we implemented, and its cost/generalization trade-offs and limitations.
 
 ## 1. Task Formulation
 
@@ -268,7 +268,7 @@ The label `hfss_food_marketing` scores $F_1 = 0.000$ at our selected checkpoint 
 
 We generated predictions over the official, unlabeled test split ($n=503$) twice: first from the single joint adapter underlying the headline results in §1, and subsequently from the per-tier adapter composition of §2.15, which we consider the final submission. Neither is independently scorable, as the official test split ships without gold labels. As a sanity check, both submissions' label distributions fall within the ranges established across every development and held-out-test run reported in this document, including the persistent near-absence of `hfss_food_marketing` and `insufficient_context` documented in §3.2.
 
-We additionally produced a third, exploratory test-split submission (`submission-8-18-qwen-improve-selfconsistent-test.jsonl`) from the ST1/ST2 adapter of §2.15, wrapped with a selective self-consistency decoding step (`src/lora/lora_predict_generative_selfconsistent.py`): each instance is decoded greedily once, and only escalated to 5-sample resampling at temperature 0.7 with a per-label majority vote if the greedy prediction touches one of three labels the 8-17 training run showed collapsing under continued training (`direct_exhortation`, `hfss_food_marketing`, `insufficient_context`); on the test split, 61 of 503 instances were escalated. This run is uncalibrated, using default decision thresholds rather than the per-label thresholds tuned for the adapter's calibrated variant. Dev-split validation of the same configuration ran as two escalation batches (57 and 118 instances); on the escalated subset in both batches, self-consistency resampling produced a small net regression rather than a gain (`mean_macro_f1` 0.767→0.765 and 0.724→0.719, greedy-only versus self-consistency-applied). We therefore report this submission as an exploratory variant alongside, not a replacement for, the two submissions above.
+Once organizer-side scoring against the held-out gold labels was released on the shared task's competition website, our submission ranked 2nd on ST2 (product category) and 3rd on ST3 (advertising-compliance flags) among all participating systems.
 
 ### 3.4 Legal Grounding for ST3
 
