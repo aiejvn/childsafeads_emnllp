@@ -7,7 +7,36 @@ tracks are live; this doc covers current state, confirmed results, and the queue
 
 ## Currently running
 
-**Nothing. GPU is free.**
+**One job: `allenai/longformer-base-4096` 5-way st1 classifier**, `runs/st1-classifier-longformer`,
+launched 2026-08-18 ~01:24. First test of a genuinely-long-context encoder (4096 native position
+embeddings, vs roberta-base's 512 ceiling that motivated the truncation-side fix below) — user
+provided the model locally at `./models/allenai/longformer-base-4096`. Config: `--context full
+--max-length 4096 --truncation-side left` (still set for the rare >4096-token tail, but at this
+length only ~14/2857 instances (0.5%) need any truncation at all — see the context-window sizing
+note below), r8/a16 LoRA on `query,value` only (Longformer's *global* attention projections,
+`query_global`/`value_global`/`key_global`, are NOT LoRA-adapted this round — a candidate
+follow-up if this run looks promising). `--batch-size 2` (batch=4 OOM'd, batch=1 and 2 both fit;
+picked 2 for throughput — Longformer's HF eager sliding-window attention implementation is much
+more memory-hungry than its "linear attention" reputation suggests, no flash-attention kernel
+available for it). ~1.3-1.5 it/s, 956 steps/epoch, ETA ~50-60 min for all 5 epochs + evals —
+check `runs/run_20260818_012406_lora_train_st1_classifier_longformer.log` or `ps -p 1220782` for
+status. **This is the most important pending result — report it before starting anything else.**
+
+**Context-window sizing (answers "how much context would we need for everything"):** measured
+across all 2857 train+dev instances tokenized with `full_context`: median 1253 tokens, mean
+1484, max 14624. Coverage by cap: 512→2.5%, 1024→32.3%, 2048→79.0%, **4096→99.51%** (14
+instances still truncated), 6144→99.93%, 8192→99.965% (1 instance left). RoBERTa cannot exceed
+512 regardless of `--max-length` (hard architectural ceiling from its position embeddings) —
+this is *why* the truncation-side bug below existed in the first place and why a different
+architecture (Longformer, 4096; ModernBERT, 8192) is needed to actually use more context.
+
+**Also ran (2026-08-18, before Longformer): a `--max-length` sweep within RoBERTa's 512 ceiling**
+(128, 256, vs standing 512, all with `--truncation-side left`) to characterize the
+context-length-vs-performance curve while waiting for a longer-context model. Non-monotonic and
+likely mostly noise given the small test-holdout none-counts: 128→dev=0.616/test=0.577(best seen
+all-time, but low-transcript-signal at this length), 256→dev=0.595/test=0.509, 512→dev=0.622-0.645/
+test=0.538-0.546. Logged (`runs/results_st1_classifiers.csv`), not a strong standalone
+conclusion either way — filed as data points for the eventual longer-context comparison.
 
 **MAJOR FINDING 2026-08-18, CONFIRMED + PROMOTED: `--truncation-side left` is the new standing
 default for `lora_train_st1_classifier.py`.** roberta-base's 512-token position-embedding
