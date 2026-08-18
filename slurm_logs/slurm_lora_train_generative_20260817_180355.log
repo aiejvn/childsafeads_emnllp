@@ -1,0 +1,9 @@
+Running on rg31609
+Started: Mon 17 Aug 2026 06:05:58 PM EDT
+Account: rrg-zhu2048_gpu
+Partition: gpubase_bygpu_b2
+---
+Python: /lustre09/project/6090544/kwang103/childsafeads_emnllp/.venv/bin/python  Torch: 2.13.0
+---
+Command: python src/lora/lora_train_generative.py public_data_dev/train.jsonl public_data_dev/dev.jsonl --model Qwen/Qwen3-4B --lean-prompt --df-path emnllp-dialog-flow-dialog-flow.json --batch-size 1 --eval-batch-size 8 --eval-every 5 --st1-only --few-shot --pos-weight --oversample-rare-st1 3 --no-gradient-checkpointing --output-dir /scratch/kwang103/runs/lora-qwen-st1-5epoch-fewshot-poswt-oversample-minority-select-rerun --minority-select --epochs 20
+[2026-08-17T22:06:08.843] error: *** JOB 19178595 ON rg31609 CANCELLED AT 2026-08-17T22:06:08 DUE to SIGNAL Terminated ***
