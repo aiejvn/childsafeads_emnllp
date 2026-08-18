@@ -401,35 +401,3 @@ Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, Llion Jones, Aidan N
 Jason Wei, Xuezhi Wang, Dale Schuurmans, Maarten Bosma, Brian Ichter, Fei Xia, Ed Chi, Quoc Le, and Denny Zhou. 2022. Chain-of-Thought Prompting Elicits Reasoning in Large Language Models. In *Advances in Neural Information Processing Systems 35 (NeurIPS 2022)*.
 
 Xikun Zhang, Antoine Bosselut, Michihiro Yasunaga, Hongyu Ren, Percy Liang, Christopher D. Manning, and Jure Leskovec. 2022. GreaseLM: Graph REASoning Enhanced Language Models for Question Answering. In *International Conference on Learning Representations (ICLR 2022)*.
-
-## Setup
-
-1. **Clone with submodules** (this repo vendors `oj-eval` and `GreaseLM` as git submodules):
-   ```
-   git clone --recurse-submodules <repo-url>
-   # or, if already cloned:
-   git submodule update --init --recursive
-   ```
-
-2. **Install Python dependencies** (uv-managed venv, Python 3.12):
-   ```
-   sh setup_uv.sh   # installs uv
-   uv venv
-   source .venv/bin/activate
-   uv pip install -r requirements.txt
-   ```
-
-3. **Unpack the shared-task data:**
-   ```
-   unzip public_data_dev.zip -d public_data_dev
-   unzip public_data_test.zip -d public_data_test   # official test split, if you have it
-   ```
-
-4. **Place base model weights locally** under `models/<org>/<model>` (e.g. `models/Qwen/Qwen3-4B`). All training and inference here load with `local_files_only=True`; no runtime Hugging Face Hub download occurs, so weights must be downloaded ahead of time, e.g.:
-   ```
-   huggingface-cli download Qwen/Qwen3-4B --local-dir models/Qwen/Qwen3-4B
-   ```
-
-5. **Configure API keys**: only needed for the GPT-5.4 / agentic-RAG baselines or W&B logging, not for the core Qwen3-4B LoRA pipeline. Create a `.env` file in the repo root with whichever of these you need: `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `AWS_BEARER_TOKEN_BEDROCK` (+ `AWS_REGION`), `OJ_API_KEY` / `PRIVATE_OJ_API_KEY` (OpenJustice), `WANDB_API_KEY`.
-
-6. **Train and predict**: see the Reproducibility section above for the exact commands to reproduce the reported training run and to compose the final per-tier submission.
