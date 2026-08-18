@@ -25,7 +25,7 @@
 {"instanceID": "UCCo6EC0MOfJSnHbD3LI6iFA_P_oo947MpnI_86caccc2", "st1": "physical_goods", "st2": ["other"], "st3": ["misleading_claim"]}
 {"instanceID": "UCCo6EC0MOfJSnHbD3LI6iFA_TVGe3diUTJQ_f04ed828", "st1": "physical_goods", "st2": ["food", "health"], "st3": ["misleading_claim"]}
 {"instanceID": "UCCo6EC0MOfJSnHbD3LI6iFA_SdMyAzW-xxM_74dd5245", "st1": "physical_goods", "st2": ["creator_community", "fashion"], "st3": ["misleading_claim"]}
-{"instanceID": "UCCo6EC0MOfJSnHbD3LI6iFA_TZGVTTDef3Q_74dd5245", "st1": "physical_goods", "st2": ["creator_community", "fashion", "hardware_electronics"], "st3": ["direct_exhortation", "undisclosed_advertising"]}
+{"instanceID": "UCCo6EC0MOfJSnHbD3LI6iFA_TZGVTTDef3Q_74dd5245", "st1": "physical_goods", "st2": ["creator_community", "fashion"], "st3": ["direct_exhortation", "undisclosed_advertising"]}
 {"instanceID": "UCCo6EC0MOfJSnHbD3LI6iFA_PTgU73AYq88_7efdc27a", "st1": "physical_goods", "st2": ["food", "health"], "st3": ["direct_exhortation", "misleading_claim"]}
 {"instanceID": "UCCo6EC0MOfJSnHbD3LI6iFA_XCfckjnnrf8_f9ec48c8", "st1": "digital_content_or_services", "st2": ["apps", "financial"], "st3": ["misleading_claim"]}
 {"instanceID": "UCCo6EC0MOfJSnHbD3LI6iFA_NmtjHhaxusU_74dd5245", "st1": "physical_goods", "st2": ["fashion"], "st3": ["misleading_claim"]}
@@ -59,7 +59,7 @@
 {"instanceID": "UCEyodonqP_80YrDvattntmw_C6evcuSe4yY_0e29329d", "st1": "physical_services", "st2": ["health"], "st3": ["no_flag"]}
 {"instanceID": "UCEyodonqP_80YrDvattntmw_OlmNLzPUd4o_0e29329d", "st1": "physical_goods", "st2": ["food"], "st3": ["misleading_claim"]}
 {"instanceID": "UCIjIavVA7pz7X9zgbafTjTA_-ZSsIwkFq2E_80515661", "st1": "physical_goods", "st2": ["fashion", "food"], "st3": ["inadequate_disclosure", "misleading_claim"]}
-{"instanceID": "UCIjIavVA7pz7X9zgbafTjTA_cPnefv-JlqY_80515661", "st1": "physical_goods", "st2": ["fashion", "food"], "st3": ["direct_exhortation", "inadequate_disclosure"]}
+{"instanceID": "UCIjIavVA7pz7X9zgbafTjTA_cPnefv-JlqY_80515661", "st1": "physical_goods", "st2": ["creator_community", "fashion", "food"], "st3": ["direct_exhortation", "inadequate_disclosure"]}
 {"instanceID": "UCkD-ZOixI0a9FjIExDsHsbg_FXL1B3o1iJE_7d6bc6ce", "st1": "digital_content_or_services", "st2": ["apps", "hardware_electronics"], "st3": ["direct_exhortation", "misleading_claim"]}
 {"instanceID": "UCVFqk8JxVGg2_99AmqFdS4g_hQRVPvu7lQU_622d7a31", "st1": "physical_goods", "st2": ["food"], "st3": ["misleading_claim", "undisclosed_advertising"]}
 {"instanceID": "UCVFqk8JxVGg2_99AmqFdS4g_L2CDKCFAJVs_677d3459", "st1": "digital_content_or_services", "st2": ["apps"], "st3": ["inadequate_disclosure", "misleading_claim"]}
@@ -482,7 +482,7 @@
 {"instanceID": "UC4kjDjhexSVuC8JWk4ZanFw_Z4Snm4snDtQ_44ecaf60", "st1": "physical_goods", "st2": ["food"], "st3": ["misleading_claim"]}
 {"instanceID": "UC4kjDjhexSVuC8JWk4ZanFw_XIti0uQOeX4_e6c6c154", "st1": "physical_goods", "st2": ["creator_community", "other"], "st3": ["misleading_claim"]}
 {"instanceID": "UC4kjDjhexSVuC8JWk4ZanFw_OcGJvCDHsL8_5799ee24", "st1": "physical_goods", "st2": ["creator_community", "toys"], "st3": ["direct_exhortation", "inadequate_disclosure"]}
-{"instanceID": "UC4kjDjhexSVuC8JWk4ZanFw_4JU5jziWVkE_1dc35d6f", "st1": "physical_goods", "st2": ["toys", "hardware_electronics"], "st3": ["direct_exhortation", "misleading_claim"]}
+{"instanceID": "UC4kjDjhexSVuC8JWk4ZanFw_4JU5jziWVkE_1dc35d6f", "st1": "physical_goods", "st2": ["hardware_electronics", "toys"], "st3": ["direct_exhortation", "misleading_claim"]}
 {"instanceID": "UC4kjDjhexSVuC8JWk4ZanFw_bU7d6drQefc_1d3a8c0b", "st1": "physical_goods", "st2": ["toys"], "st3": ["no_flag"]}
 {"instanceID": "UC4kjDjhexSVuC8JWk4ZanFw_NlKd8Uh0wTg_1e31b42d", "st1": "physical_goods", "st2": ["creator_community", "toys"], "st3": ["misleading_claim", "undisclosed_advertising"]}
 {"instanceID": "UC4kjDjhexSVuC8JWk4ZanFw_oxfLT07dvI4_1d3a8c0b", "st1": "physical_goods", "st2": ["food"], "st3": ["misleading_claim"]}
