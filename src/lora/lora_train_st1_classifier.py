@@ -49,20 +49,42 @@ from lora import CONTEXT_CHOICES, ST1_LABELS, load_split, render_context, setup_
 
 
 class ST1Dataset(Dataset):
-    def __init__(self, instances: list, tokenizer, context: str = "full", max_length: int = 512):
+    def __init__(self, instances: list, tokenizer, context: str = "full", max_length: int = 512,
+                 page_token_budget: int = None):
         self.instances = instances
         self.tokenizer = tokenizer
         self.context = context
         self.max_length = max_length
+        # Only meaningful for --context full: reserves this many tokens (kept from the PAGE
+        # block's START, e.g. product title/category) instead of letting whole-string
+        # truncation decide how much of PAGE survives -- see --page-token-budget's help text
+        # for why plain --truncation-side left still loses the start of long PAGE blocks.
+        self.page_token_budget = page_token_budget
 
     def __len__(self) -> int:
         return len(self.instances)
 
+    def _encode_budgeted(self, text: str) -> tuple:
+        prefix, marker, page = text.partition("\n\nPAGE (")
+        page = marker[2:] + page  # restore "PAGE (" (marker's leading "\n\n" is the prefix/page separator, dropped)
+        page_ids = self.tokenizer(page, add_special_tokens=False, truncation=False)["input_ids"]
+        page_budget = min(self.page_token_budget, self.max_length - 2)
+        page_ids = page_ids[:page_budget]  # keep PAGE's start
+        prefix_budget = max(0, self.max_length - 2 - len(page_ids))
+        prefix_ids = self.tokenizer(prefix, add_special_tokens=False, truncation=False)["input_ids"]
+        prefix_ids = prefix_ids[-prefix_budget:] if prefix_budget else []  # keep prefix's end, closest to PAGE
+        input_ids = [self.tokenizer.cls_token_id] + prefix_ids + page_ids + [self.tokenizer.sep_token_id]
+        return input_ids, [1] * len(input_ids)
+
     def __getitem__(self, idx: int) -> dict:
         inst = self.instances[idx]
         text = render_context(inst, self.context)
-        enc = self.tokenizer(text, truncation=True, max_length=self.max_length)
-        item = {"instanceID": inst["instanceID"], "input_ids": enc["input_ids"], "attention_mask": enc["attention_mask"]}
+        if self.page_token_budget and self.context == "full" and "\n\nPAGE (" in text:
+            input_ids, attention_mask = self._encode_budgeted(text)
+        else:
+            enc = self.tokenizer(text, truncation=True, max_length=self.max_length)
+            input_ids, attention_mask = enc["input_ids"], enc["attention_mask"]
+        item = {"instanceID": inst["instanceID"], "input_ids": input_ids, "attention_mask": attention_mask}
         if inst.get("labels"):
             item["label"] = ST1_LABELS.index(inst["labels"]["st1"])
         return item
@@ -225,6 +247,14 @@ def main():
                      "block entirely for most instances (measured: ~78%% of a 300-instance train "
                      "sample). 'left' keeps the end instead, preserving PAGE content at the cost "
                      "of the tail of a long transcript.")
+    ap.add_argument("--page-token-budget", type=int, default=None, help="only meaningful for "
+                     "--context full: instead of truncating the whole rendered string (which, "
+                     "even with --truncation-side left, still cuts off PAGE's own start for "
+                     "~42%% of instances when PAGE alone exceeds the remaining budget), reserve "
+                     "this many tokens for PAGE specifically (kept from PAGE's start) and give "
+                     "the rest to the transcript+metadata prefix (kept from the prefix's end, "
+                     "closest to PAGE). Overrides --truncation-side for --context full instances "
+                     "that contain a PAGE block; other context modes are unaffected.")
     ap.add_argument("--epochs", type=int, default=5)
     ap.add_argument("--batch-size", type=int, default=16)
     ap.add_argument("--grad-accum-steps", type=int, default=1)
@@ -344,8 +374,8 @@ def main():
 
     tokenizer = AutoTokenizer.from_pretrained(model_path)
     tokenizer.truncation_side = args.truncation_side
-    train_ds = ST1Dataset(train_instances, tokenizer, args.context, args.max_length)
-    dev_ds = ST1Dataset(dev_instances, tokenizer, args.context, args.max_length)
+    train_ds = ST1Dataset(train_instances, tokenizer, args.context, args.max_length, args.page_token_budget)
+    dev_ds = ST1Dataset(dev_instances, tokenizer, args.context, args.max_length, args.page_token_budget)
     collate = Collator(tokenizer)
     train_loader = DataLoader(train_ds, batch_size=args.batch_size, shuffle=True, collate_fn=collate)
     dev_loader = DataLoader(dev_ds, batch_size=args.batch_size, shuffle=False, collate_fn=collate)
@@ -422,7 +452,7 @@ def main():
         test_model = PeftModel.from_pretrained(test_base, best_dir).to(device)
         test_model.eval()
         test_loader = DataLoader(
-            ST1Dataset(test_holdout_instances, tokenizer, args.context, args.max_length),
+            ST1Dataset(test_holdout_instances, tokenizer, args.context, args.max_length, args.page_token_budget),
             batch_size=args.batch_size, shuffle=False, collate_fn=collate,
         )
         test_metrics, test_ids, test_gold, test_pred = evaluate_split(test_model, test_loader, test_holdout_instances, device)

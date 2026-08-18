@@ -1,0 +1,29 @@
+2026-08-18 01:04:49,881 | INFO | MainThread | logging to runs/run_20260818_010449_lora_train_st1_classifier_FacebookAI_roberta-base.log
+2026-08-18 01:04:49,881 | INFO | MainThread | config: {'train': 'public_data_dev/train.jsonl', 'dev': 'public_data_dev/dev.jsonl', 'model': 'FacebookAI/roberta-base', 'local': False, 'context': 'full', 'max_length': 512, 'truncation_side': 'right', 'page_token_budget': 300, 'epochs': 5, 'batch_size': 16, 'grad_accum_steps': 1, 'lr': 0.0002, 'head_lr': None, 'warmup_ratio': 0.06, 'lora_r': 8, 'lora_alpha': 16, 'lora_dropout': 0.1, 'target_modules': 'query,value', 'class_weight': True, 'oversample_rare_st1': 3, 'undersample_majority_st1': 1, 'oversample_first': False, 'sample_size': None, 'test_holdout': 500, 'split_seed': None, 'seed': 42, 'device': None, 'output_dir': 'runs/st1-classifier-roberta-pagebudget300', 'no_wandb': True} device=cuda
+2026-08-18 01:04:50,020 | INFO | MainThread | train/test-holdout split (fresh random split every run unless --split-seed is pinned): split_seed=1110855332 train=1853 test_holdout=500
+2026-08-18 01:04:50,022 | INFO | MainThread | train=1853 dist=digital_content_or_services=842 (45.4%), none=29 (1.6%), other=2 (0.1%), physical_goods=885 (47.8%), physical_services=95 (5.1%)
+2026-08-18 01:04:50,022 | INFO | MainThread | dev=504 dist=digital_content_or_services=248, none=14, other=0, physical_goods=218, physical_services=24
+2026-08-18 01:04:50,023 | INFO | MainThread | oversampled rare st1 labels ['none', 'other'] 3x: train now 1915 instances
+2026-08-18 01:04:50,137 | INFO | MainThread | class_weight: digital_content_or_services=2.274, none=22.011, other=50.000, physical_goods=2.164, physical_services=20.158
+2026-08-18 01:06:03,811 | INFO | MainThread | epoch 1: mean train loss = 1.4585
+2026-08-18 01:06:13,232 | INFO | MainThread | epoch 1 dev metrics: accuracy=0.726, macro_f1=0.416, loss=0.792
+2026-08-18 01:06:13,232 | INFO | MainThread | epoch 1 dev metrics per-label F1: digital_content_or_services=0.746, none=0.196, other=0.000, physical_goods=0.853, physical_services=0.286
+2026-08-18 01:06:13,347 | INFO | MainThread | epoch 1: new best macro_f1=0.416, saved to runs/st1-classifier-roberta-pagebudget300/best
+2026-08-18 01:07:32,268 | INFO | MainThread | epoch 2: mean train loss = 0.7962
+2026-08-18 01:07:41,983 | INFO | MainThread | epoch 2 dev metrics: accuracy=0.823, macro_f1=0.528, loss=0.566
+2026-08-18 01:07:41,983 | INFO | MainThread | epoch 2 dev metrics per-label F1: digital_content_or_services=0.856, none=0.291, other=0.000, physical_goods=0.885, physical_services=0.610
+2026-08-18 01:07:42,095 | INFO | MainThread | epoch 2: new best macro_f1=0.528, saved to runs/st1-classifier-roberta-pagebudget300/best
+2026-08-18 01:09:00,946 | INFO | MainThread | epoch 3: mean train loss = 0.5436
+2026-08-18 01:09:10,617 | INFO | MainThread | epoch 3 dev metrics: accuracy=0.857, macro_f1=0.578, loss=0.451
+2026-08-18 01:09:10,617 | INFO | MainThread | epoch 3 dev metrics per-label F1: digital_content_or_services=0.888, none=0.341, other=0.000, physical_goods=0.880, physical_services=0.783
+2026-08-18 01:09:10,726 | INFO | MainThread | epoch 3: new best macro_f1=0.578, saved to runs/st1-classifier-roberta-pagebudget300/best
+2026-08-18 01:10:29,997 | INFO | MainThread | epoch 4: mean train loss = 0.4324
+2026-08-18 01:10:39,445 | INFO | MainThread | epoch 4 dev metrics: accuracy=0.869, macro_f1=0.568, loss=0.463
+2026-08-18 01:10:39,445 | INFO | MainThread | epoch 4 dev metrics per-label F1: digital_content_or_services=0.888, none=0.242, other=0.000, physical_goods=0.903, physical_services=0.807
+2026-08-18 01:11:58,726 | INFO | MainThread | epoch 5: mean train loss = 0.3686
+2026-08-18 01:12:08,139 | INFO | MainThread | epoch 5 dev metrics: accuracy=0.871, macro_f1=0.552, loss=0.419
+2026-08-18 01:12:08,139 | INFO | MainThread | epoch 5 dev metrics per-label F1: digital_content_or_services=0.892, none=0.154, other=0.000, physical_goods=0.897, physical_services=0.815
+2026-08-18 01:12:08,255 | INFO | MainThread | saved final epoch adapter to runs/st1-classifier-roberta-pagebudget300/last (best dev macro_f1=0.578)
+2026-08-18 01:12:08,255 | INFO | MainThread | reloading best-dev checkpoint from runs/st1-classifier-roberta-pagebudget300/best for the test-holdout pass (generalization check, not used for model selection)
+2026-08-18 01:12:17,526 | INFO | MainThread | test holdout metrics: accuracy=0.854, macro_f1=0.560, loss=0.417
+2026-08-18 01:12:17,526 | INFO | MainThread | test holdout metrics per-label F1: digital_content_or_services=0.855, none=0.300, other=0.000, physical_goods=0.886, physical_services=0.760

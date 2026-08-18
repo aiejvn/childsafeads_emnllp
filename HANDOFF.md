@@ -34,13 +34,30 @@ Test macro_f1 (0.546, 0.538) lands roughly in/near the historical baseline test 
 cleaner/less noisy signal per `feedback_rotating_test_holdout.md`. **New standing config**:
 `--model FacebookAI/roberta-base --context full --max-length 512 --truncation-side left
 --lora-r 8 --lora-alpha 16 --target-modules query,value --class-weight --oversample-rare-st1 3`.
-Logged to `runs/results_st1_classifiers.csv` (3 rows), commit pending.
+Logged to `runs/results_st1_classifiers.csv`, committed (`937c5ae`).
 
-**Next natural follow-up**: none of this session's other hyperparameter sweeps (capacity,
-head-lr, oversample factor, undersample-majority) were tried ON TOP of `--truncation-side left`
-— they were all run under the old (truncated) baseline. Worth re-checking whether any of those
-previously-discarded levers behave differently now that the model can actually see the page
-content, before assuming they're still closed questions.
+**Follow-up 1 (closed): re-tested capacity + oversample factor on top of `--truncation-side
+left`.** Neither previously-discarded lever changes verdict once the model can see the page:
+capacity bump (`--lora-r 16 --lora-alpha 32`) still underperforms r8/a16 (dev=0.630/test=0.516,
+test none_f1=0.000 — a collapse) and `--oversample-rare-st1 2` still doesn't beat the standing
+`3` (dev=0.612/test=0.541, test none_f1=0.182 vs `3`'s 0.222-0.316). Both discarded again —
+confirms the inverted-U capacity finding and the oversample-factor-doesn't-matter finding are
+independent of the truncation fix, not artifacts of it.
+
+**Follow-up 2 (closed, negative result): token-budgeted context split does NOT beat plain
+left-truncation.** Diagnostic found that even `--truncation-side left` still loses PAGE's own
+START (product title/category) for 42%% of instances, when the PAGE block alone exceeds the
+remaining ~510-token budget. Built `--page-token-budget N` (reserves N tokens for PAGE
+specifically, kept from PAGE's start; gives the rest to the transcript+metadata prefix, kept
+from the prefix's end) — verified correct via a standalone decode check before running. Tried
+N=300 (dev=0.578/test=0.560) and N=400 (dev=0.616/test=0.558): both land BELOW the plain
+left-truncation baseline's dev range (0.622-0.645, the cleaner/more trustworthy signal) despite
+a marginal test-side edge that's within this task's established noise band. Likely cause: the
+fixed split forces prefix truncation on every instance regardless of need, while plain
+whole-string left-truncation only truncates when an instance actually exceeds 512 tokens (many
+don't). **Standing config is confirmed as plain `--truncation-side left`, no
+`--page-token-budget`** — the flag exists in the script (harmless, opt-in, default `None`) but
+isn't recommended. This closes out the truncation investigation thread.
 
 Prior state (superseded by the above): the hyperparameter sweep on the roberta-base 5-way st1 classifier
 (Track 2, HANDOFF next-candidates item #2) ran and finished 2026-08-17 ~21:20-21:28 — both
