@@ -1,0 +1,7 @@
+2026-08-18 15:16:27,659 | INFO | MainThread | logging to runs/run_20260818_151627_lora_predict_generative_Qwen_Qwen3-4B.log
+2026-08-18 15:16:27,660 | INFO | MainThread | loading model/tokenizer from local path models/Qwen/Qwen3-4B (no remote download)
+2026-08-18 15:16:51,957 | INFO | MainThread | system prompt: lean (1698 chars) + dialog flow from emnllp-dialog-flow-dialog-flow.json (5685 chars)
+2026-08-18 15:19:45,577 | INFO | MainThread | generate_predictions: input length (tokens, unpadded) -- min=1913 mean=2999 max=4000 n=503
+2026-08-18 15:19:45,585 | INFO | MainThread | wrote 503 predictions to runs/submission-8-18-qwen-improve-lr1e-4-dropout0.2.jsonl
+2026-08-18 15:19:45,588 | INFO | MainThread | copied predictions to submission_lora_generative.jsonl (canonical submission file)
+2026-08-18 15:19:45,588 | INFO | MainThread | target has no gold labels -- skipping evaluation

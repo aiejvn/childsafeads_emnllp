@@ -11,6 +11,7 @@ falling back to a safe default, the same way baseline_gpt.py does on API errors.
 """
 import os
 import re
+from collections import Counter
 from typing import List, Literal
 
 import torch
@@ -87,7 +88,8 @@ def _to_device(batch: dict, device: str) -> dict:
 
 @torch.no_grad()
 def generate_predictions(model, loader, tokenizer, max_new_tokens: int, st3_only: bool = False,
-                         st12_only: bool = False, st1_only: bool = False, log=None) -> tuple:
+                         st12_only: bool = False, st1_only: bool = False, log=None,
+                         force_sample: bool = False, temperature: float = 0.7) -> tuple:
     """Batched freeform generation over `loader`. Requires `loader`'s collator to have
     left-padded input_ids/attention_mask (set tokenizer.padding_side = "left" before building
     it) so every sequence's prompt ends at the same position and `out[:, prompt_len:]` is
@@ -99,6 +101,14 @@ def generate_predictions(model, loader, tokenizer, max_new_tokens: int, st3_only
     up to MAX_ATTEMPTS times; anything still unparseable after that falls back to a default
     prediction rather than retrying forever. Returns (instanceIDs, predictions), both in
     loader-iteration order.
+
+    `force_sample` (default False, the original behavior: greedy on the first attempt, only
+    sampled on parse-failure retries) makes every attempt -- including the first -- sample at
+    `temperature` instead of decoding greedily. Set it when the caller wants K independently
+    varied completions per instance (self-consistency voting -- see
+    lora_predict_generative_selfconsistent.py/lora_calibrate_thresholds_generative.py): calling
+    this function K times with force_sample=False would return the identical greedy completion
+    all K times, since only the (rare) parse-failure retry path ever samples.
 
     Batches are moved to `model.device` rather than a caller-supplied device string, since
     that's correct whether the model sits on one GPU or is dispatched across several via
@@ -125,8 +135,8 @@ def generate_predictions(model, loader, tokenizer, max_new_tokens: int, st3_only
                 input_ids=batch["input_ids"][rows],
                 attention_mask=batch["attention_mask"][rows],
                 max_new_tokens=max_new_tokens,
-                do_sample=attempt > 0,  # first try greedy; retries sample so they can differ
-                temperature=0.7 if attempt > 0 else None,
+                do_sample=force_sample or attempt > 0,  # first try greedy; retries sample so they can differ
+                temperature=temperature if (force_sample or attempt > 0) else None,
                 pad_token_id=tokenizer.pad_token_id,
             )
             still_pending = []
@@ -150,3 +160,63 @@ def generate_predictions(model, loader, tokenizer, max_new_tokens: int, st3_only
         log.info(f"generate_predictions: input length (tokens, unpadded) -- "
                  f"min={min(seq_lens)} mean={sum(seq_lens) / len(seq_lens):.0f} max={max(seq_lens)} n={len(seq_lens)}")
     return ids, preds
+
+
+@torch.no_grad()
+def self_consistency_probs(model, loader, tokenizer, max_new_tokens: int, k: int, temperature: float = 0.7,
+                           st3_only: bool = False, st12_only: bool = False, st1_only: bool = False,
+                           log=None) -> tuple:
+    """Runs `generate_predictions(..., force_sample=True)` k times over `loader` and
+    aggregates per-instance/per-label vote frequencies -- the self-consistency signal both
+    lora_predict_generative_selfconsistent.py (majority-vote decode) and
+    lora_calibrate_thresholds_generative.py (frequency as a pseudo-probability, fed into
+    common/predict_utils.tune_per_label_thresholds) build on, so the k-sample loop only
+    lives in one place. Returns (ids, st1_votes, st2_freq, st3_freq):
+      - ids: instanceIDs, loader-iteration order (matches st1_votes/st2_freq/st3_freq's order)
+      - st1_votes: list[Counter], one per instance, tallying its k sampled st1 labels
+      - st2_freq / st3_freq: torch.Tensor [n_instances, n_labels], each entry the fraction of
+        the k samples (in [0, 1]) that included that label -- same shape/range as the encoder
+        pipeline's sigmoid outputs (predict_utils.run_inference), so it's a drop-in input to
+        tune_per_label_thresholds/decode without either of those needing to know it came from
+        vote-counting rather than a classification head.
+
+    Runs k full passes over the whole of `loader` -- callers that only want to spend this cost
+    on a subset of instances (e.g. ones a cheap prior greedy pass flagged as touching a fragile
+    label) should build `loader` over just that subset rather than filtering after the fact.
+    `loader` must not shuffle -- instance order must be identical across the k passes for the
+    per-index aggregation below to line up."""
+    ids_ref = None
+    st1_lists, st2_lists, st3_lists = None, None, None
+    for sample_idx in range(k):
+        ids, preds = generate_predictions(
+            model, loader, tokenizer, max_new_tokens, st3_only=st3_only, st12_only=st12_only,
+            st1_only=st1_only, log=(log if sample_idx == 0 else None), force_sample=True, temperature=temperature,
+        )
+        if ids_ref is None:
+            ids_ref = ids
+            st1_lists = [[] for _ in ids]
+            st2_lists = [[] for _ in ids]
+            st3_lists = [[] for _ in ids]
+        elif ids != ids_ref:
+            raise RuntimeError("loader yielded a different instance order across self-consistency "
+                                "samples -- build it with shuffle=False")
+        for i, pred in enumerate(preds):
+            st1_lists[i].append(pred["st1"])
+            st2_lists[i].append(pred["st2"])
+            st3_lists[i].append(pred["st3"])
+
+    st1_votes = [Counter(labels) for labels in st1_lists]
+    st2_freq = torch.zeros(len(ids_ref), len(ST2_LABELS))
+    st3_freq = torch.zeros(len(ids_ref), len(ST3_LABELS))
+    for i in range(len(ids_ref)):
+        # st2_lists[i]/st3_lists[i] are lists of k per-sample label *lists* (multi-label),
+        # not k single labels -- flatten one level before counting per-label frequency.
+        for sample_labels in st2_lists[i]:
+            for label in sample_labels:
+                st2_freq[i, ST2_LABELS.index(label)] += 1
+        for sample_labels in st3_lists[i]:
+            for label in sample_labels:
+                st3_freq[i, ST3_LABELS.index(label)] += 1
+    st2_freq /= k
+    st3_freq /= k
+    return ids_ref, st1_votes, st2_freq, st3_freq

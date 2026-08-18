@@ -1,0 +1,14 @@
+2026-08-18 15:14:40,183 | INFO | MainThread | logging to runs/run_20260818_151440_lora_predict_generative_Qwen_Qwen3-4B.log
+2026-08-18 15:14:40,183 | INFO | MainThread | loading model/tokenizer from local path models/Qwen/Qwen3-4B (no remote download)
+2026-08-18 15:14:40,783 | INFO | MainThread | logging to runs/run_20260818_151440_lora_predict_generative_Qwen_Qwen3-4B.log
+2026-08-18 15:14:40,783 | INFO | MainThread | loading model/tokenizer from local path models/Qwen/Qwen3-4B (no remote download)
+2026-08-18 15:14:45,246 | INFO | MainThread | system prompt: lean (1698 chars) + dialog flow from emnllp-dialog-flow-dialog-flow.json (5685 chars)
+2026-08-18 15:14:45,661 | INFO | MainThread | system prompt: lean (1698 chars) + dialog flow from emnllp-dialog-flow-dialog-flow.json (5685 chars)
+2026-08-18 15:17:43,839 | INFO | MainThread | generate_predictions: input length (tokens, unpadded) -- min=1913 mean=2999 max=4000 n=503
+2026-08-18 15:17:43,852 | INFO | MainThread | wrote 503 predictions to runs/submission-8-18-qwen-improve-combined.jsonl
+2026-08-18 15:17:43,854 | INFO | MainThread | copied predictions to submission_lora_generative.jsonl (canonical submission file)
+2026-08-18 15:17:43,854 | INFO | MainThread | target has no gold labels -- skipping evaluation
+2026-08-18 15:17:44,067 | INFO | MainThread | generate_predictions: input length (tokens, unpadded) -- min=1913 mean=2999 max=4000 n=503
+2026-08-18 15:17:44,071 | INFO | MainThread | wrote 503 predictions to runs/submission-8-18-qwen-improve-st3weight2-oversample3.jsonl
+2026-08-18 15:17:44,073 | INFO | MainThread | copied predictions to submission_lora_generative.jsonl (canonical submission file)
+2026-08-18 15:17:44,073 | INFO | MainThread | target has no gold labels -- skipping evaluation
