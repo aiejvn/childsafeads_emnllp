@@ -1,0 +1,6 @@
+2026-08-18 18:57:08,931 | INFO | MainThread | logging to runs/run_20260818_185708_combine_submissions_hybrid.log
+2026-08-18 18:57:08,931 | INFO | MainThread | sources: st1<-/home/k6/Github/childsafeads_emnllp/slurm_logs/8-17-runs/8-18-submissions/submission_hybrid.jsonl  st2<-/home/k6/Github/childsafeads_emnllp/slurm_logs/8-17-runs/8-18-submissions/submission-8-18-qwen-improve-selfconsistent-test.jsonl  st3<-/home/k6/Github/childsafeads_emnllp/slurm_logs/8-17-runs/8-18-submissions/submission_hybrid.jsonl
+2026-08-18 18:57:08,933 | INFO | MainThread | loaded 503 predictions from /home/k6/Github/childsafeads_emnllp/slurm_logs/8-17-runs/8-18-submissions/submission-8-18-qwen-improve-selfconsistent-test.jsonl
+2026-08-18 18:57:08,937 | INFO | MainThread | loaded 503 predictions from /home/k6/Github/childsafeads_emnllp/slurm_logs/8-17-runs/8-18-submissions/submission_hybrid.jsonl
+2026-08-18 18:57:08,961 | INFO | MainThread | wrote 503 merged predictions to runs/nice_submission.jsonl
+2026-08-18 18:57:08,999 | INFO | MainThread | target has no gold labels (or only partial coverage) -- skipping evaluation

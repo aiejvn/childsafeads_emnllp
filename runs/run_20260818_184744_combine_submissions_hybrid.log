@@ -1,0 +1,6 @@
+2026-08-18 18:47:44,735 | INFO | MainThread | logging to runs/run_20260818_184744_combine_submissions_hybrid.log
+2026-08-18 18:47:44,736 | INFO | MainThread | sources: st1<-runs/submission_hybrid.jsonl  st2<-slurm_logs/8-17-runs/submission-8-18-qwen-improve-selfconsistent-test.jsonl  st3<-runs/submission_hybrid.jsonl
+2026-08-18 18:47:44,738 | INFO | MainThread | loaded 503 predictions from slurm_logs/8-17-runs/submission-8-18-qwen-improve-selfconsistent-test.jsonl
+2026-08-18 18:47:44,740 | INFO | MainThread | loaded 503 predictions from runs/submission_hybrid.jsonl
+2026-08-18 18:47:44,770 | INFO | MainThread | wrote 503 merged predictions to runs/submission_hybrid.jsonl
+2026-08-18 18:47:44,808 | INFO | MainThread | target has no gold labels (or only partial coverage) -- skipping evaluation
